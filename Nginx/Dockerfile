@@ -1,4 +1,4 @@
-FROM nginx:1.27.4-alpine-slim@sha256:b05aceb5ec1844435cae920267ff9949887df5b88f70e11d8b2871651a596612
+FROM nginx:1.27.5-alpine-slim@sha256:b947b2630c97622793113555e13332eec85bdc7a0ac6ab697159af78942bb856
 
 RUN apk update && \
     apk upgrade && \
@@ -6,7 +6,7 @@ RUN apk update && \
 
 RUN mkdir -p /etc/nginx/ssl
 
-RUN openssl req -x509 -nodes -out /etc/nginx/ssl/transcendence.pem -keyout /etc/nginx/ssl/transcendence.key \
-    -subj "/C=FR/ST=Alpes-Maritimes/L=Nice/O=Ecole\ 42/OU=Ecole/CN=transcendence.fr/emailAddress=lkukahle@student.42nice.fr"
+RUN openssl req -x509 -nodes -out /etc/nginx/ssl/shmooz.pem -keyout /etc/nginx/ssl/shmooz.key \
+    -subj "/C=FR/ST=Alpes-Maritimes/L=Nice/O=Ecole\ 42/OU=Ecole/CN=shmooz.fr/emailAddress=lkukahle@student.42nice.fr"
 
 COPY shmooz.conf /etc/nginx/conf.d/default.conf

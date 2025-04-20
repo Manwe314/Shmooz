@@ -6,7 +6,7 @@ RUN apk update && \
     apk add --no-cache netcat-openbsd && \
     rm -rf /var/cache/apk/*
 
-COPY . .
+#COPY . .
 
 RUN chmod +X entrypoint.sh
 
