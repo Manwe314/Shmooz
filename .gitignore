@@ -1,0 +1,6 @@
+.vsconfig
+.DS_Store
+__pycache__
+__pycache__/
+*.pyc
+dump.rdb

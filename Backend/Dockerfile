@@ -1,6 +1,7 @@
 FROM python:3.13-alpine-slim@sha256:18159b2be11db91f84b8f8f655cd860f805dbd9e49a583ddaac8ab39bf4fe1a7
 
 WORKDIR /app
+COPY ./entrypoint.sh .
 
 RUN apk update && \
     apk add --no-cache netcat-openbsd && \
@@ -12,4 +13,4 @@ RUN chmod +x /app/entrypoint.sh
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD [ "/app/entrypoint.sh" ]
+CMD ["/app/entrypoint.sh"]
