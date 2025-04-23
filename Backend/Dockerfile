@@ -6,9 +6,9 @@ RUN apk update && \
     apk add --no-cache netcat-openbsd && \
     rm -rf /var/cache/apk/*
 
-#COPY . .
+COPY . .
 
-RUN chmod +X entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 RUN pip install --no-cache-dir -r requirements.txt
 

@@ -1,5 +1,16 @@
 services:
-  #frontend:
+  frontend:
+    build:
+      context: ./Frontend
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    expose:
+      - "4000"
+    networks:
+      - app-network
   
   backend:
     build:
@@ -28,7 +39,7 @@ services:
 
   nginx:
     build:
-      context: ./nginx
+      context: ./Nginx
     ports:
       - "443:443"
     depends_on:
