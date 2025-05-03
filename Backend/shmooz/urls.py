@@ -21,9 +21,12 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from administration.views import AdminApiView
+from portfolio.views import GradientColorView
 
 urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/auth/', AdminApiView.as_view(), name='Admin_actions')
+    path('api/auth/', AdminApiView.as_view(), name='Admin_actions'),
+    path('api/gradient-colors/', GradientColorView.as_view(), name='Gradient_color_root'),
+    path('api/gradient-colors/<str:slug>/', GradientColorView.as_view(), name='Gradient_color_sluged'),
 ]
