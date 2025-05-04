@@ -9,6 +9,7 @@ class GradientColorView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, slug=None):
+        print(f"the slug: {slug}", flush=True)
         if slug == 'kuxi':
             return Response({
                 "color1":"D81B1E",
