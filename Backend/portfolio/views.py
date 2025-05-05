@@ -1,7 +1,11 @@
 from django.shortcuts import render
+from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny 
+from .models import Deck
+from administration.serializers import DeckSerializer
+
 # Create your views here.
 
 
@@ -28,3 +32,14 @@ class GradientColorView(APIView):
                 "color3": "050319",
                 "position3": "71",
             })
+
+
+class DeckListView(ListAPIView):
+    serializer_class = DeckSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        if slug:
+            return Deck.objects.filter(owner_slug=slug)
+        return Deck.objects.all()

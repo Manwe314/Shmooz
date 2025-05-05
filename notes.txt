@@ -1,0 +1,17 @@
+For Production:
+    serve media files with nginx.
+
+
+For Admin panel:
+    
+    Background Gradient:
+        3 Colors  hex code
+        3 Positions 0-100
+    
+    Deck component:
+        title text
+        display_text text
+        owner slug_text
+        image .png /.jpg
+        projects [project component(s)]
+    

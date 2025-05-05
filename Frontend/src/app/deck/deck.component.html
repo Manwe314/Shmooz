@@ -1,0 +1,14 @@
+<div
+  class="deck-container"
+  (click)="handleClick()"
+  (mouseenter)="hovered = true"
+  (mouseleave)="hovered = false"
+>
+  <div
+    class="card"
+    *ngFor="let card of cards; let i = index"
+    [ngStyle]="getCardStyle(i)"
+  >
+    <img [src]="card.imageUrl" alt="Card" />
+  </div>
+</div>

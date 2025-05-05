@@ -7,6 +7,7 @@ done
 echo "PostgreSQL is up and running."
 
 echo "Running migrations..."
+python manage.py makemigrations
 python manage.py migrate
 
 echo "Checking for admin user..."
