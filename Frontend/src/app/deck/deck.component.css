@@ -2,6 +2,7 @@
   width: 192px;
   height: 269px;
   position: relative;
+  justify-content: center;
   cursor: pointer;
   transition: transform 0.2s ease;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -23,44 +24,15 @@
   transition: transform 0.3s ease, filter 0.3s ease;
   will-change: transform, filter;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 30px solid red;
-}
-
-.card-layer-5 {
-  z-index: 10;
-  background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('{{ imageUrl }}');
-  transform: translateX(-15px) translateY(-10px) rotate(-5deg);
-  filter: brightness(0.7);
-}
-
-.card-layer-4 {
-  z-index: 20;
-  background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('{{ imageUrl }}');
-  transform: translateX(-4px) rotate(-2deg);
-  filter: brightness(0.75);
-}
-
-.card-layer-3 {
-  z-index: 30;
-  background-image: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url('{{ imageUrl }}');
-  transform: translateX(17px) translateY(18px) rotate(8deg);
-  filter: brightness(0.8);
-}
-
-/* Middle card */
-.card-layer-2 {
-  z-index: 40;
-  background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('{{ imageUrl }}');
-  transform: translateX(9px) translateY(14px) rotate(5deg);
-  filter: brightness(0.85);
 }
 
 /* Top card (with actual image tag inside) */
-.card-layer-1 {
+.card-on-top {
   z-index: 50;
+  transform: rotate(90deg);
 }
 
-.card-layer-1 img {
+.card-on-top img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -68,6 +40,7 @@
 }
 
 .deck-label {
+  transform: translate(0%, -800%) rotate(-90deg);
   position: absolute;
   bottom: 8px;
   left: 12px;

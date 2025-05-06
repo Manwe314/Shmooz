@@ -1,8 +1,9 @@
 <div class="deck-wheel-container">
+  @for (deck of decks; track $index) {
     <app-deck
-      *ngFor="let deck of decks"
-      [displayName]="deck.displayed_name"
-      [imageUrl]="getImageUrl(deck.image)"
-      [title]="deck.title"
+    [displayName]="deck.displayed_name"
+    [imageUrl]="getImageUrl(deck.image_url)"
+    [title]="deck.title"
     ></app-deck>
+  }
   </div>

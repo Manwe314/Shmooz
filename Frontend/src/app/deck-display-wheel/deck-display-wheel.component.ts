@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { DeckService, Deck } from '../services/deck.service';
 import { SlugService } from '../services/slug.service';
 import { DeckComponent } from '../deck/deck.component';
-import { NgFor } from '@angular/common';
 import { filter, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-deck-display-wheel',
-  imports: [NgFor , DeckComponent],
+  imports: [DeckComponent],
   templateUrl: './deck-display-wheel.component.html',
   styleUrl: './deck-display-wheel.component.css'
 })

@@ -1,20 +1,8 @@
-<div
-  class="deck-container"
-  (click)="handleClick()"
-  (mouseenter)="hovered = true"
-  (mouseleave)="hovered = false"
->
-  <div class="card card-layer-5"></div>
-
-  <div class="card card-layer-4"></div>
-
-  <div class="card card-layer-3"></div>
-
-  <div class="card card-layer-2"></div>
-
-  <div class="card card-layer-1">
-
-
+<div class="deck-container" (click)="handleClick()" (mouseenter)="hovered = true" (mouseleave)="hovered = false">
+  @for (i of cards; track i) {
+    <div class="card" [ngStyle]="getDeckCardsStyle(i)"></div>
+  }
+  <div class="card card-on-top">
     <img [src]="imageUrl" alt="Card Image" />
     <div class="deck-label">{{ displayName }}</div>
   </div>

@@ -26,7 +26,7 @@ class ImageUploadView(APIView):
         if serializer.is_valid():
             image_instance = serializer.save(commit=False)
 
-            image_instance.upload_slug = slug or 'default'
+            image_instance.upload_slug = slug or 'COMPANY'
 
             image_instance.save()
             return Response({"status": "success", "data": ImageUploadSerializer(image_instance).data}, status=201)

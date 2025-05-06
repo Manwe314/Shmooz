@@ -4,7 +4,7 @@ from django.db import models
 # Create your models here.
 
 def upload_dynamicly(instance, filename):
-    slug = getattr(instance, 'upload_slug', 'default')
+    slug = getattr(instance, 'upload_slug', 'COMPANY')
     return f'uploads/{slug}/{filename}'
 
 class ImageUpload(models.Model):

@@ -15,6 +15,7 @@
   animation: pulseGradient 10s ease-in-out infinite, shiftCentre 8s ease-in-out infinite;
   z-index: -1;
   transition: background 1s ease-in-out;
+  pointer-events: none;
 }
 
 @keyframes pulseGradient {

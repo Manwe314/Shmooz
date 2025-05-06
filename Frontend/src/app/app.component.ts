@@ -1,13 +1,11 @@
 import { filter } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { SlugService } from './services/slug.service';
-import { LandingBackgroundComponent } from './landing-background/landing-background.component';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { DeckDisplayWheelComponent } from './deck-display-wheel/deck-display-wheel.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, LandingBackgroundComponent, DeckDisplayWheelComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
