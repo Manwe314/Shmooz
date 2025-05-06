@@ -2,6 +2,7 @@ import { filter } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { SlugService } from './services/slug.service';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { LoginComponent } from "./admin/login/login.component";
 
 @Component({
   selector: 'app-root',
