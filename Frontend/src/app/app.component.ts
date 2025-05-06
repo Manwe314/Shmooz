@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { SlugService } from './services/slug.service';
 import { LandingBackgroundComponent } from './landing-background/landing-background.component';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { LoginComponent } from "./admin/login/login.component";
 
 @Component({
   selector: 'app-root',

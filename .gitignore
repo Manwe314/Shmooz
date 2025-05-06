@@ -6,3 +6,4 @@ migrations
 Volume/
 *.pyc
 dump.rdb
+/Volume
