@@ -37,11 +37,8 @@ class DeckCreateView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, slug=None):
-        data = request.data.copy()
-        if slug:
-            data['slug'] = slug
-
-        serializer = DeckSerializer(data=data)
+        
+        serializer = DeckSerializer(data=request.data, context={"request": request, "slug": slug})
         if serializer.is_valid():
             deck = serializer.save()
             return Response(DeckSerializer(deck).data, status=201)

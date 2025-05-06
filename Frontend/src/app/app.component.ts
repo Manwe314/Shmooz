@@ -3,11 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { SlugService } from './services/slug.service';
 import { LandingBackgroundComponent } from './landing-background/landing-background.component';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { DeckComponent } from './deck/deck.component';
+import { DeckDisplayWheelComponent } from './deck-display-wheel/deck-display-wheel.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, LandingBackgroundComponent, DeckComponent],
+  imports: [RouterOutlet, LandingBackgroundComponent, DeckDisplayWheelComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

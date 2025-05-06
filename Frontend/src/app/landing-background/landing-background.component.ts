@@ -23,7 +23,7 @@ export class LandingBackgroundComponent implements OnInit{
   ngOnInit() {
     this.slugService.slug$
     .pipe(
-      filter(slug => slug !== null), // ✅ skip only null, allow empty string ''
+      filter(slug => slug !== null), 
       switchMap(slug => this.colorService.getGradientColors(slug!))
     )
     .subscribe(colors => {

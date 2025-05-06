@@ -1,0 +1,7 @@
+.deck-wheel-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 32px;
+    overflow-x: auto;
+    padding: 20px;
+}

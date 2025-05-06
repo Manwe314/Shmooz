@@ -1,0 +1,8 @@
+<div class="deck-wheel-container">
+    <app-deck
+      *ngFor="let deck of decks"
+      [displayName]="deck.displayed_name"
+      [imageUrl]="getImageUrl(deck.image)"
+      [title]="deck.title"
+    ></app-deck>
+  </div>

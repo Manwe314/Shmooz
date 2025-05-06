@@ -41,5 +41,5 @@ class DeckListView(ListAPIView):
     def get_queryset(self):
         slug = self.kwargs.get('slug')
         if slug:
-            return Deck.objects.filter(owner_slug=slug)
+            return Deck.objects.filter(owner=slug)
         return Deck.objects.all()

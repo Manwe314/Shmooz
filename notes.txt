@@ -15,3 +15,13 @@ For Admin panel:
         image .png /.jpg
         projects [project component(s)]
     
+
+
+
+to-do:
+    chnage "COMPANY" (default search) with actaul default target
+
+for tomorrow:
+    image_url has /None/ after /uploads/
+    src[img] = has image id as $path instead of /media/...
+    deck component boarder still invisable.

@@ -9,16 +9,16 @@ class ImageUploadSerializer(serializers.ModelSerializer):
 
 class DeckSerializer(serializers.ModelSerializer):
     image_file = serializers.ImageField(write_only=True, required=True)
-    slug = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Deck
-        fields = ['id', 'title', 'displayed_name', 'owner', 'image', 'image_file', 'created_at']
+        fields = ['id', 'title', 'displayed_name', 'owner', 'image', 'image_file', 'image_url', 'created_at']
         read_only_fields = ['id', 'image', 'created_at']
 
     def create(self, validated_data):
         image_file = validated_data.pop('image_file')
-        slug = validated_data.pop('slug', 'default')
+        slug = self.context.get('slug', 'default')
 
         image = ImageUpload(
             title=validated_data['title'],
@@ -29,3 +29,8 @@ class DeckSerializer(serializers.ModelSerializer):
 
         deck = Deck.objects.create(image=image, **validated_data)
         return deck
+
+    def get_image_url(self, obj):
+        if obj.image and obj.image.image:
+            return obj.image.image.url
+        return None
