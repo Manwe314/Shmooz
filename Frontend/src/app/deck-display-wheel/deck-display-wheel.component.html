@@ -16,6 +16,7 @@
           [displayName]="deck.displayed_name"
           [imageUrl]="getImageUrl(deck.image_url)"
           [title]="deck.title"
+          (deckSelected)="onDeckClicked(deck.title)"
         />
       }
     </div>

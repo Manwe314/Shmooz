@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, signal, effect, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, signal, effect, OnInit, Output, EventEmitter } from '@angular/core';
 import { DeckService, Deck } from '../services/deck.service';
 import { SlugService } from '../services/slug.service';
 import { DeckComponent } from '../deck/deck.component';
@@ -29,6 +29,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
 
   @ViewChild('deckContainer', { static: true }) deckContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('deckMaskRef') deckMaskRef!: ElementRef<HTMLDivElement>;
+  @Output() deckSelected = new EventEmitter<string>();
 
   ngAfterViewInit() {
     this.slugService.slug$
@@ -98,6 +99,10 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
     this.actualGap = Math.round(leftoverSpace / gaps);
 
     this.currentPage = 0;
+  }
+  
+  onDeckClicked(title: string) {
+    this.deckSelected.emit(title);
   }
 
   getImageUrl(path: string): string {
