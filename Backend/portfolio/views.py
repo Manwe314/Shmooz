@@ -3,9 +3,9 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny 
-from .models import Deck
-from administration.serializers import DeckSerializer
-
+from .models import Deck, ProjectCard
+from administration.serializers import DeckSerializer, ProjectCardSerializer
+import sys
 # Create your views here.
 
 
@@ -43,3 +43,23 @@ class DeckListView(ListAPIView):
         if slug:
             return Deck.objects.filter(owner=slug)
         return Deck.objects.all()
+
+
+
+class ProjectCardListView(ListAPIView):
+    serializer_class = ProjectCardSerializer
+    permission_classes = [AllowAny]
+
+    def dispatch(self, request, *args, **kwargs):
+        print("🚀 dispatch() was hit!", file=sys.stdout, flush=True)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        owner = self.kwargs.get('slug', 'COMPANY')
+        deck_title = self.request.headers.get('X-deck-title')
+        print(f"{owner} wants {deck_title} decks cards!", file=sys.stdout, flush=True)
+        if owner and deck_title:
+            print(ProjectCard.objects.filter(owner=owner, deck_title=deck_title), file=sys.stdout, flush=True)
+            return ProjectCard.objects.filter(owner=owner, deck_title=deck_title)
+        print('whoops cant fint what you want', flush=True)
+        return ProjectCard.objects.none()  

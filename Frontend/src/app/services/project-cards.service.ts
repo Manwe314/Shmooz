@@ -8,10 +8,10 @@ export interface ProjectCard {
   title: string;
   text: string;
   text_color: string;
-  labelLetter: string;
+  label_letter: string;
   label_color: string;
   inline_color: string;
-  backgroundImage: string;
+  image_url: string;
   owner: string;
   deckTitle: string;
 }
@@ -29,11 +29,12 @@ export class ProjectCardsService {
       return of(this.cache.get(cacheKey)!);
     }
 
-    const url = path ?  `http://backend:8000/api/project-cards/${path}` : `http://backend:8000/api/project-cards/` ;
+    const url = path ?  `http://backend:8000/api/projects/${path}` : `http://backend:8000/api/projects/` ;
     const headers = new HttpHeaders({
-      'deck-title': deckTitle // use consistent casing with backend
+      'X-deck-title': deckTitle
     });
 
+    console.log('url im hitting: ', url);
     return this.http.get<ProjectCard[]>(url, { headers }).pipe(
       tap(cards => this.cache.set(cacheKey, cards))
     );
