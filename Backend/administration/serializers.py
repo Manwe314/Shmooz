@@ -41,7 +41,7 @@ class ProjectCardSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
 
     class Meta:
-        model = Deck
+        model = ProjectCard
         fields = ['id', 'title', 'text', 'text_color', 'label_letter', 'label_color', 'inline_color', 'deckTitle', 'owner', 'image', 'image_file', 'image_url', 'created_at']
         read_only_fields = ['id', 'image', 'created_at']
 

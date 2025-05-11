@@ -8,6 +8,8 @@ import { ProjectCardsService } from '../services/project-cards.service';
 import { ProjectCard } from '../services/project-cards.service';
 import { filter, switchMap } from 'rxjs';
 
+
+
 @Component({
   selector: 'app-landing-page',
   imports: [CommonModule, DeckDisplayWheelComponent, LandingBackgroundComponent, HandComponent],
@@ -28,10 +30,19 @@ export class LandingPageComponent {
       filter(slug => slug !== null),
       switchMap(slug => this.projectCardService.getCardsForDeck(slug!, deckTitle))
     )
-    .subscribe(cards => {
-      this.cards.set(cards);
-      console.log('Project cards to show: ', cards);
+    .subscribe({
+      next: (cards) => {
+        this.cards.set(cards);
+      },
+      error: (err: { status: any; message: any; error: any; url: any }) => {
+        console.error("🔥 ERROR fetching cards");
+        console.error("Status:", err.status);
+        console.error("Message:", err.message);
+        console.error("Error:", err.error);
+        console.error("URL:", err.url);
+      }
     });
+  
   }
 
 }

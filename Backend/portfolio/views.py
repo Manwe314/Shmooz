@@ -50,16 +50,10 @@ class ProjectCardListView(ListAPIView):
     serializer_class = ProjectCardSerializer
     permission_classes = [AllowAny]
 
-    def dispatch(self, request, *args, **kwargs):
-        print("🚀 dispatch() was hit!", file=sys.stdout, flush=True)
-        return super().dispatch(request, *args, **kwargs)
-
     def get_queryset(self):
         owner = self.kwargs.get('slug', 'COMPANY')
         deck_title = self.request.headers.get('X-deck-title')
-        print(f"{owner} wants {deck_title} decks cards!", file=sys.stdout, flush=True)
+
         if owner and deck_title:
-            print(ProjectCard.objects.filter(owner=owner, deck_title=deck_title), file=sys.stdout, flush=True)
-            return ProjectCard.objects.filter(owner=owner, deck_title=deck_title)
-        print('whoops cant fint what you want', flush=True)
+            return ProjectCard.objects.filter(owner=owner, deckTitle=deck_title)
         return ProjectCard.objects.none()  

@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
+
+
 export interface ProjectCard {
   id: string;
   title: string;
@@ -29,12 +31,13 @@ export class ProjectCardsService {
       return of(this.cache.get(cacheKey)!);
     }
 
-    const url = path ?  `http://backend:8000/api/projects/${path}` : `http://backend:8000/api/projects/` ;
+    const url = path ?  `https://127.0.0.1:443/api/projects/${path}` : `https://127.0.0.1:443/api/projects/` ;
     const headers = new HttpHeaders({
       'X-deck-title': deckTitle
     });
 
-    console.log('url im hitting: ', url);
+    console.log('url getting hit: ', url);
+    console.log('Fetching for path:', path, 'deckTitle:', deckTitle);
     return this.http.get<ProjectCard[]>(url, { headers }).pipe(
       tap(cards => this.cache.set(cacheKey, cards))
     );
