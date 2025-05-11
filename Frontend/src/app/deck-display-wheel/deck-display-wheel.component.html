@@ -1,9 +1,26 @@
-<div class="deck-wheel-container">
-  @for (deck of decks; track $index) {
-    <app-deck
-    [displayName]="deck.displayed_name"
-    [imageUrl]="getImageUrl(deck.image_url)"
-    [title]="deck.title"
-    ></app-deck>
-  }
+<div class="deck-pager">
+  <button class="nav-button" (click)="prevPage()" [disabled]="!canScrollPrev">‹</button>
+
+  <div #deckMaskRef class="deck-mask">
+    <div
+      class="deck-slider"
+      [style.transform]="getTransform()"
+      [style.gap.px]="actualGap"
+      [style.transition]="'transform 0.4s ease'"
+      [style.padding-left.px]="actualGap"
+      [style.padding-right.px]="actualGap"
+    >
+      @for (deck of decks; track $index) {
+        <app-deck
+          class="deck-slide"
+          [displayName]="deck.displayed_name"
+          [imageUrl]="getImageUrl(deck.image_url)"
+          [title]="deck.title"
+          (deckSelected)="onDeckClicked(deck.title)"
+        />
+      }
+    </div>
   </div>
+
+  <button class="nav-button" (click)="nextPage()" [disabled]="!canScrollNext">›</button>
+</div>

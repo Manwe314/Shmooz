@@ -1,2 +1,3 @@
-<app-deck-display-wheel></app-deck-display-wheel>
+<app-deck-display-wheel (deckSelected)="onDeckSelected($event)"></app-deck-display-wheel>
+<app-hand [cards]="cards()"></app-hand>
 <app-landing-background></app-landing-background>

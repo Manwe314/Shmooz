@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -11,6 +11,7 @@ export class DeckComponent {
   @Input() displayName: string = '';
   @Input() imageUrl: string = ''; 
   @Input() title?: string;
+  @Output() deckSelected = new EventEmitter<string>();
 
   hovered = false;
   cards = [0, 1, 2, 3];  
@@ -31,6 +32,7 @@ export class DeckComponent {
   }
 
   handleClick() {
-    console.log('Deck clicked:', this.title || this.displayName);
+    this.deckSelected.emit(this.title);
+    console.log('Deck clicked: ', this.title || this.displayName);
   }
 }
