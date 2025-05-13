@@ -54,8 +54,3 @@ networks:
 
 volumes:
   db-data:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "./Volume/postgresql"

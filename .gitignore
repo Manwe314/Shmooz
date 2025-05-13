@@ -3,6 +3,7 @@
 __pycache__
 __pycache__/
 Volume/
+DockerDesktopWSL/
 *.pyc
 dump.rdb
 /Volume
