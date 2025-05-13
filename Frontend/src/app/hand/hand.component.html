@@ -1,6 +1,6 @@
 <div class="hand-container">
-  @for (card of cards; track $index)
+  @for (card of cards; track $index; let i = $index; let total = $count)
   {
-    <app-project-card [card]="card"></app-project-card>
+    <app-project-card class="hand-card" [card]="card" [style.transform]="getCardTransform(i, total)"></app-project-card>
   }
 </div>

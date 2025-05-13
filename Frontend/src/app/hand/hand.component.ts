@@ -18,4 +18,18 @@ export class HandComponent {
     }
   }
 
+  getCardTransform(index: number, total: number): string {
+    if (total === 1) {
+      return `translateY(20%)`;
+    }
+    
+    const min_low = 15;
+    const spread = Math.min(30, total * 6);
+    const offset = index - (total - 1) / 2;
+    const angle = offset * (spread / total);
+    const lift =  (Math.abs(offset) * 5) + min_low;
+  
+    return `translateY(${lift}%) rotate(${angle}deg)`;
+  }
+
 }
