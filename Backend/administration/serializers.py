@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import ImageUpload
 from portfolio.models import Deck, ProjectCard
+from rest_framework.exceptions import ValidationError
 
 class ImageUploadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,25 +9,23 @@ class ImageUploadSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'image', 'uploaded_at']
 
 class DeckSerializer(serializers.ModelSerializer):
-    image_file = serializers.ImageField(write_only=True, required=True)
+    image_id = serializers.IntegerField(write_only=True, required=True)
     image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Deck
-        fields = ['id', 'title', 'displayed_name', 'owner', 'image', 'image_file', 'image_url', 'created_at']
+        fields = [
+            'id', 'title', 'displayed_name', 'owner',
+            'image', 'image_id', 'image_url', 'created_at'
+        ]
         read_only_fields = ['id', 'image', 'created_at']
 
     def create(self, validated_data):
-        image_file = validated_data.pop('image_file')
-        slug = self.context.get('slug', 'COMPANY')
-
-        image = ImageUpload(
-            title=validated_data['title'],
-            image=image_file
-        )
-        image.upload_slug = slug
-        image.save()
-
+        image_id = validated_data.pop('image_id')
+        try:
+            image = ImageUpload.objects.get(id=image_id)
+        except ImageUpload.DoesNotExist:
+            raise ValidationError("Invalid image_id")
         deck = Deck.objects.create(image=image, **validated_data)
         return deck
 
@@ -37,29 +36,27 @@ class DeckSerializer(serializers.ModelSerializer):
     
 
 class ProjectCardSerializer(serializers.ModelSerializer):
-    image_file = serializers.ImageField(write_only=True, required=True)
+    image_id = serializers.IntegerField(write_only=True, required=True)
     image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ProjectCard
-        fields = ['id', 'title', 'text', 'text_color', 'label_letter', 'label_color', 'inline_color', 'deckTitle', 'owner', 'image', 'image_file', 'image_url', 'created_at']
+        fields = [
+            'id', 'title', 'text', 'text_color',
+            'label_letter', 'label_color', 'inline_color',
+            'deckTitle', 'owner', 'image', 'image_id', 'image_url', 'created_at'
+        ]
         read_only_fields = ['id', 'image', 'created_at']
 
     def create(self, validated_data):
-        image_file = validated_data.pop('image_file')
-        slug = self.context.get('slug', 'COMPANY')
+        image_id = validated_data.pop('image_id')
+        try:
+            image = ImageUpload.objects.get(id=image_id)
+        except ImageUpload.DoesNotExist:
+            raise ValidationError("Invalid image_id")
+        card = ProjectCard.objects.create(image=image, **validated_data)
+        return card
 
-        image = ImageUpload(
-            title=validated_data['title'],
-            image=image_file
-        )
-        image.upload_slug = slug
-        image.save()
-
-        ProjectCard = ProjectCard.objects.create(image=image, **validated_data)
-        return ProjectCard
-    
-    
     def get_image_url(self, obj):
         if obj.image and obj.image.image:
             return obj.image.image.url

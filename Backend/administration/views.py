@@ -34,7 +34,6 @@ class ImageUploadView(APIView):
     
 class DeckCreateView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, slug=None):
         
@@ -46,7 +45,6 @@ class DeckCreateView(APIView):
     
 class ProjectCardCreateView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, slug=None):
         
