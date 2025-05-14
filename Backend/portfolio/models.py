@@ -1,5 +1,6 @@
 from django.db import models
 from administration.models import ImageUpload
+from django.utils import timezone
 
 # Create your models here.
 
@@ -17,9 +18,17 @@ class Deck(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.title
+    
+class SlugEntry(models.Model):
+    slug = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.slug
+
     
 class ProjectCard(models.Model):
     title = models.CharField(max_length=50)
@@ -38,3 +47,4 @@ class ProjectCard(models.Model):
     owner = models.CharField(max_length=50)
     deckTitle = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(null=True, blank=True)

@@ -19,6 +19,8 @@ services:
       - .env
     volumes:
       - ./Backend:/app
+    ports:
+      - "8000:8000"
     expose:
       - "8000"
     networks:
@@ -59,3 +61,10 @@ volumes:
       type: "none"
       o: "bind"
       device: "./Volume/postgresql"
+
+
+    #   driver: local
+    # driver_opts:
+    #   type: "none"
+    #   o: "bind"
+    #   device: "./Volume/postgresql"

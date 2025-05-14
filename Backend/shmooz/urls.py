@@ -22,9 +22,14 @@ from rest_framework_simplejwt.views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
-from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView
-from portfolio.views import GradientColorView, DeckListView, ProjectCardListView
+from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView, DeckUpdateDeleteView, ProjectCardUpdateDeleteView, SlugCreateView
+from portfolio.views import GradientColorView, DeckListView, ProjectCardListView, SlugListView
 
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+)
+from rest_framework.permissions import AllowAny
 
 
 urlpatterns = [
@@ -37,9 +42,16 @@ urlpatterns = [
 
     path('api/auth/create_project_card/<str:slug>', ProjectCardCreateView.as_view(), name='create_project_card_slug'),
     path('api/auth/create_project_card/', ProjectCardCreateView.as_view(), name='create_project_card'),
+    
+    path('api/auth/alter_deck/<int:pk>', DeckUpdateDeleteView.as_view(), name='deck_update_delete'),
+    path('api/auth/alter_project_card/<int:pk>', ProjectCardUpdateDeleteView.as_view(), name='project_card_update_delete'),
+
+    path('api/auth/create_slug/', SlugCreateView.as_view(), name='slug_create'),
 
     path('upload-image/<str:slug>', ImageUploadView.as_view()),
     path('upload-image/', ImageUploadView.as_view()),
+
+    path('api/slugs/', SlugListView.as_view(), name='slug_list'),
 
     path('api/gradient-colors/<str:slug>', GradientColorView.as_view(), name='Gradient_color_sluged'),
     path('api/gradient-colors/', GradientColorView.as_view(), name='Gradient_color_root'),
@@ -49,6 +61,11 @@ urlpatterns = [
 
     path('api/projects/<slug:slug>', ProjectCardListView.as_view(), name='get_projects_sluged'),
     path('api/projects/', ProjectCardListView.as_view(), name='get_projects_root'),
+]
+
+urlpatterns += [
+    path('api/schema/', SpectacularAPIView.as_view(permission_classes=[AllowAny]), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema', permission_classes=[AllowAny]), name='swagger-ui'),
 ]
 
 if settings.DEBUG:

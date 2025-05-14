@@ -19,7 +19,7 @@ fclean: down
 	docker system prune -a --force
 	rm -Rf ./Volume
 	rm -Rf ./Backend/administration/__pycache__
-	rm -Rf ./Backend/administration/migrations
+	rm -Rf ./Backend/portfolio/__pycache__
 re: 
 	@mkdir -p ./Volume
 	@mkdir -p ./Volume/postgresql

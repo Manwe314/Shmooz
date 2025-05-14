@@ -2,6 +2,12 @@ from rest_framework import serializers
 from .models import ImageUpload
 from portfolio.models import Deck, ProjectCard
 from rest_framework.exceptions import ValidationError
+from portfolio.models import SlugEntry
+
+class SlugEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SlugEntry
+        fields = ['id', 'slug']
 
 class ImageUploadSerializer(serializers.ModelSerializer):
     class Meta:

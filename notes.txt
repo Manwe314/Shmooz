@@ -12,7 +12,7 @@ For Admin panel:
         3 Positions 0-100
     
     Deck component:
-        title text
+        title text  
         display_text text
         owner slug_text
         image .png /.jpg
@@ -26,16 +26,21 @@ For Admin panel:
         label color text (hex without #)
         innner line color text (hex without #)
         owner slug_text
-        deckTitle text (title of the deck that owns this card)
+        deckTitle text (title of the deck that owns this card) 
         image .png / .jpg
-
-
+ 
+edit deck ->  project card  -> project page
 
 to-do:
     change "COMPANY" (default search) with actaul default target
     deck visual update: box shadow, placement, text, more...
     deck wheel animation polish. ?upgrade to be flat wheel
     deck wheel placement.
+    backend:
+        get filters by time (create / edit)
+        remove DeckTitle use and use deck id foreign key.
+
 
 for tomorrow:
-    project cards!
+    backend finish
+    project card animations
