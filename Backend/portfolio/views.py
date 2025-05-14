@@ -3,8 +3,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny 
-from .models import Deck, ProjectCard
-from administration.serializers import DeckSerializer, ProjectCardSerializer
+from .models import Deck, ProjectCard, SlugEntry
+from administration.serializers import DeckSerializer, ProjectCardSerializer, SlugEntrySerializer
 import sys
 # Create your views here.
 
@@ -57,3 +57,11 @@ class ProjectCardListView(ListAPIView):
         if owner and deck_title:
             return ProjectCard.objects.filter(owner=owner, deckTitle=deck_title)
         return ProjectCard.objects.none()  
+
+class SlugListView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        slugs = SlugEntry.objects.all()
+        serializer = SlugEntrySerializer(slugs, many=True)
+        return Response(serializer.data)

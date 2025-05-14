@@ -4,6 +4,7 @@ __pycache__
 __pycache__/
 Volume/
 DockerDesktopWSL/
+./Backend/media/uploads/
 *.pyc
 dump.rdb
 /Volume
