@@ -5,7 +5,7 @@
   justify-content: center;
   cursor: pointer;
   transition: transform 0.2s ease;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px #00000033;
 }
 
 .deck-container:hover {
@@ -41,10 +41,8 @@
 
 .deck-label {
   transform: translate(0%, -800%) rotate(-90deg);
-  position: absolute;
-  bottom: 8px;
-  left: 12px;
-  right: 12px;
+  justify-content: center;
+  align-content: center;
   text-align: center;
   font-weight: bold;
   color: white;
