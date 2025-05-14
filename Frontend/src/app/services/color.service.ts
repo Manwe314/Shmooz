@@ -18,7 +18,7 @@ export class ColorService {
   private http = inject(HttpClient);
 
   getGradientColors(path: string = ''): Observable<GradientColors> {
-    const endpoint = path ? `http://backend:8000/api/gradient-colors/${path}` : 'http://backend:8000/api/gradient-colors/';
+    const endpoint = path ? `https://127.0.0.1/api/gradient-colors/${path}` : 'https://127.0.0.1/api/gradient-colors/';
     return this.http.get<GradientColors>(endpoint);
   }
 }
