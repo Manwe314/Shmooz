@@ -102,8 +102,8 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
     this.currentPage = 0;
   }
   
-  onDeckClicked(title: string) {
-    this.deckSelected.emit(title);
+  onDeckClicked(id: string) {
+    this.deckSelected.emit(id);
   }
 
   getImageUrl(path: string): string {

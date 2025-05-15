@@ -45,6 +45,12 @@ class ProjectCard(models.Model):
     label_color = models.CharField(max_length=50)
     inline_color = models.CharField(max_length=50)
     owner = models.CharField(max_length=50)
-    deckTitle = models.CharField(max_length=50)
+    deck = models.ForeignKey(
+        Deck,
+        on_delete=models.CASCADE,
+        related_name='project_cards',
+        null=True,  # optional: allow nulls if you want a soft transition
+        blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(null=True, blank=True)

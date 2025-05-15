@@ -15,7 +15,6 @@ export interface ProjectCard {
   inline_color: string;
   image_url: string;
   owner: string;
-  deckTitle: string;
 }
 
 @Injectable({
@@ -25,19 +24,19 @@ export class ProjectCardsService {
   private http = inject(HttpClient);
   private cache = new Map<string, ProjectCard[]>();
 
-  getCardsForDeck(path: string, deckTitle: string): Observable<ProjectCard[]> {
-    const cacheKey = `${path}::${deckTitle}`;
+  getCardsForDeck(path: string, deck_id: string): Observable<ProjectCard[]> {
+    const cacheKey = `${path}::${deck_id}`;
     if (this.cache.has(cacheKey)) {
       return of(this.cache.get(cacheKey)!);
     }
 
     const url = path ?  `https://127.0.0.1:443/api/projects/${path}` : `https://127.0.0.1:443/api/projects/` ;
     const headers = new HttpHeaders({
-      'X-deck-title': deckTitle
+      'X-deck-id': deck_id
     });
 
     console.log('url getting hit: ', url);
-    console.log('Fetching for path:', path, 'deckTitle:', deckTitle);
+    console.log('Fetching for path:', path, 'deckTitle:', deck_id);
     return this.http.get<ProjectCard[]>(url, { headers }).pipe(
       tap(cards => this.cache.set(cacheKey, cards))
     );

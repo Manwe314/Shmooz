@@ -24,11 +24,11 @@ export class LandingPageComponent {
     private slugService: SlugService,
   ) {}
 
-  onDeckSelected(deckTitle: string) {
+  onDeckSelected(deck_id: string) {
     this.slugService.slug$
     .pipe(
       filter(slug => slug !== null),
-      switchMap(slug => this.projectCardService.getCardsForDeck(slug!, deckTitle))
+      switchMap(slug => this.projectCardService.getCardsForDeck(slug!, deck_id))
     )
     .subscribe({
       next: (cards) => {

@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 export class DeckComponent {
   @Input() displayName: string = '';
   @Input() imageUrl: string = ''; 
-  @Input() title?: string;
+  @Input() id?: string;
   @Output() deckSelected = new EventEmitter<string>();
 
   hovered = false;
@@ -32,7 +32,7 @@ export class DeckComponent {
   }
 
   handleClick() {
-    this.deckSelected.emit(this.title);
-    console.log('Deck clicked: ', this.title || this.displayName);
+    this.deckSelected.emit(this.id);
+    console.log('Deck clicked: ', this.id || this.displayName);
   }
 }

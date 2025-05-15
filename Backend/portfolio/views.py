@@ -52,10 +52,10 @@ class ProjectCardListView(ListAPIView):
 
     def get_queryset(self):
         owner = self.kwargs.get('slug', 'COMPANY')
-        deck_title = self.request.headers.get('X-deck-title')
+        deck_id = self.request.headers.get('X-deck-id')
 
-        if owner and deck_title:
-            return ProjectCard.objects.filter(owner=owner, deckTitle=deck_title)
+        if owner and deck_id:
+            return ProjectCard.objects.filter(owner=owner, deck_id=deck_id)
         return ProjectCard.objects.none()  
 
 class SlugListView(APIView):

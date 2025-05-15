@@ -15,8 +15,8 @@
           class="deck-slide"
           [displayName]="deck.displayed_name"
           [imageUrl]="getImageUrl(deck.image_url)"
-          [title]="deck.title"
-          (deckSelected)="onDeckClicked(deck.title)"
+          [id]="deck.id"
+          (deckSelected)="onDeckClicked(deck.id)"
         />
       }
     </div>

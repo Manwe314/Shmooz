@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Deck {
+  id: string;
   title: string;
   displayed_name: string;
   owner: string;
