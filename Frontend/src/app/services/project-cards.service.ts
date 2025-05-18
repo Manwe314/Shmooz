@@ -15,6 +15,9 @@ export interface ProjectCard {
   inline_color: string;
   image_url: string;
   owner: string;
+  animationState?: 'entering' | 'inHand';
+  offsetX?: number;
+  offsetY?: number;
 }
 
 @Injectable({

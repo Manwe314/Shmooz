@@ -5,6 +5,7 @@ For Production:
     a env variable. 
     add back jwt is authenticated!
     chnage DockerFiles to copy files
+    wrap ProjectCard data wityh animatioed project dard to add animation specific data 
 
 
 For Admin panel:
@@ -13,11 +14,15 @@ For Admin panel:
         3 Colors  hex code
         3 Positions 0-100
     
+    images:
+        image .png / .jpg
+        optional upload slug string.
+    
     Deck component:
         title text  
         display_text text
         owner slug_text
-        image .png /.jpg
+        image id of the image uploaded
         ?cards, layout, width, height, text color, text font?
     
     ProjectCard component:
@@ -28,16 +33,21 @@ For Admin panel:
         label color text (hex without #)
         innner line color text (hex without #)
         owner slug_text
-        deckTitle text (title of the deck that owns this card) 
-        image .png / .jpg
+        deck id text (id of the deck that owns this card) 
+        image id of the image uploaded
  
-edit deck ->  project card  -> project page
 
 to-do:
     change "COMPANY" (default search) with actaul default target
     deck visual update: box shadow, placement, text, more...
     deck wheel animation polish. ?upgrade to be flat wheel
     deck wheel placement.
+    chose a font and use it.
+    project card: 
+        card placement in hand
+        hover animation + image paralax on hover
+        dealing animation BIG refine.
+        
     backend:
         get filters by time (create / edit)
 

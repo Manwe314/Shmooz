@@ -30,7 +30,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
 
   @ViewChild('deckContainer', { static: true }) deckContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('deckMaskRef') deckMaskRef!: ElementRef<HTMLDivElement>;
-  @Output() deckSelected = new EventEmitter<string>();
+  @Output() deckSelected = new EventEmitter<{ id: string; origin: { x: number; y: number } }>();
 
   ngAfterViewInit() {
     this.slugService.slug$
@@ -102,8 +102,8 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
     this.currentPage = 0;
   }
   
-  onDeckClicked(id: string) {
-    this.deckSelected.emit(id);
+  onDeckClicked(deckData: { id: string; origin: { x: number; y: number } }) {
+    this.deckSelected.emit(deckData);
   }
 
   getImageUrl(path: string): string {

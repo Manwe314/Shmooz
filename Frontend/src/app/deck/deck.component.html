@@ -1,4 +1,4 @@
-<div class="deck-container" (click)="handleClick()" (mouseenter)="hovered = true" (mouseleave)="hovered = false">
+<div class="deck-container" #deckEl (click)="handleClick()" (mouseenter)="hovered = true" (mouseleave)="hovered = false">
   @for (i of cards; track i) {
     <div class="card" [ngStyle]="getDeckCardsStyle(i)"></div>
   }

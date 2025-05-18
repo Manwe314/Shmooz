@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -11,7 +11,8 @@ export class DeckComponent {
   @Input() displayName: string = '';
   @Input() imageUrl: string = ''; 
   @Input() id?: string;
-  @Output() deckSelected = new EventEmitter<string>();
+  @Output() deckSelected = new EventEmitter<{ id: string; origin: { x: number; y: number } }>();
+  @ViewChild('deckEl', { static: true }) deckEl!: ElementRef<HTMLDivElement>;
 
   hovered = false;
   cards = [0, 1, 2, 3];  
@@ -32,7 +33,14 @@ export class DeckComponent {
   }
 
   handleClick() {
-    this.deckSelected.emit(this.id);
-    console.log('Deck clicked: ', this.id || this.displayName);
+    const rect = this.deckEl.nativeElement.getBoundingClientRect();
+    const origin = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+  
+    this.deckSelected.emit({ id: this.id!, origin });
+  
+    console.log('Deck clicked:', this.id, 'at', origin);
   }
 }
