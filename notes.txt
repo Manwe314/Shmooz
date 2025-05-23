@@ -2,10 +2,10 @@ For Production:
     serve media files with nginx.
     deck-display-wheel.ts uses any twice. (dont know how not to use)
     switch client side "127.0.0.1" api calls and server side "backend:8000" calls to
-    a env variable. 
+    an env variable. 
     add back jwt is authenticated!
     chnage DockerFiles to copy files
-    wrap ProjectCard data wityh animatioed project dard to add animation specific data 
+    wrap ProjectCard data wityh animatioed project card to add animation specific data 
 
 
 For Admin panel:
@@ -13,6 +13,9 @@ For Admin panel:
     Background Gradient:
         3 Colors  hex code
         3 Positions 0-100
+    
+    page Names:
+        2 page names strings
     
     images:
         image .png / .jpg
@@ -43,6 +46,7 @@ to-do:
     deck wheel animation polish. ?upgrade to be flat wheel
     deck wheel placement.
     chose a font and use it.
+    fix the navigation buttons (tech and visual)
     project card: 
         card placement in hand
         hover animation + image paralax on hover
@@ -50,8 +54,9 @@ to-do:
         
     backend:
         get filters by time (create / edit)
+        make a model so save gradient colors and page names in the backend.
 
 
 for tomorrow:
-    backend finish
-    project card animations
+    page-ing component. 
+    CSS GRID TIMEEE

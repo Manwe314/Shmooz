@@ -33,6 +33,15 @@ class GradientColorView(APIView):
                 "position3": "71",
             })
 
+class PageNamesView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, slug=None):
+        if slug == 'kuxi':
+            return Response({"page1": "About-me", "page2": "CV"})
+        else:
+            return Response({"page1": "About-us", "page2": "Contact Us"})
+
 
 class DeckListView(ListAPIView):
     serializer_class = DeckSerializer
