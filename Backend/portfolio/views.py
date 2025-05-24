@@ -23,7 +23,7 @@ class GradientColorView(APIView):
                 "color3": "050319",
                 "position3": "80",
             })
-        elif slug == None:
+        elif slug == 'COMPANY':
             return Response({
                 "color1":"712243",
                 "position1": "0",
@@ -32,6 +32,9 @@ class GradientColorView(APIView):
                 "color3": "050319",
                 "position3": "71",
             })
+        return Response({
+            "message": f"Unrecognized slug: {slug}"
+        }, status=404)
 
 class PageNamesView(APIView):
     permission_classes = [AllowAny]
@@ -41,6 +44,24 @@ class PageNamesView(APIView):
             return Response({"page1": "About-me", "page2": "CV"})
         else:
             return Response({"page1": "About-us", "page2": "Contact Us"})
+        
+
+class PageHandlerView(APIView):
+    permission_classes =[AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        route_name = request.resolver_match.view_name
+
+        if route_name == 'page1_handler':
+            slug = kwargs.get('slug')
+            return Response(f"this is Page One for {slug}")
+        if route_name == 'page2_handler':
+            slug = kwargs.get('slug')
+            return Response(f"this is Page Two for {slug}")
+        if route_name == 'project_page_handler':
+            index = kwargs.get('id')
+            return Response(f"this is Project Page id: {index}")
+        return Response("uh oh unknown name")
 
 
 class DeckListView(ListAPIView):

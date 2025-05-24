@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { ApiService } from './api.service';
 
 
 
@@ -25,6 +26,7 @@ export interface ProjectCard {
 })
 export class ProjectCardsService {
   private http = inject(HttpClient);
+  private api = inject(ApiService);
   private cache = new Map<string, ProjectCard[]>();
 
   getCardsForDeck(path: string, deck_id: string): Observable<ProjectCard[]> {
@@ -33,7 +35,7 @@ export class ProjectCardsService {
       return of(this.cache.get(cacheKey)!);
     }
 
-    const url = path ?  `https://127.0.0.1:443/api/projects/${path}` : `https://127.0.0.1:443/api/projects/` ;
+    const url = path ?  this.api.buildUrl(`projects/${path}`) : this.api.buildUrl(`projects/COMPANY`) ;
     const headers = new HttpHeaders({
       'X-deck-id': deck_id
     });

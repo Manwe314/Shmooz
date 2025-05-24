@@ -47,6 +47,8 @@ to-do:
     deck wheel placement.
     chose a font and use it.
     fix the navigation buttons (tech and visual)
+    remove unslugged endpoints.
+    fix the inital rendering of the wrong content.
     project card: 
         card placement in hand
         hover animation + image paralax on hover
@@ -58,5 +60,6 @@ to-do:
 
 
 for tomorrow:
+    navigation buttons fix
     page-ing component. 
     CSS GRID TIMEEE
