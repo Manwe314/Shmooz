@@ -25,34 +25,23 @@ export class LandingBackgroundComponent implements OnInit{
   ) {}
 
   ngOnInit() {
-    this.slugService.slug$
-    .pipe(
-      filter(slug => slug !== null), 
-      switchMap(slug => this.backgroundService.getGradientColors(slug!))
-    )
-    .subscribe(colors => {
-      this.gradientStyle = `radial-gradient(circle at 50% 130%, #${colors.color1} ${colors.position1}%, #${colors.color2} ${colors.position2}%, #${colors.color3} ${colors.position3}%)`;
-      console.log('Gradient style: ', this.gradientStyle);
-    });
+    const gradient = this.backgroundService.getGradient();
+    if (gradient)
+      this.gradientStyle = `radial-gradient(circle at 50% 130%, #${gradient.color1} ${gradient.position1}%, #${gradient.color2} ${gradient.position2}%, #${gradient.color3} ${gradient.position3}%)`;
+    const names = this.backgroundService.getPageNames();
+    if (names)
+      this.pageNames = names;
 
     this.router.events
-    .pipe(filter(event => event instanceof NavigationEnd))
-    .subscribe(() => {
-      this.currentPage = this.getCurrentPageFromUrl();
-    });
-
-    this.slugService.slug$
-    .pipe(
-      filter(slug => slug !== null), 
-      switchMap(slug => this.backgroundService.getPageInfo(slug!))
-    )
-    .subscribe(pages => {
-      this.pageNames = pages;
-    });
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.currentPage = this.getCurrentPageFromUrl();
+      });
   }
 
   getCurrentPageFromUrl(): 'home' | 'page1' | 'page2' {
     const path = this.router.url.split('/')[1] || '';
+    console.log('i think we are on page: ', path);
     if (path === 'page_one') return 'page1';
     if (path === 'page_two') return 'page2';
     return 'home';
@@ -64,6 +53,7 @@ export class LandingBackgroundComponent implements OnInit{
       page1: this.pageNames.page1,
       page2: this.pageNames.page2
     };
+    console.log('the currant page is: ', this.currentPage);
 
     return (['home', 'page1', 'page2'] as const)
       .filter(p => p !== this.currentPage)

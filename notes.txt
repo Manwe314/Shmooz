@@ -57,9 +57,10 @@ to-do:
     backend:
         get filters by time (create / edit)
         make a model so save gradient colors and page names in the backend.
+    CSS GRID TIMEEE
+    page-ing component. 
 
 
 for tomorrow:
     navigation buttons fix
-    page-ing component. 
-    CSS GRID TIMEEE
+    finish resolving all

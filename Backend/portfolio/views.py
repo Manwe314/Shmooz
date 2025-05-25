@@ -54,14 +54,14 @@ class PageHandlerView(APIView):
 
         if route_name == 'page1_handler':
             slug = kwargs.get('slug')
-            return Response(f"this is Page One for {slug}")
+            return Response({"message": f"this is Page One for {slug}"})
         if route_name == 'page2_handler':
             slug = kwargs.get('slug')
-            return Response(f"this is Page Two for {slug}")
+            return Response({"message": f"this is Page Two for {slug}"})
         if route_name == 'project_page_handler':
             index = kwargs.get('id')
-            return Response(f"this is Project Page id: {index}")
-        return Response("uh oh unknown name")
+            return Response({"message": f"this is Project Page id: {index}"})
+        return Response({"message": "uh oh unknown name"})
 
 
 class DeckListView(ListAPIView):

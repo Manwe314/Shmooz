@@ -23,6 +23,24 @@ export interface PageInfo {
 export class BackgroundService {
   private http = inject(HttpClient);
   private api = inject(ApiService);
+  private gradient: GradientColors | null = null;
+  private pageNames: PageInfo | null = null;
+  
+  setResolvedGradient(data: GradientColors) {
+    this.gradient = data;
+  }
+  
+  getGradient(): GradientColors | null {
+    return this.gradient;
+  }
+  
+  setResolvedPageNames(data: PageInfo) {
+    this.pageNames = data;
+  }
+  
+  getPageNames(): PageInfo | null {
+    return this.pageNames;
+  }
   
   getGradientColors(path: string = ''): Observable<GradientColors> {
     const endpoint = path ? this.api.buildUrl(`gradient-colors/${path}`) : this.api.buildUrl('gradient-colors/COMPANY');
