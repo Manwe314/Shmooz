@@ -18,6 +18,15 @@ export interface Deck {
 export class DeckService {
   private http = inject(HttpClient);
   private api = inject(ApiService);
+  private decks: Deck[] | null = null;
+
+  setResolvedDecks(data: Deck[]) {
+    this.decks = data;
+  }
+  
+  getResolvedDeck(): Deck[] {
+    return this.decks ?? [];
+  }
 
   getDecks(path: string) : Observable<Deck[]> {
     const endpoint = path ? this.api.buildUrl(`deck/${path}`) : this.api.buildUrl(`deck/COMPANY`)

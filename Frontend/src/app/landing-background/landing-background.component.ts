@@ -35,6 +35,7 @@ export class LandingBackgroundComponent implements OnInit{
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
+        console.log('Setting to ', this.getCurrentPageFromUrl());
         this.currentPage = this.getCurrentPageFromUrl();
       });
   }

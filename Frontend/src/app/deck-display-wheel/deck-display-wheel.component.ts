@@ -33,16 +33,8 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   @Output() deckSelected = new EventEmitter<{ id: string; origin: { x: number; y: number } }>();
 
   ngAfterViewInit() {
-    this.slugService.slug$
-    .pipe(
-      filter(slug => slug !== null),
-      switchMap(slug => this.deckService.getDecks(slug!))
-    )
-    .subscribe(decks => {
-      console.log('Decks I got: ', decks);
-      this.decks =  decks;
-      this.updateLayout();
-    })
+    this.decks = this.deckService.getResolvedDeck();
+    setTimeout(() => this.updateLayout(), 0);
     if (typeof window !== 'undefined') {
       this.resizeSub = fromEvent(window, 'resize').subscribe(() => this.updateLayout());
     }
@@ -107,6 +99,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   }
 
   getImageUrl(path: string): string {
+    //URL
     return `https://127.0.0.1${path}`
   }
 

@@ -14,10 +14,9 @@ export class PageResolver implements Resolve<boolean> {
 
   resolve(route: ActivatedRouteSnapshot): Observable<boolean> {
     const path = route.url[0]?.path ?? '';
-    const slug = route.paramMap.get('slug') ?? 'COMPANY';
     const id = route.paramMap.get('id') ?? undefined;
+    const slug = this.slugService.getCurrentSlug() ?? 'COMPANY';
 
-    this.slugService.setSlug(slug);
 
     return this.pageService.getPageData(path, slug, id).pipe(
       tap(data => this.pageService.setContent(data)),
