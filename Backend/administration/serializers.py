@@ -44,23 +44,31 @@ class DeckSerializer(serializers.ModelSerializer):
 class ProjectCardSerializer(serializers.ModelSerializer):
     image_id = serializers.IntegerField(write_only=True, required=True)
     image_url = serializers.SerializerMethodField()
+    deck_id = serializers.IntegerField(write_only=True, required=True)  # NEW
+    deck = serializers.PrimaryKeyRelatedField(read_only=True) 
 
     class Meta:
         model = ProjectCard
         fields = [
             'id', 'title', 'text', 'text_color',
             'label_letter', 'label_color', 'inline_color',
-            'deckTitle', 'owner', 'image', 'image_id', 'image_url', 'created_at'
+            'owner', 'image', 'image_id', 'image_url',
+            'deck_id', 'deck', 'created_at', 'edited_at'
         ]
-        read_only_fields = ['id', 'image', 'created_at']
+        read_only_fields = ['id', 'image', 'created_at', 'edited_at']
 
     def create(self, validated_data):
         image_id = validated_data.pop('image_id')
+        deck_id = validated_data.pop('deck_id')
         try:
             image = ImageUpload.objects.get(id=image_id)
         except ImageUpload.DoesNotExist:
             raise ValidationError("Invalid image_id")
-        card = ProjectCard.objects.create(image=image, **validated_data)
+        try:
+            deck = Deck.objects.get(id=deck_id)
+        except Deck.DoesNotExist:
+            raise ValidationError("Invalid deck_id")
+        card = ProjectCard.objects.create(image=image, deck=deck, **validated_data)
         return card
 
     def get_image_url(self, obj):

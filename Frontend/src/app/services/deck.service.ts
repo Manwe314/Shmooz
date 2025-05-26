@@ -1,8 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ApiService } from './api.service';
 
 export interface Deck {
+  id: string;
   title: string;
   displayed_name: string;
   owner: string;
@@ -15,9 +17,19 @@ export interface Deck {
 })
 export class DeckService {
   private http = inject(HttpClient);
+  private api = inject(ApiService);
+  private decks: Deck[] | null = null;
+
+  setResolvedDecks(data: Deck[]) {
+    this.decks = data;
+  }
+  
+  getResolvedDeck(): Deck[] {
+    return this.decks ?? [];
+  }
 
   getDecks(path: string) : Observable<Deck[]> {
-    const endpoint = path ? `http://backend:8000/api/deck/${path}` : `http://backend:8000/api/deck/COMPANY`
+    const endpoint = path ? this.api.buildUrl(`deck/${path}`) : this.api.buildUrl(`deck/COMPANY`)
     return this.http.get<Deck[]>(endpoint);
   }
 }

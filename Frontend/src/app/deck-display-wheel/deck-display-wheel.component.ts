@@ -30,19 +30,11 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
 
   @ViewChild('deckContainer', { static: true }) deckContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('deckMaskRef') deckMaskRef!: ElementRef<HTMLDivElement>;
-  @Output() deckSelected = new EventEmitter<string>();
+  @Output() deckSelected = new EventEmitter<{ id: string; origin: { x: number; y: number } }>();
 
   ngAfterViewInit() {
-    this.slugService.slug$
-    .pipe(
-      filter(slug => slug !== null),
-      switchMap(slug => this.deckService.getDecks(slug!))
-    )
-    .subscribe(decks => {
-      console.log('Decks I got: ', decks);
-      this.decks =  decks;
-      this.updateLayout();
-    })
+    this.decks = this.deckService.getResolvedDeck();
+    setTimeout(() => this.updateLayout(), 0);
     if (typeof window !== 'undefined') {
       this.resizeSub = fromEvent(window, 'resize').subscribe(() => this.updateLayout());
     }
@@ -102,11 +94,12 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
     this.currentPage = 0;
   }
   
-  onDeckClicked(title: string) {
-    this.deckSelected.emit(title);
+  onDeckClicked(deckData: { id: string; origin: { x: number; y: number } }) {
+    this.deckSelected.emit(deckData);
   }
 
   getImageUrl(path: string): string {
+    //URL
     return `https://127.0.0.1${path}`
   }
 

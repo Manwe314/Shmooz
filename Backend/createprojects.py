@@ -1,8 +1,8 @@
-# seed_project_cards.py
+# seed_project_cards_updated.py
 
 from django.core.files import File
 from administration.models import ImageUpload
-from portfolio.models import ProjectCard
+from portfolio.models import ProjectCard, Deck
 
 def upload_image(title, filename, slug):
     with open(f'/app/media/{filename}', 'rb') as f:
@@ -18,49 +18,55 @@ def upload_image(title, filename, slug):
 # === Upload image once ===
 image1 = upload_image("Project 1 Image", "1.png", "kuxi")
 
+# === Get decks ===
+deck_map = {
+    "boardGames deck": Deck.objects.get(title="boardGames deck", owner="kuxi"),
+    "test1 deck": Deck.objects.get(title="test1 deck", owner="kuxi"),
+}
+
 # === Create ProjectCards using uploaded image ===
 cards = [
     {
         "title": "Project two",
         "text": "Shmooz To Reality",
         "label_letter": "S",
-        "deckTitle": "boardGames deck"
+        "deck_name": "boardGames deck"
     },
     {
         "title": "Project three",
         "text": "trolizmi",
         "label_letter": "T",
-        "deckTitle": "test1 deck"
+        "deck_name": "test1 deck"
     },
     {
         "title": "Project four",
         "text": "MC Fire",
         "label_letter": "Sh",
-        "deckTitle": "boardGames deck"
+        "deck_name": "boardGames deck"
     },
     {
         "title": "Project five",
         "text": "ADAM?",
         "label_letter": "A",
-        "deckTitle": "test1 deck"
+        "deck_name": "test1 deck"
     },
     {
         "title": "Project six",
         "text": "kodak",
         "label_letter": "KK",
-        "deckTitle": "boardGames deck"
+        "deck_name": "boardGames deck"
     },
     {
         "title": "Project seven",
         "text": "toomuch?",
         "label_letter": "L",
-        "deckTitle": "boardGames deck"
+        "deck_name": "boardGames deck"
     },
     {
         "title": "Project eight",
         "text": "WAP",
         "label_letter": "W",
-        "deckTitle": "boardGames deck"
+        "deck_name": "boardGames deck"
     },
 ]
 
@@ -72,10 +78,10 @@ for card_data in cards:
         label_letter=card_data["label_letter"],
         label_color="2B111C",
         inline_color="FEF1DF",
-        deckTitle=card_data["deckTitle"],
         owner="kuxi",
-        image=image1
+        image=image1,
+        deck=deck_map[card_data["deck_name"]],
     )
     print(f"✅ Created ProjectCard: {card_data['title']}")
 
-print("✅ Seeded 6 ProjectCards using shared image.")
+print("✅ Seeded 7 ProjectCards using deck FK.")

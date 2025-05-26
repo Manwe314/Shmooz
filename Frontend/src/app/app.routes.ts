@@ -1,11 +1,21 @@
 import { Routes } from '@angular/router';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { LoginComponent } from './admin/login/login.component';
+import { PageComponent } from './page/page.component';
+import { PageResolver } from './resolvers/page.resolver';
+import { LandingBackgroundResolver } from './resolvers/landing-background.resolver';
+import { deckResolver } from './resolvers/deck.resolver';
+import { SlugResolver } from './resolvers/slug.resolver';
 
 
 export const routes: Routes = [
-    {path: '', component: LandingPageComponent},
+    {path: '', component: LandingPageComponent, resolve: {slug: SlugResolver, deck: deckResolver, background: LandingBackgroundResolver}, runGuardsAndResolvers: 'always'},
     {path: 'login', component: LoginComponent},
-    {path: ':slug', component: LandingPageComponent},
+    {path: 'page_one', component: PageComponent, resolve: {slug: SlugResolver, page: PageResolver, background: LandingBackgroundResolver}, runGuardsAndResolvers: 'always'},
+    {path: 'page_two', component: PageComponent, resolve: {slug: SlugResolver, page: PageResolver, background: LandingBackgroundResolver}, runGuardsAndResolvers: 'always'},
+    {path: 'page_one/:slug', component: PageComponent, resolve: {slug: SlugResolver, page: PageResolver, background: LandingBackgroundResolver}, runGuardsAndResolvers: 'always'},
+    {path: 'page_two/:slug', component: PageComponent, resolve: {slug: SlugResolver, page: PageResolver, background: LandingBackgroundResolver}, runGuardsAndResolvers: 'always'},
+    {path: 'project_page/:id', component: PageComponent, resolve: {slug: SlugResolver, page: PageResolver, background: LandingBackgroundResolver}, runGuardsAndResolvers: 'always'},
+    {path: ':slug', component: LandingPageComponent, resolve: {slug: SlugResolver, deck: deckResolver, background: LandingBackgroundResolver}, runGuardsAndResolvers: 'always'},
     {path: '**', redirectTo: '', pathMatch: 'full'}
 ];

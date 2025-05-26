@@ -18,17 +18,23 @@ import { filter, switchMap } from 'rxjs';
 })
 export class LandingPageComponent {
   cards = signal<ProjectCard[]>([]);
+  deckOrigin: { x: number; y: number } | null = null;
+
   
   constructor(
     private projectCardService: ProjectCardsService,
     private slugService: SlugService,
   ) {}
 
-  onDeckSelected(deckTitle: string) {
+  onDeckSelected(deckData: { id: string; origin: { x: number; y: number } }) {
+    const { id, origin } = deckData;
+
+    this.deckOrigin = origin;
+    
     this.slugService.slug$
     .pipe(
       filter(slug => slug !== null),
-      switchMap(slug => this.projectCardService.getCardsForDeck(slug!, deckTitle))
+      switchMap(slug => this.projectCardService.getCardsForDeck(slug!, id))
     )
     .subscribe({
       next: (cards) => {
