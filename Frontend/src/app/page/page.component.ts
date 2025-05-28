@@ -6,7 +6,7 @@ import { switchMap } from 'rxjs/operators';
 import { SlugService } from '../services/slug.service';
 import { LandingBackgroundComponent } from '../landing-background/landing-background.component';
 import { ApiService } from '../services/api.service';
-import { PageService } from '../services/page.service';
+import { Block, PageService } from '../services/page.service';
 
 @Component({
   selector: 'app-page',
@@ -15,15 +15,29 @@ import { PageService } from '../services/page.service';
   styleUrl: './page.component.css'
 })
 export class PageComponent {
-  content = '';
-
+  blocks: Block[] = [];
   constructor(
     private pageService: PageService,
   ) {}
 
   ngOnInit(): void {
-    this.content = this.pageService.getContent().message;
+    const data = this.pageService.getContent();
+    this.blocks = data.blocks || [];
   }
+
+  trackByBlock(index : number, block: Block){
+    return block.id;
+  }
+
+  getTextStyles(content: any) {
+    return {
+      'grid-column': `${content.colStart} / span ${content.colSpan || 1}`,
+      'grid-row': `${content.rowStart} / span ${content.rowSpan || 1}`,
+      'color': content.color || 'inherit',
+      'text-align': content.textAlign || 'left'
+    };
+  }
+  
     
 
 }

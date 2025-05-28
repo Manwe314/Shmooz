@@ -23,7 +23,7 @@ export class PageResolver implements Resolve<boolean> {
       map(() => true), 
       catchError(err => {
         console.error('[PageResolver] failed to load page data', err);
-        this.pageService.setContent({ message: 'Failed to load page content.' });
+        this.pageService.setContent({ blocks: [] });
         return of(true); 
       })
     );

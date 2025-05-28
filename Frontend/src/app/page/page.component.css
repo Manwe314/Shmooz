@@ -1,12 +1,11 @@
-.page-wrapper {
-    padding: 2rem;
-    color: white;
-    font-size: 1.25rem;
-    max-width: 800px;
-    margin: 100px auto 0;
-    text-align: center;
-  }
-  
-  .page-content {
-    white-space: pre-line;
-  }
+.block-wrapper {
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.grid-container {
+  width: 100%;
+  display: grid;
+  gap: 1rem;
+}
