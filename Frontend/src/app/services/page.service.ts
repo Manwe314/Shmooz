@@ -47,7 +47,7 @@ export interface LinkContent extends BaseContent {
 
 
 export interface PageData {
-  blocks: Block[];
+  content: Block[];
 }
 
 @Injectable({
@@ -56,7 +56,7 @@ export interface PageData {
 export class PageService {
   private http = inject(HttpClient);
   private api = inject(ApiService);
-  private content: PageData = {blocks: []};
+  private content: PageData = {content: []};
 
   setContent(data: PageData) {
     this.content = data;

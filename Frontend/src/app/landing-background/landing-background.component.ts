@@ -56,8 +56,6 @@ export class LandingBackgroundComponent implements OnInit{
       .filter(p => p !== this.currentPage)
       .map(p => ({ path: p, label: map[p] }));
 
-    console.log('[LandingBackground] Set current page:', this.currentPage);
-    console.log('[LandingBackground] Computed otherPages:', this.otherPages);
   }
 
   navigateTo(page: 'home' | 'page1' | 'page2') {

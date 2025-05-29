@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import ImageUpload
-from .serializers import ImageUploadSerializer, DeckSerializer, ProjectCardSerializer, SlugEntrySerializer
+from .serializers import ImageUploadSerializer, DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.generics import get_object_or_404
 from rest_framework import status
@@ -104,3 +104,13 @@ class ProjectCardUpdateDeleteView(APIView):
         card = get_object_or_404(ProjectCard, pk=pk)
         card.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class PageUploadView(APIView):
+    #permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = PagesModelSerializer(data=request.data)
+        if serializer.is_valid():
+            page = serializer.save()
+            return Response(PagesModelSerializer(page).data, status=201)
+        return Response(serializer.errors, status=400)

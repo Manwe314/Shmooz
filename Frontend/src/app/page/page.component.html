@@ -14,7 +14,7 @@
            'grid-template-rows': block.gridTemplateRows
          }">
 
-      @for (content of block.content) {
+      @for (content of block.content; track content.id) {
         @switch (content.type) {
           
           @case ('image') {

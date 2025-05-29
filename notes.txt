@@ -39,6 +39,9 @@ For Admin panel:
         owner slug_text
         deck id text (id of the deck that owns this card) 
         image id of the image uploaded
+
+    Pages:
+        TBD.
  
 
 to-do:
@@ -60,8 +63,13 @@ to-do:
         remove unslugged endpoints.
         get filters by time (create / edit)
         make a model to save gradient colors and page names in the backend.
+    
+    Pages:
+        visual overhaul
+        upgrade customization
+        fix scrolling
 
 
 for tomorrow:
-    CSS GRID TIMEEE
-    page-ing component. 
+    laying out pages better.
+    adding same for project pages / endpoint

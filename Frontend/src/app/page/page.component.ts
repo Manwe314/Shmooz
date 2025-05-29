@@ -22,7 +22,7 @@ export class PageComponent {
 
   ngOnInit(): void {
     const data = this.pageService.getContent();
-    this.blocks = data.blocks || [];
+    this.blocks = data.content || [];
   }
 
   trackByBlock(index : number, block: Block){

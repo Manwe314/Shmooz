@@ -3,9 +3,10 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny 
-from .models import Deck, ProjectCard, SlugEntry
-from administration.serializers import DeckSerializer, ProjectCardSerializer, SlugEntrySerializer
+from .models import Deck, ProjectCard, SlugEntry, PagesModel
+from administration.serializers import DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer
 import sys
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 
@@ -45,25 +46,6 @@ class PageNamesView(APIView):
         else:
             return Response({"page1": "About-us", "page2": "Contact Us"})
         
-
-class PageHandlerView(APIView):
-    permission_classes =[AllowAny]
-
-    def get(self, request, *args, **kwargs):
-        route_name = request.resolver_match.view_name
-
-        if route_name == 'page1_handler':
-            slug = kwargs.get('slug')
-            return Response({"message": f"this is Page One for {slug}"})
-        if route_name == 'page2_handler':
-            slug = kwargs.get('slug')
-            return Response({"message": f"this is Page Two for {slug}"})
-        if route_name == 'project_page_handler':
-            index = kwargs.get('id')
-            return Response({"message": f"this is Project Page id: {index}"})
-        return Response({"message": "uh oh unknown name"})
-
-
 class DeckListView(ListAPIView):
     serializer_class = DeckSerializer
     permission_classes = [AllowAny]
@@ -95,3 +77,13 @@ class SlugListView(APIView):
         slugs = SlugEntry.objects.all()
         serializer = SlugEntrySerializer(slugs, many=True)
         return Response(serializer.data)
+
+class PageFetchView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request,  slug=None, *args, **kwargs):
+        category = self.kwargs.get('category')  
+        if not category or not slug:
+            return Response({"detail": "Missing category or slug"}, status=400)
+        page = get_object_or_404(PagesModel, owner=slug, category=category)
+        return Response(PagesModelSerializer(page).data)

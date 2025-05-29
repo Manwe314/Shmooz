@@ -22,8 +22,8 @@ from rest_framework_simplejwt.views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
-from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView, DeckUpdateDeleteView, ProjectCardUpdateDeleteView, SlugCreateView
-from portfolio.views import GradientColorView, DeckListView, ProjectCardListView, SlugListView, PageNamesView, PageHandlerView
+from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView, DeckUpdateDeleteView, ProjectCardUpdateDeleteView, SlugCreateView, PageUploadView
+from portfolio.views import GradientColorView, DeckListView, ProjectCardListView, SlugListView, PageNamesView, PageFetchView
 
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -38,15 +38,15 @@ urlpatterns = [
     path('api/auth/', AdminApiView.as_view(), name='Admin_actions'),
 
     path('api/auth/create_deck/<str:slug>', DeckCreateView.as_view(), name='create_deck_slug'),
-    path('api/auth/create_deck/', DeckCreateView.as_view(), name='create_deck'),
 
     path('api/auth/create_project_card/<str:slug>', ProjectCardCreateView.as_view(), name='create_project_card_slug'),
-    path('api/auth/create_project_card/', ProjectCardCreateView.as_view(), name='create_project_card'),
     
     path('api/auth/alter_deck/<int:pk>', DeckUpdateDeleteView.as_view(), name='deck_update_delete'),
     path('api/auth/alter_project_card/<int:pk>', ProjectCardUpdateDeleteView.as_view(), name='project_card_update_delete'),
 
     path('api/auth/create_slug/', SlugCreateView.as_view(), name='slug_create'),
+
+    path('api/auth/upload_page/', PageUploadView.as_view(), name='upload_page'),
 
     path('upload-image/<str:slug>', ImageUploadView.as_view()),
     path('upload-image/', ImageUploadView.as_view()),
@@ -54,20 +54,17 @@ urlpatterns = [
     path('api/slugs/', SlugListView.as_view(), name='slug_list'),
 
     path('api/gradient-colors/<str:slug>', GradientColorView.as_view(), name='Gradient_color_sluged'),
-    path('api/gradient-colors/', GradientColorView.as_view(), name='Gradient_color_root'),
 
     path('api/page-names/<str:slug>', PageNamesView.as_view(), name='page_names_sluged'),
-    path('api/page-names/', PageNamesView.as_view(), name='page_names_root'),
 
-    path('api/page1/<slug:slug>', PageHandlerView.as_view(), name='page1_handler'),
-    path('api/page2/<slug:slug>', PageHandlerView.as_view(), name='page2_handler'),
-    path('api/project_page/<int:id>', PageHandlerView.as_view(), name='project_page_handler'),
+    path('api/page1/<slug:slug>', PageFetchView.as_view(), {'category': 'page_one'}, name='page1_handler'),
+    path('api/page2/<slug:slug>', PageFetchView.as_view(), {'category': 'page_two'}, name='page2_handler'),
+    
+    path('api/project_page/<int:id>', PageFetchView.as_view(), name='project_page_handler'),
 
     path('api/deck/<slug:slug>', DeckListView.as_view(), name='get_deck_sluged'),
-    path('api/deck/', DeckListView.as_view(), name='get_deck_root'),
 
     path('api/projects/<slug:slug>', ProjectCardListView.as_view(), name='get_projects_sluged'),
-    path('api/projects/', ProjectCardListView.as_view(), name='get_projects_root'),
 ]
 
 urlpatterns += [
