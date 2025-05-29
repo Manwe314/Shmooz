@@ -1,69 +1,71 @@
-@for (block of blocks; track block.id) {
-  <div class="block-wrapper"
-       [ngStyle]="{
-         'background-color': block.backgroundColor,
-         'border': '2px solid ' + block.borderColor,
-         'box-shadow': 'inset 0 2px 4px rgba(0,0,0,0.2)',
-         'border-radius': '12px'
-       }">
-       
-    <div class="grid-container"
-         [ngStyle]="{
-           'display': 'grid',
-           'grid-template-columns': block.gridTemplateColumns,
-           'grid-template-rows': block.gridTemplateRows
-         }">
+<div class="scroll-container">
+  <div class="page-content">
+    @for (block of blocks; track block.id) {
+      <div class="block-wrapper"
+          [ngStyle]="{
+            'background-color': block.backgroundColor,
+            'border': '2px solid ' + block.borderColor,
+            'box-shadow': 'inset 0 2px 4px rgba(0,0,0,0.2)',
+            'border-radius': '12px'
+          }">
 
-      @for (content of block.content; track content.id) {
-        @switch (content.type) {
-          
-          @case ('image') {
-            <img [src]="content.url"
-                 [alt]="content.alt || ''"
-                 [ngStyle]="{
-                   'grid-column': content.colStart + ' / span ' + (content.colSpan || 1),
-                   'grid-row': content.rowStart + ' / span ' + (content.rowSpan || 1),
-                   'border-radius': content.borderRadius || '8px',
-                   'width': '100%',
-                   'height': 'auto',
-                   'object-fit': 'cover'
-                 }" />
-          }
+        <div class="grid-container"
+            [ngStyle]="{
+              'display': 'grid',
+              'grid-template-columns': block.gridTemplateColumns,
+              'grid-template-rows': block.gridTemplateRows
+            }">
 
-          @case ('text') {
-            @switch (content.tag || 'p') {
-              @case ('p') { <p [ngStyle]="getTextStyles(content)">{{content.text}}</p> }
-              @case ('h1') { <h1 [ngStyle]="getTextStyles(content)">{{content.text}}</h1> }
-              @case ('h2') { <h2 [ngStyle]="getTextStyles(content)">{{content.text}}</h2> }
-              @case ('span') { <span [ngStyle]="getTextStyles(content)">{{content.text}}</span> }
-              @default { <div [ngStyle]="getTextStyles(content)">{{content.text}}</div> }
+          @for (content of block.content; track content.id) {
+            @switch (content.type) {
+
+              @case ('image') {
+                <img [src]="content.url"
+                    [alt]="content.alt || ''"
+                    [ngStyle]="{
+                      'grid-column': content.colStart + ' / span ' + (content.colSpan || 1),
+                      'grid-row': content.rowStart + ' / span ' + (content.rowSpan || 1),
+                      'border-radius': content.borderRadius || '8px',
+                      'width': '100%',
+                      'height': 'auto',
+                      'object-fit': 'cover'
+                    }" />
+              }
+
+              @case ('text') {
+                @switch (content.tag || 'p') {
+                  @case ('p') { <p [ngStyle]="getTextStyles(content)">{{content.text}}</p> }
+                  @case ('h1') { <h1 [ngStyle]="getTextStyles(content)">{{content.text}}</h1> }
+                  @case ('h2') { <h2 [ngStyle]="getTextStyles(content)">{{content.text}}</h2> }
+                  @case ('span') { <span [ngStyle]="getTextStyles(content)">{{content.text}}</span> }
+                  @default { <div [ngStyle]="getTextStyles(content)">{{content.text}}</div> }
+                }
+              }
+
+              @case ('link') {
+                <a [href]="content.url"
+                  target="_blank"
+                  rel="noopener"
+                  [ngStyle]="{
+                    'grid-column': content.colStart + ' / span ' + (content.colSpan || 1),
+                    'grid-row': content.rowStart + ' / span ' + (content.rowSpan || 1),
+                    'display': 'flex',
+                    'align-items': 'center',
+                    'gap': '8px',
+                    'text-decoration': 'none',
+                    'color': 'inherit'
+                  }">
+                  @if (content.iconUrl) {
+                    <img [src]="content.iconUrl" alt="icon" style="width: 24px; height: 24px;" />
+                  }
+                  <span>{{ content.text }}</span>
+                </a>
+              }
             }
           }
-
-          @case ('link') {
-            <a [href]="content.url"
-               target="_blank"
-               rel="noopener"
-               [ngStyle]="{
-                 'grid-column': content.colStart + ' / span ' + (content.colSpan || 1),
-                 'grid-row': content.rowStart + ' / span ' + (content.rowSpan || 1),
-                 'display': 'flex',
-                 'align-items': 'center',
-                 'gap': '8px',
-                 'text-decoration': 'none',
-                 'color': 'inherit'
-               }">
-              @if (content.iconUrl) {
-                <img [src]="content.iconUrl" alt="icon" style="width: 24px; height: 24px;" />
-              }
-              <span>{{ content.text }}</span>
-            </a>
-          }
-        }
-      }
-    </div>
+        </div>
+      </div>
+    }
   </div>
-}
-
-
+</div>
 <app-landing-background></app-landing-background>
