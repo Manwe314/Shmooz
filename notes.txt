@@ -39,28 +39,37 @@ For Admin panel:
         owner slug_text
         deck id text (id of the deck that owns this card) 
         image id of the image uploaded
+
+    Pages:
+        TBD.
  
 
 to-do:
-    change "COMPANY" (default search) with actaul default target
-    deck visual update: box shadow, placement, text, more...
-    deck wheel animation polish. ?upgrade to be flat wheel
-    deck wheel placement.
     chose a font and use it.
-    fix the navigation buttons (tech and visual)
-    remove unslugged endpoints.
-    fix the inital rendering of the wrong content.
+    change "COMPANY" (default search) with actaul default target
+    navigation buttons visual update
+    
+    Deck:
+        deck visual update: box shadow, placement, text, more...
+        deck wheel animation polish. ?upgrade to be flat wheel
+        deck wheel placement.
+    
     project card: 
         card placement in hand
         hover animation + image paralax on hover
         dealing animation BIG refine.
         
     backend:
+        remove unslugged endpoints.
         get filters by time (create / edit)
-        make a model so save gradient colors and page names in the backend.
+        make a model to save gradient colors and page names in the backend.
+    
+    Pages:
+        visual overhaul
+        upgrade customization
+        fix scrolling
 
 
 for tomorrow:
-    CSS GRID TIMEEE
-    page-ing component. 
-    navigation buttons fix
+    laying out pages better.
+    adding same for project pages / endpoint

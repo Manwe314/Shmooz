@@ -3,8 +3,51 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 
+export interface Block {
+  id: string;
+  backgroundColor: string; // rgba(0,0,0,0.1)
+  borderColor: string;
+  gridTemplateColumns: string; // e.g. '1fr 2fr 1fr'
+  gridTemplateRows: string;    // e.g. 'auto auto'
+  content: BlockContent[];
+}
+
+export type BlockContent = ImageContent | TextContent | LinkContent;
+
+export interface BaseContent {
+  id: string;
+  type: 'image' | 'text' | 'link';
+  rowStart: number;
+  colStart: number;
+  rowSpan?: number;
+  colSpan?: number;
+}
+
+export interface ImageContent extends BaseContent {
+  type: 'image';
+  url: string;
+  alt?: string;
+  borderRadius?: string;
+}
+
+export interface TextContent extends BaseContent {
+  type: 'text';
+  text: string;
+  color?: string;
+  tag?: 'p' | 'h1' | 'h2' | 'span' | 'div';
+  textAlign?: 'left' | 'center' | 'right';
+}
+
+export interface LinkContent extends BaseContent {
+  type: 'link';
+  url: string;
+  text: string;
+  iconUrl?: string;
+}
+
+
 export interface PageData {
-  message: string;
+  content: Block[];
 }
 
 @Injectable({
@@ -13,7 +56,7 @@ export interface PageData {
 export class PageService {
   private http = inject(HttpClient);
   private api = inject(ApiService);
-  private content: PageData = {"message": "Loading..."};
+  private content: PageData = {content: []};
 
   setContent(data: PageData) {
     this.content = data;

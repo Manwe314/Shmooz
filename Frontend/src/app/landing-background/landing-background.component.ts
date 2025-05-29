@@ -17,6 +17,7 @@ export class LandingBackgroundComponent implements OnInit{
   gradientStyle = '';
   currentPage: 'home' | 'page1' | 'page2' = 'home';
   pageNames: PageInfo = {page1: 'page one', page2: 'page two'};
+  otherPages: { path: 'home' | 'page1' | 'page2'; label: string }[] = [];
 
   constructor(
     private backgroundService: BackgroundService,
@@ -32,33 +33,29 @@ export class LandingBackgroundComponent implements OnInit{
     if (names)
       this.pageNames = names;
 
+    this.updateCurrentPageAndOthers();
+
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        console.log('Setting to ', this.getCurrentPageFromUrl());
-        this.currentPage = this.getCurrentPageFromUrl();
-      });
+    .pipe(filter(event => event instanceof NavigationEnd))
+    .subscribe(() => this.updateCurrentPageAndOthers());
   }
 
-  getCurrentPageFromUrl(): 'home' | 'page1' | 'page2' {
+  private updateCurrentPageAndOthers(): void {
     const path = this.router.url.split('/')[1] || '';
-    console.log('i think we are on page: ', path);
-    if (path === 'page_one') return 'page1';
-    if (path === 'page_two') return 'page2';
-    return 'home';
-  }
+    if (path === 'page_one') this.currentPage = 'page1';
+    else if (path === 'page_two') this.currentPage = 'page2';
+    else this.currentPage = 'home';
 
-  get otherPages(): { path: 'home' | 'page1' | 'page2'; label: string }[] {
     const map: Record<'home' | 'page1' | 'page2', string> = {
       home: 'Home',
       page1: this.pageNames.page1,
       page2: this.pageNames.page2
     };
-    console.log('the currant page is: ', this.currentPage);
 
-    return (['home', 'page1', 'page2'] as const)
+    this.otherPages = (['home', 'page1', 'page2'] as const)
       .filter(p => p !== this.currentPage)
       .map(p => ({ path: p, label: map[p] }));
+
   }
 
   navigateTo(page: 'home' | 'page1' | 'page2') {
@@ -70,6 +67,10 @@ export class LandingBackgroundComponent implements OnInit{
 
     const slug = this.slugService.getCurrentSlug();
     const segments = [pathMap[page], slug].filter(Boolean);
+    if (segments.length === 0){
+      this.router.navigate(['']);
+      return;
+    }
 
     this.router.navigate(segments);
   }
