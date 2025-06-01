@@ -1,4 +1,4 @@
-<div class="card" [ngStyle]="backgroundImage">
+<div class="card" [ngStyle]="backgroundImage" (click)="onCardClick()">
   <div class="inset-border" [ngStyle]="insetBorder"></div>
   <div class="label-circle"[ngStyle]="label">
     {{ card.label_letter }}

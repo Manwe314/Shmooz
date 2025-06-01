@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import ImageUpload
-from portfolio.models import Deck, ProjectCard, PagesModel
+from portfolio.models import Deck, ProjectCard, PagesModel, BackgroundData
 from rest_framework.exceptions import ValidationError
 from portfolio.models import SlugEntry
 import re
@@ -74,10 +74,6 @@ def validate_link_item(value):
         raise ValidationError(f"{value['id']} does not contain both url and text")
     return value
     
-
-
-
-
 class SlugEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = SlugEntry
@@ -87,6 +83,21 @@ class ImageUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageUpload
         fields = ['id', 'title', 'image', 'uploaded_at']
+
+class PageNamesSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = BackgroundData
+        fields = ['id', 'page1', 'page2']
+
+class GradientColorsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BackgroundData
+        fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3']
+
+class BackgroundDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BackgroundData
+        fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3', 'page1', 'page2']
 
 class DeckSerializer(serializers.ModelSerializer):
     image_id = serializers.IntegerField(write_only=True, required=True)
@@ -118,7 +129,7 @@ class DeckSerializer(serializers.ModelSerializer):
 class ProjectCardSerializer(serializers.ModelSerializer):
     image_id = serializers.IntegerField(write_only=True, required=True)
     image_url = serializers.SerializerMethodField()
-    deck_id = serializers.IntegerField(write_only=True, required=True)  # NEW
+    deck_id = serializers.IntegerField(write_only=True, required=True)  
     deck = serializers.PrimaryKeyRelatedField(read_only=True) 
 
     class Meta:
@@ -151,9 +162,11 @@ class ProjectCardSerializer(serializers.ModelSerializer):
         return None
 
 class PagesModelSerializer(serializers.ModelSerializer):
+    project_card_id = serializers.IntegerField(write_only=True, required=False)
+
     class Meta:
         model = PagesModel
-        fields = ['id', 'owner', 'category', 'content', 'created_at', 'edited_at']
+        fields = ['id', 'owner', 'category', 'content', 'project_card_id', 'created_at', 'edited_at']
         read_only_fields = ['id', 'created_at', 'edited_at']
 
     def validate_content(self, content):
@@ -198,4 +211,17 @@ class PagesModelSerializer(serializers.ModelSerializer):
         return content
 
     def create(self, validated_data):
+        project_card_id = validated_data.pop("project_card_id", None)
+        if project_card_id:
+            from portfolio.models import ProjectCard
+            try:
+                project_card = ProjectCard.objects.get(id=project_card_id)
+            except ProjectCard.DoesNotExist:
+                raise serializers.ValidationError("Invalid project_card_id.")
+
+            if PagesModel.objects.filter(project_card=project_card).exists():
+                raise serializers.ValidationError("A page for this project card already exists.")
+
+            validated_data["project_card"] = project_card
+
         return PagesModel.objects.create(**validated_data)

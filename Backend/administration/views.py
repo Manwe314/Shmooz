@@ -3,11 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import ImageUpload
-from .serializers import ImageUploadSerializer, DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer
+from .serializers import ImageUploadSerializer, DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer, BackgroundDataSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.generics import get_object_or_404
 from rest_framework import status
-from portfolio.models import Deck, ProjectCard, SlugEntry
+from portfolio.models import Deck, ProjectCard, SlugEntry, PagesModel
 from django.utils import timezone 
 
 # Create your views here.
@@ -35,6 +35,16 @@ class ImageUploadView(APIView):
             image_instance.save()
             return Response({"status": "success", "data": ImageUploadSerializer(image_instance).data}, status=201)
         return Response(serializer.errors, status=400)
+
+class BackgroundDataUploadView(APIView):
+    #permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug=None):
+        serializer = BackgroundDataSerializer(data=request.data)
+        if serializer.is_valid():
+            background = serializer.save()
+            return Response(BackgroundDataSerializer(background).data, status=201)
+        return Response(serializer.errors, status=400)
     
 class DeckCreateView(APIView):
     #permission_classes = [IsAuthenticated]
@@ -58,6 +68,16 @@ class ProjectCardCreateView(APIView):
             return Response(ProjectCardSerializer(ProjectCard).data, status=201)
         return Response(serializer.errors, status=400)
     
+class PageUploadView(APIView):
+    #permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = PagesModelSerializer(data=request.data)
+        if serializer.is_valid():
+            page = serializer.save()
+            return Response(PagesModelSerializer(page).data, status=201)
+        return Response(serializer.errors, status=400)
+
 class SlugCreateView(APIView):
     #permission_classes = [IsAuthenticated]
 
@@ -105,12 +125,21 @@ class ProjectCardUpdateDeleteView(APIView):
         card.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-class PageUploadView(APIView):
+class PagesModelUpdateDeleteView(APIView):
     #permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        serializer = PagesModelSerializer(data=request.data)
+    def put(self, request, pk):
+        page = get_object_or_404(PagesModel, pk=pk)
+        serializer = PagesModelSerializer(page, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
-            page = serializer.save()
-            return Response(PagesModelSerializer(page).data, status=201)
+            updated_page = serializer.save()
+            updated_page.edited_at = timezone.now()
+            updated_page.save()
+            return Response(PagesModelSerializer(updated_page).data)
         return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        page = get_object_or_404(PagesModel, pk=pk)
+        page.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    

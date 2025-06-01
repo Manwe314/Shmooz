@@ -28,6 +28,24 @@ class SlugEntry(models.Model):
 
     def __str__(self):
         return self.slug
+    
+class BackgroundData(models.Model):
+    owner = models.CharField(max_length=50)
+    
+    color1 = models.CharField(max_length=50)
+    color2 = models.CharField(max_length=50)
+    color3 = models.CharField(max_length=50)
+
+    position1 = models.CharField(max_length=50)
+    position2 = models.CharField(max_length=50)
+    position3 = models.CharField(max_length=50)
+
+    page1 = models.CharField(max_length=50)
+    page2 = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.owner
+
 
     
 class ProjectCard(models.Model):
@@ -66,12 +84,23 @@ class PagesModel(models.Model):
 
     owner = models.SlugField(max_length=50)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    
     content = models.JSONField()  
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(null=True, blank=True)
+
+    project_card = models.OneToOneField(
+        'portfolio.ProjectCard',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='page'
+    )
 
     class Meta:
         unique_together = ['owner', 'category']
 
     def __str__(self):
+        if self.project_card:
+            return f"Page for ProjectCard ID {self.project_card.id}"
         return f"{self.owner} - {self.category}"
