@@ -8,7 +8,7 @@ export class SlugResolver implements Resolve<boolean> {
   constructor(private slugService: SlugService) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<boolean> {
-    const slug = route.paramMap.get('slug') ?? 'COMPANY';
+    const slug = route.paramMap.get('slug') ?? route.queryParamMap.get('slug') ?? 'COMPANY';
     this.slugService.setSlug(slug);
     return of(true);
   }

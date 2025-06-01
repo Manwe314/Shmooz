@@ -2,7 +2,7 @@ For Production:
     serve media files with nginx.
     deck-display-wheel.ts uses any twice. (dont know how not to use)
     switch client side "127.0.0.1" api calls and server side "backend:8000" calls to
-    an env variable. 
+    an env variable. OR just update api service.
     add back jwt is authenticated!
     chnage DockerFiles to copy files
     wrap ProjectCard data wityh animatioed project card to add animation specific data
@@ -11,12 +11,11 @@ For Production:
 
 For Admin panel:
     
-    Background Gradient:
+    Background data:
         3 Colors  hex code
         3 Positions 0-100
-    
-    page Names:
         2 page names strings
+        owner string(slug)
     
     images:
         image .png / .jpg
@@ -48,6 +47,7 @@ to-do:
     chose a font and use it.
     change "COMPANY" (default search) with actaul default target
     navigation buttons visual update
+    slug guard based on slug registry in slug resolver
     
     Deck:
         deck visual update: box shadow, placement, text, more...
@@ -60,9 +60,9 @@ to-do:
         dealing animation BIG refine.
         
     backend:
-        remove unslugged endpoints.
         get filters by time (create / edit)
-        make a model to save gradient colors and page names in the backend.
+        add time for all models (created at edited at)
+        add alter endpoint for all models
     
     Pages:
         visual overhaul
@@ -71,5 +71,4 @@ to-do:
 
 
 for tomorrow:
-    laying out pages better.
-    adding same for project pages / endpoint
+    project cards animations upgrades! on select on ohver on play!

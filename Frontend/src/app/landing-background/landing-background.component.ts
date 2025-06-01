@@ -28,7 +28,7 @@ export class LandingBackgroundComponent implements OnInit{
   ngOnInit() {
     const gradient = this.backgroundService.getGradient();
     if (gradient)
-      this.gradientStyle = `radial-gradient(circle at 50% 130%, #${gradient.color1} ${gradient.position1}%, #${gradient.color2} ${gradient.position2}%, #${gradient.color3} ${gradient.position3}%)`;
+      this.gradientStyle = `radial-gradient(circle at 50% 130%, ${gradient.color1} ${gradient.position1}, ${gradient.color2} ${gradient.position2}, ${gradient.color3} ${gradient.position3})`;
     const names = this.backgroundService.getPageNames();
     if (names)
       this.pageNames = names;
@@ -42,7 +42,7 @@ export class LandingBackgroundComponent implements OnInit{
 
   private updateCurrentPageAndOthers(): void {
     const path = this.router.url.split('/')[1] || '';
-    if (path === 'page_one') this.currentPage = 'page1';
+    if (path === 'page_one' || path === 'project_page') this.currentPage = 'page1';
     else if (path === 'page_two') this.currentPage = 'page2';
     else this.currentPage = 'home';
 

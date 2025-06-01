@@ -3,8 +3,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny 
-from .models import Deck, ProjectCard, SlugEntry, PagesModel
-from administration.serializers import DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer
+from .models import Deck, ProjectCard, SlugEntry, PagesModel, BackgroundData
+from administration.serializers import DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer, PageNamesSerializer, GradientColorsSerializer, BackgroundDataSerializer
 import sys
 from django.shortcuts import get_object_or_404
 # Create your views here.
@@ -14,37 +14,18 @@ class GradientColorView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, slug=None):
-        print(f"the slug: {slug}", flush=True)
-        if slug == 'kuxi':
-            return Response({
-                "color1":"D81B1E",
-                "position1": "11",
-                "color2": "330321",
-                "position2": "38",
-                "color3": "050319",
-                "position3": "80",
-            })
-        elif slug == 'COMPANY':
-            return Response({
-                "color1":"712243",
-                "position1": "0",
-                "color2": "181532",
-                "position2": "46",
-                "color3": "050319",
-                "position3": "71",
-            })
-        return Response({
-            "message": f"Unrecognized slug: {slug}"
-        }, status=404)
+        background = get_object_or_404(BackgroundData, owner=slug)
+        serializer = GradientColorsSerializer(background)
+        return Response(serializer.data)
 
 class PageNamesView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, slug=None):
-        if slug == 'kuxi':
-            return Response({"page1": "About-me", "page2": "CV"})
-        else:
-            return Response({"page1": "About-us", "page2": "Contact Us"})
+        names = get_object_or_404(BackgroundData, owner=slug)
+        serializer = PageNamesSerializer(names)
+        return Response(serializer.data)
+        
         
 class DeckListView(ListAPIView):
     serializer_class = DeckSerializer
@@ -86,4 +67,16 @@ class PageFetchView(APIView):
         if not category or not slug:
             return Response({"detail": "Missing category or slug"}, status=400)
         page = get_object_or_404(PagesModel, owner=slug, category=category)
+        return Response(PagesModelSerializer(page).data)
+    
+class ProjectPageFetchView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, id):
+        card = get_object_or_404(ProjectCard, id=id)
+        try:
+            page = PagesModel.objects.get(project_card=card)
+        except PagesModel.DoesNotExist:
+            return Response({"detail": "Page for this project card does not exist."}, status=404)
+
         return Response(PagesModelSerializer(page).data)

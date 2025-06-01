@@ -1,5 +1,4 @@
 .block-wrapper {
-  width: 100%;
   padding: 1rem;
   margin-bottom: 2rem;
 }
@@ -8,4 +7,20 @@
   width: 100%;
   display: grid;
   gap: 1rem;
+}
+
+.page-content{
+  padding: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
 }

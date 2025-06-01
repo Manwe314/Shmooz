@@ -27,9 +27,6 @@ export class AppComponent implements OnInit{
         while (currentRoute.firstChild) {
           currentRoute = currentRoute.firstChild;
         }
-
-        const slug = currentRoute.snapshot.paramMap.get('slug') || '';
-        this.slugService.setSlug(slug);
       });
   }
 }

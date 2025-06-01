@@ -2,6 +2,8 @@ import { Component, ElementRef, ViewChild, Input, OnChanges, SimpleChanges } fro
 import { CommonModule } from '@angular/common';
 import { ProjectCard } from '../services/project-cards.service';
 import { ProjectCardComponent } from '../project-card/project-card.component';
+import { Router } from '@angular/router';
+import { SlugService } from '../services/slug.service';
 
 @Component({
   selector: 'app-hand',
@@ -12,6 +14,8 @@ import { ProjectCardComponent } from '../project-card/project-card.component';
 export class HandComponent {
   private _cards: ProjectCard[] = [];
   hoveredIndex: number | null = null;
+  playingCardIndex: number | null = null;
+  constructor(private router: Router, private slugService: SlugService) {}
   @Input() deckOrigin: { x: number; y: number } | null = null;
   @ViewChild('handContainerRef', { static: true }) handContainerRef!: ElementRef<HTMLDivElement>;
   @Input() set cards(value: ProjectCard[]) {
@@ -83,6 +87,19 @@ export class HandComponent {
     }
   
     return `translateY(${lift}%) rotate(${angle}deg)`;
+  }
+  
+  onCardClicked(card: ProjectCard, index: number) {
+    this.playingCardIndex = index;
+    const slug = this.slugService.getCurrentSlug() ?? 'COMPANY';
+
+    setTimeout(() => {
+      this.router.navigate([`/project_page/${card.id}`], {queryParams: { slug } });
+    }, 1000);
+  }
+
+  isPlaying(index: number) {
+    return this.playingCardIndex === index;
   }
 
 }

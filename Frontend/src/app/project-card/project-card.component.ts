@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ProjectCard } from '../services/project-cards.service';
 import { CommonModule } from '@angular/common';
 
@@ -10,6 +10,11 @@ import { CommonModule } from '@angular/common';
 })
 export class ProjectCardComponent {
   @Input() card!: ProjectCard;
+  @Output() cardClicked = new EventEmitter<ProjectCard>();
+
+  onCardClick() {
+    this.cardClicked.emit(this.card);
+  }
 
   get backgroundImage(): Record<string, string> {
     if (!this.card){
