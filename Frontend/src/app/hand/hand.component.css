@@ -3,29 +3,21 @@
   height: 50%;
   width: 100%;
   bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
   pointer-events: none;
   z-index: 1000; 
 }
 
 .hand-card {
-  position: relative;
-  width: 120px;
-  transform-origin: bottom center;
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 205px;
   pointer-events: auto;
-  transition: transform 0.6s ease, opacity 0.3s ease;
+  transition: transform 0.8s ease, opacity 0.3s ease;
   opacity: 1;
 }
 
-.hand-card[style*="translate("] {
-  opacity: 0.3;
-}
-
-.hand-card[style*="translateY"] {
-  opacity: 1;
-}
 
 .hand-card.playing {
   position: fixed;

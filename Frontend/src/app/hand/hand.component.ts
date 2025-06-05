@@ -63,12 +63,29 @@ export class HandComponent {
     }
   }
 
+  computeArgument(index: number, total: number): number{
+    const step_angle = 0.13;
+    if (total % 2 === 1){
+      return (index - (total - 1) / 2) * step_angle;
+    }
+    else{
+      const half = total / 2;
+      if (index < half)
+        return ((-(half - index)) * step_angle) + (step_angle / 2);
+      else
+        return ((index - half + 1) * step_angle) - (step_angle / 2);
+    }
+  }
+
   getCardTransform(index: number, total: number, card: ProjectCard): string {
-    const min_low = 15;
-    const spread = Math.min(30, total * 6);
-    const offset = index - (total - 1) / 2;
-    const angle = offset * (spread / total);
-    const lift =  (Math.abs(offset) * 5) + min_low;
+    const argument = this.computeArgument(index, total);
+    const horizontalRadius = 475 * 3;
+    const vertiacalRadius = 275 * 3;
+    const globalLower = 20;
+    const xOffset = horizontalRadius * Math.sin(argument); 
+    const yoffset = vertiacalRadius * (1 - Math.cos(argument)) + globalLower; 
+    const rotation = Math.atan2(vertiacalRadius * Math.sin(argument), horizontalRadius * Math.cos(argument)) * (180 / Math.PI);
+    
 
     if (card.animationState === 'entering') {
       const x = card.offsetX ?? 0;
@@ -77,16 +94,19 @@ export class HandComponent {
     }
 
     if (this.hoveredIndex === index) {
-      return `translateY(${lift - 30}px) rotate(${angle}deg)`;
+      return `translateX(-50%) translateX(${xOffset}px) translateY(${yoffset}px) translateY(${-yoffset - 30}px)`;
     }
   
     if (this.hoveredIndex !== null) {
+      const shiftTotal = 28;
+      const rotationTotal = total > 6 ? total + 2 : total;
       const distance = index - this.hoveredIndex;
-      const lateralShift = distance * 5; // shift away slightly
-      return `translate(${lateralShift}px, ${lift}px) rotate(${angle}deg)`;
+      const lateralShift = shiftTotal / distance;
+      const rotationalShift = rotationTotal / distance;
+      return ` translateX(-50%) translateX(${xOffset}px) translateX(${lateralShift}px) translateY(${yoffset}px) rotate(${rotation}deg) rotate(${rotationalShift}deg)`;
     }
   
-    return `translateY(${lift}%) rotate(${angle}deg)`;
+    return `translateX(-50%) translateX(${xOffset}px) translateY(${yoffset}px) rotate(${rotation}deg)`;
   }
   
   onCardClicked(card: ProjectCard, index: number) {
