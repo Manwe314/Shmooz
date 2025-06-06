@@ -81,7 +81,7 @@ export class HandComponent {
     const argument = this.computeArgument(index, total);
     const horizontalRadius = 475 * 3;
     const vertiacalRadius = 275 * 3;
-    const globalLower = 20;
+    const globalLower = 30;
     const xOffset = horizontalRadius * Math.sin(argument); 
     const yoffset = vertiacalRadius * (1 - Math.cos(argument)) + globalLower; 
     const rotation = Math.atan2(vertiacalRadius * Math.sin(argument), horizontalRadius * Math.cos(argument)) * (180 / Math.PI);
@@ -94,7 +94,7 @@ export class HandComponent {
     }
 
     if (this.hoveredIndex === index) {
-      return `translateX(-50%) translateX(${xOffset}px) translateY(${yoffset}px) translateY(${-yoffset - 30}px)`;
+      return `translateX(-50%) translateX(${xOffset}px) translateY(${yoffset}px) translateY(${-yoffset - 40}px)`;
     }
   
     if (this.hoveredIndex !== null) {

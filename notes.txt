@@ -71,6 +71,6 @@ to-do:
 
 
 for tomorrow:
-    project cards playing animation upgrade
     project cards geting into hand AND GOING out animation
     project page transition animation.
+    project card hover paralax

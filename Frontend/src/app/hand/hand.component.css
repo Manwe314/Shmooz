@@ -21,9 +21,14 @@
 
 .hand-card.playing {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(1.2);
   z-index: 2000;
-  transition: transform 1s ease;
+  animation: play 0.75s cubic-bezier(.44,.07,.05,1) forwards;
+}
+
+@keyframes play {
+  100% {
+    top: 56%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
 }
