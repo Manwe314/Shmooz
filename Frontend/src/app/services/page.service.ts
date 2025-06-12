@@ -69,6 +69,8 @@ export class PageService {
   getPageData(path: string, slug: string, id?: string): Observable<PageData> {
     let endpoint: string;
 
+    //to-do mc givi pagination
+
     if (path === 'page_one') 
       endpoint = this.api.buildUrl(`page1/${slug}`);
     else if (path === 'page_two')
