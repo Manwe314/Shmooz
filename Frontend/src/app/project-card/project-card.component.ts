@@ -93,7 +93,7 @@ export class ProjectCardComponent {
 
   getImageUrl(path: string): string {
     //URL
-    return `https://127.0.0.1${path}`
+    return `https://127.0.0.1:8080${path}`
   }
 
 }

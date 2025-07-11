@@ -1,3 +1,8 @@
+To operate in school:
+    upadte yaml file to 8080:443
+    search //URL and update to 127.0.0.1:8080
+    go to api service and update it to 127.0.0.1:8080
+
 For Production:
     serve media files with nginx.
     deck-display-wheel.ts uses any twice. (dont know how not to use)

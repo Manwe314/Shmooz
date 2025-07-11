@@ -31,7 +31,7 @@
   border: 2px solid;
   border-radius: 8px;
   pointer-events: none;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
 .label-circle {

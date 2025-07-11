@@ -4,3 +4,15 @@
     <app-project-card class="hand-card" [card]="card" (cardClicked)="onCardClicked(card, i)" (mouseenter)="setHovered(i)" (mouseleave)="setHovered(null)" [class.playing]="isPlaying(i)" [style.transform]="getCardTransform(i, total, card)"></app-project-card>
   }
 </div>
+<div
+  *ngIf="deckOrigin"
+  class="debug-deck-dot"
+  [style.left.px]="deckOrigin.x"
+  [style.top.px]="deckOrigin.y"
+></div>
+<div
+  *ngIf="cardBasePoint"
+  class="debug-blue-dot"
+  [style.left.px]="cardBasePoint.x"
+  [style.top.px]="cardBasePoint.y"
+></div>

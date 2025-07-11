@@ -16,6 +16,7 @@ export class HandComponent {
   hoveredIndex: number | null = null;
   playingCardIndex: number | null = null;
   constructor(private router: Router, private slugService: SlugService) {}
+  cardBasePoint: { x: number, y: number } | null = null;
   @Input() deckOrigin: { x: number; y: number } | null = null;
   @ViewChild('handContainerRef', { static: true }) handContainerRef!: ElementRef<HTMLDivElement>;
   @Input() set cards(value: ProjectCard[]) {
@@ -24,15 +25,21 @@ export class HandComponent {
       return;
     }
 
+    const handRect = this.handContainerRef.nativeElement.getBoundingClientRect();
+    const cardBaseX = handRect.left + handRect.width / 2;
+    const cardBaseY = handRect.bottom;
+
+this.cardBasePoint = { x: cardBaseX, y: cardBaseY };
+    
     const containerRect = this.handContainerRef.nativeElement.getBoundingClientRect();
     const toX = containerRect.left + containerRect.width / 2;
-    const toY = containerRect.bottom;
+    const toY = containerRect.top + containerRect.height / 2;
 
     const fromX = this.deckOrigin.x;
     const fromY = this.deckOrigin.y;
 
-    const offsetX = fromX - toX;
-    const offsetY = fromY - toY;
+    const offsetX = 0;
+    const offsetY = 0;
     
     this._cards = value.map(card => ({
       ...card,
@@ -44,7 +51,7 @@ export class HandComponent {
     this._cards.forEach((card, index) => {
       setTimeout(() => {
         card.animationState = 'inHand';
-      }, index * 120);
+      }, (index * 120) + 120);
     });
   }
 
@@ -85,12 +92,13 @@ export class HandComponent {
     const xOffset = horizontalRadius * Math.sin(argument); 
     const yoffset = vertiacalRadius * (1 - Math.cos(argument)) + globalLower; 
     const rotation = Math.atan2(vertiacalRadius * Math.sin(argument), horizontalRadius * Math.cos(argument)) * (180 / Math.PI);
-    
+    const x = card.offsetX ?? 0;
+      const y = card.offsetY ?? 0;
 
     if (card.animationState === 'entering') {
       const x = card.offsetX ?? 0;
       const y = card.offsetY ?? 0;
-      return `translate(${x}px, ${y}px) scale(0.7) rotate(0deg)`;
+      return `translate(${x}px, ${y}px) scale(1) rotate(0deg)`;
     }
 
     if (this.hoveredIndex === index) {
@@ -105,7 +113,7 @@ export class HandComponent {
       const rotationalShift = rotationTotal / distance;
       return ` translateX(-50%) translateX(${xOffset}px) translateX(${lateralShift}px) translateY(${yoffset}px) rotate(${rotation}deg) rotate(${rotationalShift}deg)`;
     }
-  
+    return `translate(${x}px, ${y}px) scale(1) rotate(0deg)`;
     return `translateX(-50%) translateX(${xOffset}px) translateY(${yoffset}px) rotate(${rotation}deg)`;
   }
   

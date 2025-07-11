@@ -32,3 +32,27 @@
     transform: translate(-50%, -50%) scale(0.85);
   }
 }
+
+.debug-deck-dot {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: limegreen; /* ✅ High visibility */
+  z-index: 5000; /* ✅ On top of everything */
+  transform: translate(-50%, -50%); /* ✅ Centered at exact x/y */
+  pointer-events: none;
+  box-shadow: 0 0 6px 2px rgba(0, 255, 0, 0.5);
+}
+
+.debug-blue-dot {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: dodgerblue;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 6px 2px rgba(30, 144, 255, 0.5);
+}
