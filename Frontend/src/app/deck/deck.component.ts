@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-deck',
   imports: [CommonModule],
   templateUrl: './deck.component.html',
-  styleUrls: ['./deck.component.css']
+  styleUrls: ['./deck.component.css'],
 })
 export class DeckComponent {
   @Input() displayName: string = '';

@@ -4,17 +4,17 @@
   width: 100%;
   bottom: 0;
   pointer-events: none;
-  z-index: 1000; 
+  z-index: 300; 
 }
 
 .hand-card {
   position: absolute;
   left: 50%;
   bottom: 0;
-  transform: translateX(-50%);
   width: 205px;
+  transform: translateX(-50%);
   pointer-events: auto;
-  transition: transform 0.8s ease, opacity 0.3s ease;
+  transition: transform 0.8s ease, opacity 0.3s ease; 
   opacity: 1;
 }
 

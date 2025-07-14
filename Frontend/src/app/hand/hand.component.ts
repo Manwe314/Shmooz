@@ -9,7 +9,7 @@ import { SlugService } from '../services/slug.service';
   selector: 'app-hand',
   imports: [CommonModule, ProjectCardComponent],
   templateUrl: './hand.component.html',
-  styleUrl: './hand.component.css'
+  styleUrl: './hand.component.css',
 })
 export class HandComponent {
   private _cards: ProjectCard[] = [];
@@ -24,22 +24,26 @@ export class HandComponent {
       this._cards = value;
       return;
     }
-
     const handRect = this.handContainerRef.nativeElement.getBoundingClientRect();
     const cardBaseX = handRect.left + handRect.width / 2;
     const cardBaseY = handRect.bottom;
 
-this.cardBasePoint = { x: cardBaseX, y: cardBaseY };
+    this.cardBasePoint = { x: cardBaseX, y: cardBaseY };
+    console.log("blue coords: ", cardBaseX, cardBaseY);
     
     const containerRect = this.handContainerRef.nativeElement.getBoundingClientRect();
     const toX = containerRect.left + containerRect.width / 2;
-    const toY = containerRect.top + containerRect.height / 2;
+    const toY = containerRect.bottom;
 
     const fromX = this.deckOrigin.x;
     const fromY = this.deckOrigin.y;
 
-    const offsetX = 0;
-    const offsetY = 0;
+    const cardWidth = 205;
+    const cardHeight = 275;
+
+    const offsetX = (fromX - toX) - (cardWidth / 2);
+    const offsetY = (fromY - toY) + (cardHeight / 2);
+    console.log("offsets: ", offsetX, offsetY);
     
     this._cards = value.map(card => ({
       ...card,
@@ -92,13 +96,12 @@ this.cardBasePoint = { x: cardBaseX, y: cardBaseY };
     const xOffset = horizontalRadius * Math.sin(argument); 
     const yoffset = vertiacalRadius * (1 - Math.cos(argument)) + globalLower; 
     const rotation = Math.atan2(vertiacalRadius * Math.sin(argument), horizontalRadius * Math.cos(argument)) * (180 / Math.PI);
-    const x = card.offsetX ?? 0;
-      const y = card.offsetY ?? 0;
+    
 
     if (card.animationState === 'entering') {
       const x = card.offsetX ?? 0;
       const y = card.offsetY ?? 0;
-      return `translate(${x}px, ${y}px) scale(1) rotate(0deg)`;
+      return `translate(${x}px, ${y}px) scale(0.7) rotate(-90deg)`;
     }
 
     if (this.hoveredIndex === index) {
@@ -113,7 +116,7 @@ this.cardBasePoint = { x: cardBaseX, y: cardBaseY };
       const rotationalShift = rotationTotal / distance;
       return ` translateX(-50%) translateX(${xOffset}px) translateX(${lateralShift}px) translateY(${yoffset}px) rotate(${rotation}deg) rotate(${rotationalShift}deg)`;
     }
-    return `translate(${x}px, ${y}px) scale(1) rotate(0deg)`;
+
     return `translateX(-50%) translateX(${xOffset}px) translateY(${yoffset}px) rotate(${rotation}deg)`;
   }
   

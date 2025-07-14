@@ -5,3 +5,11 @@
     height: 100vh;
     overflow: hidden;
 }
+
+.deck-display {
+    z-index: 500;
+}
+
+.hand {
+    z-index: 300;
+}
