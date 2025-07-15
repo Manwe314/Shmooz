@@ -25,6 +25,12 @@
   animation: play 0.75s cubic-bezier(.44,.07,.05,1) forwards;
 }
 
+.hand-card.discarding {
+  position: fixed;
+  animation: discard 250ms cubic-bezier(1,.53,.87,.89) forwards;
+  pointer-events: none;
+}
+
 @keyframes play {
   100% {
     top: 56%;
@@ -33,26 +39,24 @@
   }
 }
 
-.debug-deck-dot {
-  position: fixed;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: limegreen; /* ✅ High visibility */
-  z-index: 5000; /* ✅ On top of everything */
-  transform: translate(-50%, -50%); /* ✅ Centered at exact x/y */
-  pointer-events: none;
-  box-shadow: 0 0 6px 2px rgba(0, 255, 0, 0.5);
-}
-
-.debug-blue-dot {
-  position: fixed;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: dodgerblue;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  box-shadow: 0 0 6px 2px rgba(30, 144, 255, 0.5);
+@keyframes discard {
+  10%{
+    transform: translateX(1vw) scale(0.95) rotate(-14deg);
+  }
+  30% {
+    transform: translateX(-250px) translateY(10px) scale(0.92) rotate(-60deg);
+    opacity: 0.98;
+  }
+  60% {
+    transform: translateX(-600px) translateY(20px) scale(0.9) rotate(-90deg);
+    opacity: 0.9;
+  }
+  90% {
+    transform: translateX(-120vw) translateY(40px) scale(0.8) rotate(-15deg);
+    opacity: 0.83;
+  }
+  100% {
+    transform: translateX(-120vw) translateY(60px) scale(0.7) rotate(-8deg);
+    opacity: 0.78;
+  }
 }

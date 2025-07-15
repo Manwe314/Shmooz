@@ -9,6 +9,7 @@
     box-sizing: border-box;
     margin-top: 50px;
     z-index: 500;
+    position: absolute;
 }
 
 .deck-mask {

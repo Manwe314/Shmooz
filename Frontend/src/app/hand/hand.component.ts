@@ -24,12 +24,6 @@ export class HandComponent {
       this._cards = value;
       return;
     }
-    const handRect = this.handContainerRef.nativeElement.getBoundingClientRect();
-    const cardBaseX = handRect.left + handRect.width / 2;
-    const cardBaseY = handRect.bottom;
-
-    this.cardBasePoint = { x: cardBaseX, y: cardBaseY };
-    console.log("blue coords: ", cardBaseX, cardBaseY);
     
     const containerRect = this.handContainerRef.nativeElement.getBoundingClientRect();
     const toX = containerRect.left + containerRect.width / 2;
@@ -43,20 +37,44 @@ export class HandComponent {
 
     const offsetX = (fromX - toX) - (cardWidth / 2);
     const offsetY = (fromY - toY) + (cardHeight / 2);
-    console.log("offsets: ", offsetX, offsetY);
     
-    this._cards = value.map(card => ({
-      ...card,
-      animationState: 'entering',
-      offsetX,
-      offsetY
-    }));
-  
-    this._cards.forEach((card, index) => {
+
+    if (this._cards.length > 0) {
+      this._cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.animationState = 'discarding';
+        }, index * 90);
+      });
+
       setTimeout(() => {
-        card.animationState = 'inHand';
-      }, (index * 120) + 120);
-    });
+        this._cards = value.map(card => ({
+          ...card,
+          animationState: 'entering',
+          offsetX,
+          offsetY
+        }));
+
+        this._cards.forEach((card, index) => {
+          setTimeout(() => {
+            card.animationState = 'inHand';
+          }, (index * 120) + 120);
+        });
+      }, (this._cards.length * 90) + 250);
+    } else {
+
+      this._cards = value.map(card => ({
+        ...card,
+        animationState: 'entering',
+        offsetX,
+        offsetY
+      }));
+    
+      this._cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.animationState = 'inHand';
+        }, (index * 120) + 120);
+      });
+    }
   }
 
   get cards(): ProjectCard[] {
@@ -103,6 +121,10 @@ export class HandComponent {
       const y = card.offsetY ?? 0;
       return `translate(${x}px, ${y}px) scale(0.7) rotate(-90deg)`;
     }
+
+    // if (card.animationState === 'discarding') {
+    //   return `translate(-50%)`;
+    // }
 
     if (this.hoveredIndex === index) {
       return `translateX(-50%) translateX(${xOffset}px) translateY(${yoffset}px) translateY(${-yoffset - 40}px)`;
