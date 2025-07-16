@@ -60,9 +60,9 @@ to-do:
         deck wheel placement.
     
     project card: 
-        card placement in hand
-        hover animation + image paralax on hover
-        dealing animation BIG refine.
+        correct origin setting.
+        disable hover while moving
+        transition animation into project page.
         
     backend:
         get filters by time (create / edit)
@@ -76,5 +76,6 @@ to-do:
 
 
 for tomorrow:
-    project cards geting into hand AND GOING out animation
     project page transition animation.
+    deck clicking guard, hover guard.
+    project pages not coming from correct place.

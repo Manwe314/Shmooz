@@ -10,6 +10,7 @@
       [class.playing]="isPlaying(i)" 
       [class.discarding]="card.animationState === 'discarding'"
       [style.transform]="getCardTransform(i, total, card)"
+      [style.--base-transform]="getCardTransform(i, total, card)"
       ></app-project-card>
   }
 </div>

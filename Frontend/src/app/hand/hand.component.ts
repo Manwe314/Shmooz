@@ -43,7 +43,7 @@ export class HandComponent {
       this._cards.forEach((card, index) => {
         setTimeout(() => {
           card.animationState = 'discarding';
-        }, index * 90);
+        }, index * 70);
       });
 
       setTimeout(() => {
@@ -59,7 +59,7 @@ export class HandComponent {
             card.animationState = 'inHand';
           }, (index * 120) + 120);
         });
-      }, (this._cards.length * 90) + 250);
+      }, (this._cards.length * 70) + 250);
     } else {
 
       this._cards = value.map(card => ({

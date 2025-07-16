@@ -23,7 +23,7 @@ deck_titles = ["coding deck", "test2 deck", "test3 deck", "test4 deck"]
 deck_map = {}
 for title in deck_titles:
     try:
-        deck = Deck.objects.get(title=title, owner="COMPANY")
+        deck = Deck.objects.get(title=title, owner="kuxi")
         deck_map[title] = deck
         print(f"✅ Found deck '{title}' with ID {deck.id}")
     except Deck.DoesNotExist:
