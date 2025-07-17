@@ -19,7 +19,8 @@ import { filter, switchMap } from 'rxjs';
 export class LandingPageComponent {
   cards = signal<ProjectCard[]>([]);
   deckOrigin: { x: number; y: number } | null = null;
-
+  isTransitioning = false;
+  pendingDeckClick: { id: string; origin: { x: number; y: number } } | null = null;
   
   constructor(
     private projectCardService: ProjectCardsService,
@@ -27,20 +28,45 @@ export class LandingPageComponent {
   ) {}
 
   onDeckSelected(deckData: { id: string; origin: { x: number; y: number } }) {
-    const { id, origin } = deckData;
+    if (this.isTransitioning) {
+     this.pendingDeckClick = deckData; // Save most recent click
+     return;
+    }
 
+    this.executeDeckSelection(deckData);
+  }
+
+  executeDeckSelection(deckData: { id: string; origin: { x: number; y: number } }) {
+    const { id, origin } = deckData;
     this.deckOrigin = origin;
-    
+
     this.slugService.slug$
-    .pipe(
-      filter(slug => slug !== null),
-      switchMap(slug => this.projectCardService.getCardsForDeck(slug!, id))
-    )
-    .subscribe({
-      next: (cards) => {
-        this.cards.set(cards);
-      },
-      error: (err: { status: any; message: any; error: any; url: any }) => {
+      .pipe(
+        filter(slug => slug !== null),
+        switchMap(slug => this.projectCardService.getCardsForDeck(slug!, id))
+      )
+      .subscribe({
+        next: (cards) => {
+          const numCards = cards.length;
+
+          const discardDuration = numCards * 70 + 250;
+          const enterDuration = numCards * 120 + 120 + 800;
+          const totalDuration = discardDuration + enterDuration + 5;
+
+          this.isTransitioning = true;
+          this.cards.set(cards);
+
+          setTimeout(() => {
+            this.isTransitioning = false;
+
+            if (this.pendingDeckClick) {
+              const pending = this.pendingDeckClick;
+              this.pendingDeckClick = null;
+              this.executeDeckSelection(pending);
+            }
+          }, totalDuration);
+        },
+        error: (err: { status: any; message: any; error: any; url: any }) => {
         console.error("🔥 ERROR fetching cards");
         console.error("Status:", err.status);
         console.error("Message:", err.message);
@@ -48,7 +74,6 @@ export class LandingPageComponent {
         console.error("URL:", err.url);
       }
     });
-  
   }
 
 }

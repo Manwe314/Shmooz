@@ -1,5 +1,5 @@
 <div class="hand-container" #handContainerRef>
-  @for (card of cards; track $index; let i = $index; let total = $count)
+  @for (card of displayedCards; track $index; let i = $index; let total = $count)
   {
     <app-project-card 
       class="hand-card" 

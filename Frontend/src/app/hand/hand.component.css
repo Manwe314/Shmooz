@@ -23,6 +23,7 @@
   position: fixed;
   z-index: 2000;
   animation: play 0.75s cubic-bezier(.44,.07,.05,1) forwards;
+  pointer-events: none;
 }
 
 .hand-card.discarding {

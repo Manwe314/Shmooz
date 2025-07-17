@@ -19,12 +19,26 @@ export class HandComponent {
   cardBasePoint: { x: number, y: number } | null = null;
   @Input() deckOrigin: { x: number; y: number } | null = null;
   @ViewChild('handContainerRef', { static: true }) handContainerRef!: ElementRef<HTMLDivElement>;
-  @Input() set cards(value: ProjectCard[]) {
-    if (!value || !this.deckOrigin) {
-      this._cards = value;
+  @Input() cards: ProjectCard[] = [];
+
+  get displayedCards(): ProjectCard[] {
+    return this._cards;
+  }
+
+  setHovered(index: number | null): void {
+    this.hoveredIndex = index;
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (!this.deckOrigin || !changes['cards'] || !this.cards?.length){
+      console.log("TUTUTUT");
       return;
     }
-    
+    if (changes['cards']) {
+      console.log('[HandComponent] received cards:', this.cards);
+      console.log('🧭 Deck origin received in hand:', this.deckOrigin);
+    }
+
     const containerRect = this.handContainerRef.nativeElement.getBoundingClientRect();
     const toX = containerRect.left + containerRect.width / 2;
     const toY = containerRect.bottom;
@@ -37,7 +51,6 @@ export class HandComponent {
 
     const offsetX = (fromX - toX) - (cardWidth / 2);
     const offsetY = (fromY - toY) + (cardHeight / 2);
-    
 
     if (this._cards.length > 0) {
       this._cards.forEach((card, index) => {
@@ -47,11 +60,11 @@ export class HandComponent {
       });
 
       setTimeout(() => {
-        this._cards = value.map(card => ({
+        this._cards = this.cards.map(card => ({
           ...card,
           animationState: 'entering',
           offsetX,
-          offsetY
+          offsetY,
         }));
 
         this._cards.forEach((card, index) => {
@@ -61,14 +74,13 @@ export class HandComponent {
         });
       }, (this._cards.length * 70) + 250);
     } else {
-
-      this._cards = value.map(card => ({
+      this._cards = this.cards.map(card => ({
         ...card,
         animationState: 'entering',
         offsetX,
-        offsetY
+        offsetY,
       }));
-    
+
       this._cards.forEach((card, index) => {
         setTimeout(() => {
           card.animationState = 'inHand';
@@ -76,21 +88,7 @@ export class HandComponent {
       });
     }
   }
-
-  get cards(): ProjectCard[] {
-    return this._cards;
-  }
-
-  setHovered(index: number | null): void {
-    this.hoveredIndex = index;
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['cards']) {
-      console.log('[HandComponent] received cards:', this.cards);
-      console.log('🧭 Deck origin received in hand:', this.deckOrigin);
-    }
-  }
+  
 
   computeArgument(index: number, total: number): number{
     const step_angle = 0.13;

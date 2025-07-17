@@ -60,9 +60,8 @@ to-do:
         deck wheel placement.
     
     project card: 
-        correct origin setting.
-        disable hover while moving
         transition animation into project page.
+        preserving hand state after navigation
         
     backend:
         get filters by time (create / edit)
@@ -77,5 +76,4 @@ to-do:
 
 for tomorrow:
     project page transition animation.
-    deck clicking guard, hover guard.
-    project pages not coming from correct place.
+    
