@@ -4,6 +4,7 @@ import { ProjectCard } from '../services/project-cards.service';
 import { ProjectCardComponent } from '../project-card/project-card.component';
 import { Router } from '@angular/router';
 import { SlugService } from '../services/slug.service';
+import { TransitionService } from '../services/transition.service';
 
 @Component({
   selector: 'app-hand',
@@ -15,7 +16,7 @@ export class HandComponent {
   private _cards: ProjectCard[] = [];
   hoveredIndex: number | null = null;
   playingCardIndex: number | null = null;
-  constructor(private router: Router, private slugService: SlugService) {}
+  constructor(private router: Router, private slugService: SlugService, private transitionService: TransitionService) {}
   cardBasePoint: { x: number, y: number } | null = null;
   @Input() deckOrigin: { x: number; y: number } | null = null;
   @ViewChild('handContainerRef', { static: true }) handContainerRef!: ElementRef<HTMLDivElement>;
@@ -142,11 +143,26 @@ export class HandComponent {
   
   onCardClicked(card: ProjectCard, index: number) {
     this.playingCardIndex = index;
+
     const slug = this.slugService.getCurrentSlug() ?? 'COMPANY';
+    const handContainer = this.handContainerRef.nativeElement;
+    const cardEls = handContainer.querySelectorAll('.hand-card');
+    const clickedCardEl = cardEls[index] as HTMLElement;
+
+    if (!clickedCardEl) {
+      console.warn('Could not find clicked card element!');
+      return;
+    }
 
     setTimeout(() => {
-      this.router.navigate([`/project_page/${card.id}`], {queryParams: { slug } });
-    }, 1000);
+      this.router.navigate([`/project_page/${card.id}`], { queryParams: { slug } });
+  
+      const clone = this.transitionService.createClone(clickedCardEl);
+  
+      this.transitionService.animateCardToFullscreen(clone).then(() => {
+        this.transitionService.unblockRoute()
+      });
+    }, 750);
   }
 
   isPlaying(index: number) {

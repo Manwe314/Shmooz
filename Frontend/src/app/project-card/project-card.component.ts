@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter, ElementRef } from '@angular/core';
 import { ProjectCard } from '../services/project-cards.service';
 import { CommonModule } from '@angular/common';
-import { ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-project-card',
