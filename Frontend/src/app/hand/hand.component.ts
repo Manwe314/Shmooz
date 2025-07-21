@@ -154,15 +154,25 @@ export class HandComponent {
       return;
     }
 
+    this.transitionService.blockNavigation(); // resets the subject
+
     setTimeout(() => {
-      this.router.navigate([`/project_page/${card.id}`], { queryParams: { slug } });
-  
-      const clone = this.transitionService.createClone(clickedCardEl);
-  
-      this.transitionService.animateCardToFullscreen(clone).then(() => {
-        this.transitionService.unblockRoute()
+      clickedCardEl.classList.add('expanding');
+
+      requestAnimationFrame(() => {
+        clickedCardEl.classList.add('fullscreen');
       });
-    }, 750);
+
+      this.router.navigate([`/project_page/${card.id}`], {
+        queryParams: { slug }
+      });
+      
+      setTimeout(() => {
+        this.transitionService.unblockRoute(); // let the guard continue
+      }, 180000); // Match your CSS transition duration
+
+
+    }, 750); 
   }
 
   isPlaying(index: number) {

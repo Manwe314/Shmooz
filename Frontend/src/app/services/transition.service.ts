@@ -17,35 +17,53 @@ export class TransitionService {
     this.unblock$.next(true);
   }
 
+  blockNavigation(): void {
+    this.unblock$ = new Subject<boolean>();
+  }
+
   resetBlock(): void {
     this.unblock$ = new Subject<boolean>();
   }
 
   createClone(el: HTMLElement): HTMLElement {
-    const rect = el.getBoundingClientRect();
-    const clone = el.cloneNode(true) as HTMLElement;
-    Object.assign(clone.style, {
-      position: 'fixed',
-      left: `${rect.left}px`,
-      top: `${rect.top}px`,
-      width: `${rect.width}px`,
-      height: `${rect.height}px`,
-      zIndex: '9999',
-      pointerEvents: 'none',
-      margin: '0',
-    });
-    document.body.appendChild(clone);
-    this.activeClone = clone;
-    return clone;
+  const clone = el.cloneNode(true) as HTMLElement;
+
+  // Remove unwanted animation class if present
+  clone.classList.remove('playing');
+  clone.classList.remove('hand-card');
+  clone.classList.add('hand-card-clone'); // Your own base class
+
+  // Copy computed position and size
+  const rect = el.getBoundingClientRect();
+  const originalTransform = getComputedStyle(el).transform;
+  
+  Object.assign(clone.style, {
+    position: 'fixed',
+    top: `${rect.top}px`,
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`,
+    margin: '0',
+    transform: 'none',
+    zIndex: '9999',
+    pointerEvents: 'none'
+  });
+  clone.style.transform = originalTransform;
+
+  document.body.appendChild(clone);
+  this.activeClone = clone;
+  return clone;
   }
 
   async animateCardToFullscreen(cardEl: HTMLElement): Promise<void> {
     return new Promise(resolve => {
-      cardEl.classList.add('expanding');
+      // cardEl.classList.add('expanding');
 
-      requestAnimationFrame(() => {
-        cardEl.classList.add('fullscreen');
-      });
+      // requestAnimationFrame(() => {
+      //   setTimeout(() => {
+      //     cardEl.classList.add('fullscreen');
+      //   }, 16);
+      // });
 
       setTimeout(() => {
         resolve();
