@@ -142,41 +142,33 @@ export class HandComponent {
   }
   
   onCardClicked(card: ProjectCard, index: number) {
-    this.playingCardIndex = index;
-
     const slug = this.slugService.getCurrentSlug() ?? 'COMPANY';
     const handContainer = this.handContainerRef.nativeElement;
     const cardEls = handContainer.querySelectorAll('.hand-card');
     const clickedCardEl = cardEls[index] as HTMLElement;
-
+    const clone = this.transitionService.createClone(clickedCardEl);
+    
     if (!clickedCardEl) {
       console.warn('Could not find clicked card element!');
       return;
     }
-
-    this.transitionService.blockNavigation(); // resets the subject
-
+    clickedCardEl.style.transition = 'none';
+    clickedCardEl.style.opacity = '0';
+    clone.classList.add('playing');
+    this.transitionService.blockNavigation(); 
+    
     setTimeout(() => {
-      clickedCardEl.classList.add('expanding');
-
       requestAnimationFrame(() => {
-        clickedCardEl.classList.add('fullscreen');
+        clone.classList.add('fullscreen');
       });
 
       this.router.navigate([`/project_page/${card.id}`], {
         queryParams: { slug }
       });
-      
+
       setTimeout(() => {
-        this.transitionService.unblockRoute(); // let the guard continue
-      }, 180000); // Match your CSS transition duration
-
-
+        this.transitionService.unblockRoute();
+      }, 100000);
     }, 750); 
   }
-
-  isPlaying(index: number) {
-    return this.playingCardIndex === index;
-  }
-
 }

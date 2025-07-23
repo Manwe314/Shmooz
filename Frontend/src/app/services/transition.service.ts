@@ -29,13 +29,11 @@ export class TransitionService {
   const clone = el.cloneNode(true) as HTMLElement;
 
   // Remove unwanted animation class if present
-  clone.classList.remove('playing');
   clone.classList.remove('hand-card');
   clone.classList.add('hand-card-clone'); // Your own base class
 
   // Copy computed position and size
   const rect = el.getBoundingClientRect();
-  const originalTransform = getComputedStyle(el).transform;
   
   Object.assign(clone.style, {
     position: 'fixed',
@@ -48,7 +46,6 @@ export class TransitionService {
     zIndex: '9999',
     pointerEvents: 'none'
   });
-  clone.style.transform = originalTransform;
 
   document.body.appendChild(clone);
   this.activeClone = clone;
@@ -57,18 +54,34 @@ export class TransitionService {
 
   async animateCardToFullscreen(cardEl: HTMLElement): Promise<void> {
     return new Promise(resolve => {
-      // cardEl.classList.add('expanding');
+    const targetW = window.innerWidth;
+    const targetH = window.innerHeight;
 
-      // requestAnimationFrame(() => {
-      //   setTimeout(() => {
-      //     cardEl.classList.add('fullscreen');
-      //   }, 16);
-      // });
+    const rect = cardEl.getBoundingClientRect();
 
-      setTimeout(() => {
-        resolve();
-      }, 100000);  
-    });
+    // Compute scale to fill screen
+    const scaleX = targetW / rect.width;
+    const scaleY = targetH / rect.height;
+
+    // Compute translation to keep center anchored
+    const translateX = (targetW / 2 - (rect.left + rect.width / 2)) / scaleX;
+    const translateY = (targetH / 2 - (rect.top + rect.height / 2)) / scaleY;
+
+    // Set CSS vars to use in transform
+    cardEl.style.setProperty('--scale-x', scaleX.toString());
+    cardEl.style.setProperty('--scale-y', scaleY.toString());
+    cardEl.style.setProperty('--translate-x', `${translateX}px`);
+    cardEl.style.setProperty('--translate-y', `${translateY}px`);
+
+    // Trigger transition
+    
+    cardEl.classList.add('fullscreen');
+
+    // Resolve after transition
+    setTimeout(() => {
+      resolve();
+    }, 180000);
+  });
   }
 
   cleanup(): void {
