@@ -9,6 +9,7 @@ export interface Block {
   borderColor: string;
   gridTemplateColumns: string; // e.g. '1fr 2fr 1fr'
   gridTemplateRows: string;    // e.g. 'auto auto'
+  tag?: string;
   content: BlockContent[];
 }
 
@@ -25,6 +26,7 @@ export interface BaseContent {
 
 export interface ImageContent extends BaseContent {
   type: 'image';
+  tag?: string;
   url: string;
   alt?: string;
   borderRadius?: string;

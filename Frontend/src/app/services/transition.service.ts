@@ -26,30 +26,65 @@ export class TransitionService {
   }
 
   createClone(el: HTMLElement): HTMLElement {
-  const clone = el.cloneNode(true) as HTMLElement;
+    const clone = el.cloneNode(true) as HTMLElement;
 
-  // Remove unwanted animation class if present
-  clone.classList.remove('hand-card');
-  clone.classList.add('hand-card-clone'); // Your own base class
+    // Remove unwanted animation class if present
+    clone.classList.remove('hand-card');
+    clone.classList.add('hand-card-clone'); // Your own base class
 
-  // Copy computed position and size
-  const rect = el.getBoundingClientRect();
-  
-  Object.assign(clone.style, {
-    position: 'fixed',
-    top: `${rect.top}px`,
-    left: `${rect.left}px`,
-    width: `${rect.width}px`,
-    height: `${rect.height}px`,
-    margin: '0',
-    transform: 'none',
-    zIndex: '9999',
-    pointerEvents: 'none'
-  });
+    // Copy computed position and size
+    const rect = el.getBoundingClientRect();
+    
+    Object.assign(clone.style, {
+      position: 'fixed',
+      top: `${rect.top}px`,
+      left: `${rect.left}px`,
+      width: `${rect.width}px`,
+      height: `${rect.height}px`,
+      margin: '0',
+      transform: 'none',
+      zIndex: '9999',
+      pointerEvents: 'none'
+    });
 
-  document.body.appendChild(clone);
-  this.activeClone = clone;
-  return clone;
+    document.body.appendChild(clone);
+    this.activeClone = clone;
+    return clone;
+  }
+
+  createFullscreenClone(el: HTMLElement, className: string): HTMLElement {
+    const rect = el.getBoundingClientRect();
+    const clone = el.cloneNode(true) as HTMLElement;
+
+    Object.assign(clone.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100vw',
+      height: '100vh',
+      margin: '0',
+      zIndex: '9998',
+      pointerEvents: 'none',
+      opacity: '0',
+      transform: 'translate(0, 0)',
+      transition: 'opacity 0.6s ease'
+    });
+
+    clone.classList.add('page-element-clone', className);
+    return clone;
+  }
+
+  morphCloneToTarget(clone: HTMLElement, target: HTMLElement): void {
+    const targetRect = target.getBoundingClientRect();
+    
+    Object.assign(clone.style, {
+      top: `${targetRect.top}px`,
+      left: `${targetRect.left}px`,
+      width: `${targetRect.width}px`,
+      height: `${targetRect.height}px`,
+      transform: 'translate(0, 0)',
+      transition: 'all 0.8s ease-in-out'
+    });
   }
 
   async animateCardToFullscreen(cardEl: HTMLElement): Promise<void> {

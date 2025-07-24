@@ -3,7 +3,7 @@
 from portfolio.models import PagesModel, ProjectCard
 from django.utils import timezone
 
-PROJECT_CARD_ID = 3
+PROJECT_CARD_ID = 4
 
 try:
     project_card = ProjectCard.objects.get(id=PROJECT_CARD_ID)
@@ -19,6 +19,7 @@ page_content = [
         "borderColor": "#F0F0DD",
         "gridTemplateColumns": "4fr 10px 6fr",
         "gridTemplateRows": "auto auto auto",
+        "tag": "borderTarget",
         "content": [
             {
                 "id": "txt-001",
@@ -33,6 +34,7 @@ page_content = [
             {
                 "id": "img-001",
                 "type": "image",
+                "tag": "imageTarget",
                 "url": "/media/1.png",
                 "alt": "Cover Image",
                 "rowStart": 1,
@@ -48,16 +50,6 @@ page_content = [
                 "text": "visit our swagger",
                 "url": "http://localhost:8000/api/docs/"
             },
-            {
-                "id": "img-002",
-                "type": "image",
-                "url": "/media/board.png",
-                "alt": "Cover Image",
-                "rowStart": 3,
-                "colStart": 1,
-                "colSpan": 3,
-                "borderRadius": "8px"
-            }
         ]
     }
 ]
@@ -70,6 +62,7 @@ else:
     page = PagesModel.objects.create(
         owner=project_card.owner,
         content=page_content,
+        category=f"project_{PROJECT_CARD_ID}",
         project_card=project_card,
         created_at=timezone.now()
     )

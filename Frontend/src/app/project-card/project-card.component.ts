@@ -19,6 +19,7 @@ export class ProjectCardComponent {
   }
 
   onMouseMove(event: MouseEvent): void {
+    if (this.elRef.nativeElement.classList.contains('hand-card-clone')) return;
     const cardEl = this.elRef.nativeElement.querySelector('.card') as HTMLElement;
     const bgEl = this.elRef.nativeElement.querySelector('.card-bg') as HTMLElement;
 

@@ -154,21 +154,24 @@ export class HandComponent {
     }
     clickedCardEl.style.transition = 'none';
     clickedCardEl.style.opacity = '0';
-    clone.classList.add('playing');
+    clone.classList.add('playing', 'no-mousemove');
     this.transitionService.blockNavigation(); 
     
     setTimeout(() => {
       requestAnimationFrame(() => {
         clone.classList.add('fullscreen');
-      });
 
-      this.router.navigate([`/project_page/${card.id}`], {
-        queryParams: { slug }
-      });
+        // 🔥 Step 2: Fade out card internals (bg, label, text)
+        setTimeout(() => {
+          clone.classList.add('fade-out-internals');
 
-      setTimeout(() => {
-        this.transitionService.unblockRoute();
-      }, 100000);
+          // 🔥 Step 3: Trigger navigation — guard will delay actual rendering
+          this.router.navigate([`/project_page/${card.id}`], {
+            queryParams: { slug }
+          });
+
+        }, 1200); // Wait a bit before fading out internals
+      });
     }, 750); 
   }
 }
