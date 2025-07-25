@@ -28,12 +28,11 @@ export class TransitionService {
   createClone(el: HTMLElement): HTMLElement {
     const clone = el.cloneNode(true) as HTMLElement;
 
-    // Remove unwanted animation class if present
     clone.classList.remove('hand-card');
-    clone.classList.add('hand-card-clone'); // Your own base class
+    clone.classList.add('hand-card-clone');
 
-    // Copy computed position and size
     const rect = el.getBoundingClientRect();
+    const container = document.getElementById('transition-overlay-container');
     
     Object.assign(clone.style, {
       position: 'fixed',
@@ -43,37 +42,33 @@ export class TransitionService {
       height: `${rect.height}px`,
       margin: '0',
       transform: 'none',
-      zIndex: '9999',
+      zIndex: '9997',
       pointerEvents: 'none'
     });
 
-    document.body.appendChild(clone);
+    container?.appendChild(clone);
     this.activeClone = clone;
     return clone;
   }
 
-  createFullscreenClone(el: HTMLElement, className: string): HTMLElement {
-    const rect = el.getBoundingClientRect();
-    const clone = el.cloneNode(true) as HTMLElement;
+  morphInsetBorderToBlockWrapper(insetBorderEl: HTMLElement, blockWrapperEl: HTMLElement) {
+    const rect = blockWrapperEl.getBoundingClientRect();
 
-    Object.assign(clone.style, {
+    // Apply transition styles
+    Object.assign(insetBorderEl.style, {
       position: 'fixed',
-      top: '0',
-      left: '0',
-      width: '100vw',
-      height: '100vh',
-      margin: '0',
-      zIndex: '9998',
-      pointerEvents: 'none',
-      opacity: '0',
-      transform: 'translate(0, 0)',
-      transition: 'opacity 0.6s ease'
+      top: `${rect.top}px`,
+      left: `${rect.left}px`,
+      width: `${rect.width}px`,
+      height: `${rect.height}px`,
+      transition: 'all 100.6s ease-in-out',
+      borderColor: window.getComputedStyle(blockWrapperEl).borderColor,
+      borderRadius: window.getComputedStyle(blockWrapperEl).borderRadius,
+      borderWidth: window.getComputedStyle(blockWrapperEl).borderWidth,
     });
-
-    clone.classList.add('page-element-clone', className);
-    return clone;
   }
 
+  
   morphCloneToTarget(clone: HTMLElement, target: HTMLElement): void {
     const targetRect = target.getBoundingClientRect();
     
@@ -83,41 +78,63 @@ export class TransitionService {
       width: `${targetRect.width}px`,
       height: `${targetRect.height}px`,
       transform: 'translate(0, 0)',
-      transition: 'all 0.8s ease-in-out'
+      transition: 'all 110.6s ease-in-out'
     });
   }
+  
+  // createFullscreenClone(el: HTMLElement, className: string): HTMLElement {
+  //   const rect = el.getBoundingClientRect();
+  //   const clone = el.cloneNode(true) as HTMLElement;
 
-  async animateCardToFullscreen(cardEl: HTMLElement): Promise<void> {
-    return new Promise(resolve => {
-    const targetW = window.innerWidth;
-    const targetH = window.innerHeight;
+  //   Object.assign(clone.style, {
+  //     position: 'fixed',
+  //     top: '50%',
+  //     left: '50%',
+  //     width: '100vw',
+  //     height: '100vh',
+  //     margin: '0',
+  //     zIndex: '9998',
+  //     pointerEvents: 'none',
+  //     opacity: '0',
+  //     overflow: 'hidden', // 💡 Prevent overflow
+  //     transform: 'translate(-50%, -50%)',
+  //     transition: 'opacity 10.6s ease'
+  //   });
 
-    const rect = cardEl.getBoundingClientRect();
+  //   clone.classList.add('page-element-clone', className);
+  //   return clone;
+  // }
+  // async animateCardToFullscreen(cardEl: HTMLElement): Promise<void> {
+  //   return new Promise(resolve => {
+  //   const targetW = window.innerWidth;
+  //   const targetH = window.innerHeight;
 
-    // Compute scale to fill screen
-    const scaleX = targetW / rect.width;
-    const scaleY = targetH / rect.height;
+  //   const rect = cardEl.getBoundingClientRect();
 
-    // Compute translation to keep center anchored
-    const translateX = (targetW / 2 - (rect.left + rect.width / 2)) / scaleX;
-    const translateY = (targetH / 2 - (rect.top + rect.height / 2)) / scaleY;
+  //   // Compute scale to fill screen
+  //   const scaleX = targetW / rect.width;
+  //   const scaleY = targetH / rect.height;
 
-    // Set CSS vars to use in transform
-    cardEl.style.setProperty('--scale-x', scaleX.toString());
-    cardEl.style.setProperty('--scale-y', scaleY.toString());
-    cardEl.style.setProperty('--translate-x', `${translateX}px`);
-    cardEl.style.setProperty('--translate-y', `${translateY}px`);
+  //   // Compute translation to keep center anchored
+  //   const translateX = (targetW / 2 - (rect.left + rect.width / 2)) / scaleX;
+  //   const translateY = (targetH / 2 - (rect.top + rect.height / 2)) / scaleY;
 
-    // Trigger transition
+  //   // Set CSS vars to use in transform
+  //   cardEl.style.setProperty('--scale-x', scaleX.toString());
+  //   cardEl.style.setProperty('--scale-y', scaleY.toString());
+  //   cardEl.style.setProperty('--translate-x', `${translateX}px`);
+  //   cardEl.style.setProperty('--translate-y', `${translateY}px`);
+
+  //   // Trigger transition
     
-    cardEl.classList.add('fullscreen');
+  //   cardEl.classList.add('fullscreen');
 
-    // Resolve after transition
-    setTimeout(() => {
-      resolve();
-    }, 180000);
-  });
-  }
+  //   // Resolve after transition
+  //   setTimeout(() => {
+  //     resolve();
+  //   }, 180000);
+  // });
+  // }
 
   cleanup(): void {
     if (this.activeClone) {

@@ -26,45 +26,64 @@ export class PageComponent {
 
   ngAfterViewInit(): void {
     console.log('[PageComponent] ngAfterViewInit called');
-    setTimeout(() => {
-      const imageEl = document.querySelector('[data-tag="imageTarget"]') as HTMLElement | null;
-      const borderEl = document.querySelector('[data-tag="borderTarget"]') as HTMLElement | null;
 
-      const clones: HTMLElement[] = [];
+    const fullscreenCard = document.querySelector('.hand-card-clone.fullscreen') as HTMLElement;
+    const targetEl = document.querySelector('[data-tag="imageTarget"]') as HTMLElement;
 
-      if (imageEl) {
-        const imageClone = this.transitionService.createFullscreenClone(imageEl, 'image-clone');
-        document.body.appendChild(imageClone);
-        clones.push(imageClone);
+    if (!fullscreenCard || !targetEl) {
+      console.warn('[Morph] Required elements not found');
+      return;
+    }
+
+    const container = document.getElementById('transition-overlay-container') || document.body;
+
+    // Wait until target has non-zero height
+    const waitForTargetDimensions = (attempts = 0) => {
+      const targetRect = targetEl.getBoundingClientRect();
+      if (targetRect.height > 0 || attempts > 10) {
+        startMorphAnimation(targetRect);
+      } else {
+        requestAnimationFrame(() => waitForTargetDimensions(attempts + 1));
       }
+    };
 
-      if (borderEl) {
-        const borderClone = this.transitionService.createFullscreenClone(borderEl, 'border-clone');
-        document.body.appendChild(borderClone);
-        clones.push(borderClone);
-      }
+    const startMorphAnimation = (targetRect: DOMRect) => {
+      const sourceRect = fullscreenCard.getBoundingClientRect();
+      const computedTarget = getComputedStyle(targetEl);
 
-      // Fade in those elements
-      requestAnimationFrame(() => {
-        clones.forEach(clone => clone.classList.add('visible'));
+      const morphClone = fullscreenCard.cloneNode(true) as HTMLElement;
+      morphClone.classList.remove('fullscreen');
+      morphClone.classList.add('morph-animate');
 
-        // Morph to layout position
-        setTimeout(() => {
-          clones.forEach(clone => {
-            const targetEl = document.querySelector(`[data-tag="${clone.classList.contains('image-clone') ? 'imageTarget' : 'borderTarget'}"]`) as HTMLElement;
-            if (targetEl) {
-              this.transitionService.morphCloneToTarget(clone, targetEl);
-            }
-          });
-
-          // Final cleanup after morph
-          setTimeout(() => {
-            this.transitionService.cleanup();
-            this.transitionService.unblockRoute(); // ✅ Allow Angular to finish route switch
-          }, 900); // Match duration of morph animation
-        }, 400); // Delay between fade-in and morph
+      Object.assign(morphClone.style, {
+        position: 'fixed',
+        top: `${sourceRect.top}px`,
+        left: `${sourceRect.left}px`,
+        width: `${sourceRect.width}px`,
+        height: `${sourceRect.height}px`,
+        margin: '0',
+        transform: 'translate(0, 0)',
+        zIndex: '9999',
+        pointerEvents: 'none',
+        transition: 'none'
       });
-    });
+
+      morphClone.style.setProperty('--target-top', `${targetRect.top}px`);
+      morphClone.style.setProperty('--target-left', `${targetRect.left}px`);
+      morphClone.style.setProperty('--target-width', `${targetRect.width}px`);
+      morphClone.style.setProperty('--target-height', `${targetRect.height}px`);
+      morphClone.style.setProperty('--target-radius', computedTarget.borderRadius);
+
+      container.appendChild(morphClone);
+
+      fullscreenCard.style.transition = 'none';
+      fullscreenCard.style.opacity = '0';
+
+      console.log('[Morph] Animation launched');
+    };
+
+    // Start the check
+    requestAnimationFrame(() => waitForTargetDimensions());
   }
 
   ngOnInit(): void {

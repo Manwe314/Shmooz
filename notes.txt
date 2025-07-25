@@ -53,6 +53,7 @@ to-do:
     change "COMPANY" (default search) with actaul default target
     navigation buttons visual update
     slug guard based on slug registry in slug resolver
+    add app-root cloner to eliminate flickering on routing.
     
     Deck:
         deck visual update: box shadow, placement, text, more...

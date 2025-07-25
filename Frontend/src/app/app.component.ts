@@ -25,7 +25,7 @@ export class AppComponent implements OnInit{
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
-        this.transitionService.cleanup();
+        //this.transitionService.cleanup();
         let currentRoute = this.route;
         while (currentRoute.firstChild) {
           currentRoute = currentRoute.firstChild;
