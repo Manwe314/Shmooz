@@ -9,6 +9,7 @@ export interface Block {
   borderColor: string;
   gridTemplateColumns: string; // e.g. '1fr 2fr 1fr'
   gridTemplateRows: string;    // e.g. 'auto auto'
+  tag?: string;
   content: BlockContent[];
 }
 
@@ -25,6 +26,7 @@ export interface BaseContent {
 
 export interface ImageContent extends BaseContent {
   type: 'image';
+  tag?: string;
   url: string;
   alt?: string;
   borderRadius?: string;
@@ -68,6 +70,8 @@ export class PageService {
 
   getPageData(path: string, slug: string, id?: string): Observable<PageData> {
     let endpoint: string;
+
+    //to-do mc givi pagination
 
     if (path === 'page_one') 
       endpoint = this.api.buildUrl(`page1/${slug}`);

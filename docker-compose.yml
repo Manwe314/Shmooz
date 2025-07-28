@@ -43,7 +43,7 @@ services:
     build:
       context: ./Nginx
     ports:
-      - "443:443"
+      - "8080:443"
     depends_on:
       - frontend
       - backend
@@ -56,9 +56,9 @@ networks:
 
 volumes:
   db-data:
-    # driver: local
-    # driver_opts:
-    #   type: "none"
-    #   o: "bind"
-    #   device: "./Volume/postgresql"
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "./Volume/postgresql"
 

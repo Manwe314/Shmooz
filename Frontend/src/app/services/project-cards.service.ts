@@ -16,7 +16,7 @@ export interface ProjectCard {
   inline_color: string;
   image_url: string;
   owner: string;
-  animationState?: 'entering' | 'inHand';
+  animationState?: 'entering' | 'inHand' | 'discarding';
   offsetX?: number;
   offsetY?: number;
 }

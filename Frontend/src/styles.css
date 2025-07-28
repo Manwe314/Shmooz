@@ -6,6 +6,158 @@ html, body {
     height: 100%;
     overflow: hidden;
     scroll-behavior: smooth;
+    background: transparent !important;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    backface-visibility: hidden;
 }  
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+/* ==== Global transition animation styles ==== */
+
+.hand-card-clone.playing {
+  position: fixed;
+  z-index: 2000;
+  animation: play 0.75s cubic-bezier(.44,.07,.05,1) forwards;
+  transform-origin: center center;
+  transition: transform 1.8s ease-in-out, opacity 10s ease;
+  pointer-events: none;
+}
+
+@keyframes play {
+  100% {
+    top: 50.2%;
+    left: 50.2%;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+}
+
+.hand-card-clone.fullscreen {
+  transition: opacity 10s ease;
+  animation: expandToFullScreen 1.2s ease forwards !important;
+  opacity: 1;
+}
+
+.hand-card-clone .card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.hand-card-clone .card-bg {
+  position: absolute;
+  top: -10px; left: -10px;
+  right: -10px; bottom: -10px;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.hand-card-clone .inset-border {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  border: 2px solid;
+  border-radius: 8px;
+  pointer-events: none;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.hand-card-clone.fullscreen .card {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes expandToFullScreen {
+  from {
+    top: 50.2%;
+    left: 50.2%;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+  to {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+}
+
+@keyframes morphToTarget {
+  0% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+  100% {
+    top: var(--target-top);
+    left: var(--target-left);
+    width: var(--target-width);
+    height: var(--target-height);
+    border-radius: var(--target-radius);
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes morphBorderToTarget {
+  0% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+  100% {
+    top: var(--target-top);
+    left: var(--target-left);
+    width: var(--target-width);
+    height: var(--target-height);
+    border-radius: var(--target-radius);
+  }
+}
+
+.hand-card-clone.fade-out-opacity {
+  transition: opacity 1s ease-in-out !important;
+  opacity: 0;
+}
+
+.hand-card-clone.morph-animate-border {
+  animation: morphBorderToTarget 1.5s cubic-bezier(.39,.04,.05,.57) forwards;
+}
+
+.hand-card-clone.morph-animate {
+  animation: morphToTarget 1.5s cubic-bezier(.39,.04,.05,.57) forwards;
+}
+
+.hand-card-clone.fullscreen .label-circle,
+.hand-card-clone.fullscreen .card-text {
+  opacity: 0;
+}
+
+.hand-card-clone.fullscreen .card-bg,
+.hand-card-clone.no-mousemove .card-bg {
+  transform: none !important;
+  transition: transform 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.hand-card-clone.fade-out-internals .card-bg {
+  opacity: 0;
+}
+

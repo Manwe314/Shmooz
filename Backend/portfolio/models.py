@@ -83,7 +83,7 @@ class PagesModel(models.Model):
     ]
 
     owner = models.SlugField(max_length=50)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    category = models.CharField(max_length=50)
     
     content = models.JSONField()  
     created_at = models.DateTimeField(auto_now_add=True)

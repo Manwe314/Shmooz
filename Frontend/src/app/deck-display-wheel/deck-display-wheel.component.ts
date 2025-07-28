@@ -6,12 +6,11 @@ import { filter, switchMap } from 'rxjs';
 import { fromEvent, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
-
 @Component({
   selector: 'app-deck-display-wheel',
   imports: [DeckComponent],
   templateUrl: './deck-display-wheel.component.html',
-  styleUrl: './deck-display-wheel.component.css'
+  styleUrl: './deck-display-wheel.component.css',
 })
 export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   decks: Deck[] = [];
@@ -100,7 +99,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
 
   getImageUrl(path: string): string {
     //URL
-    return `https://127.0.0.1${path}`
+    return `https://127.0.0.1:8080${path}`
   }
 
 }

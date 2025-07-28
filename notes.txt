@@ -1,3 +1,8 @@
+To operate in school:
+    upadte yaml file to 8080:443
+    search //URL and update to 127.0.0.1:8080
+    go to api service and update it to 127.0.0.1:8080
+
 For Production:
     serve media files with nginx.
     deck-display-wheel.ts uses any twice. (dont know how not to use)
@@ -48,6 +53,7 @@ to-do:
     change "COMPANY" (default search) with actaul default target
     navigation buttons visual update
     slug guard based on slug registry in slug resolver
+    add app-root cloner to eliminate flickering on routing.
     
     Deck:
         deck visual update: box shadow, placement, text, more...
@@ -55,9 +61,7 @@ to-do:
         deck wheel placement.
     
     project card: 
-        card placement in hand
-        hover animation + image paralax on hover
-        dealing animation BIG refine.
+        preserving hand state after navigation
         
     backend:
         get filters by time (create / edit)
@@ -68,7 +72,8 @@ to-do:
         visual overhaul
         upgrade customization
         fix scrolling
+        enforce owner - category uniqinuess with project pages as well. have guards.
 
 
 for tomorrow:
-    project cards animations upgrades! on select on ohver on play!
+    
