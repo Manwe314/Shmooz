@@ -34,8 +34,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 }
 
-
-
 .hand-card-clone.fullscreen {
   transition: opacity 10s ease;
   animation: expandToFullScreen 1.2s ease forwards !important;
@@ -98,7 +96,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 @keyframes morphToTarget {
-  from {
+  0% {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -106,7 +104,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     height: 100vh;
     border-radius: 0;
   }
-  to {
+  100% {
     top: var(--target-top);
     left: var(--target-left);
     width: var(--target-width);
@@ -116,8 +114,35 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 }
 
+@keyframes morphBorderToTarget {
+  0% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+  100% {
+    top: var(--target-top);
+    left: var(--target-left);
+    width: var(--target-width);
+    height: var(--target-height);
+    border-radius: var(--target-radius);
+  }
+}
+
+.hand-card-clone.fade-out-opacity {
+  transition: opacity 1s ease-in-out !important;
+  opacity: 0;
+}
+
+.hand-card-clone.morph-animate-border {
+  animation: morphBorderToTarget 1.5s cubic-bezier(.39,.04,.05,.57) forwards;
+}
+
 .hand-card-clone.morph-animate {
-  animation: morphToTarget 1.2s ease-in-out forwards;
+  animation: morphToTarget 1.5s cubic-bezier(.39,.04,.05,.57) forwards;
 }
 
 .hand-card-clone.fullscreen .label-circle,

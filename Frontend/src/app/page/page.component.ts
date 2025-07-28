@@ -44,18 +44,30 @@ export class PageComponent {
         startMorphAnimation(targetRect);
       } else {
         requestAnimationFrame(() => waitForTargetDimensions(attempts + 1));
+        console.log('waiting for dimensions');
       }
     };
 
     const startMorphAnimation = (targetRect: DOMRect) => {
       const sourceRect = fullscreenCard.getBoundingClientRect();
       const computedTarget = getComputedStyle(targetEl);
+      const borderTarget = document.querySelector('[data-tag="borderTarget"]') as HTMLElement;
+      const pageContent = this.elRef.nativeElement.querySelector('.page-content') as HTMLElement;
 
-      const morphClone = fullscreenCard.cloneNode(true) as HTMLElement;
-      morphClone.classList.remove('fullscreen');
-      morphClone.classList.add('morph-animate');
+      const borderClone = fullscreenCard.cloneNode(true) as HTMLElement;
+      borderClone.classList.remove('fullscreen');
+      borderClone.classList.add('morph-animate-border');
 
-      Object.assign(morphClone.style, {
+      if (borderClone) {
+        borderClone.addEventListener('animationend', () => {
+          borderClone.classList.add('fade-out-opacity');
+          setTimeout(() => {
+            borderClone.remove();
+          }, 1000);
+        }, {once: true});
+      }
+
+      Object.assign(borderClone.style, {
         position: 'fixed',
         top: `${sourceRect.top}px`,
         left: `${sourceRect.left}px`,
@@ -67,17 +79,71 @@ export class PageComponent {
         pointerEvents: 'none',
         transition: 'none'
       });
+    
+      const borderTargetRect = borderTarget.getBoundingClientRect();
+      const computedBorder = getComputedStyle(borderTarget);
+    
+      borderClone.style.setProperty('--target-top', `${borderTargetRect.top - 4}px`);
+      borderClone.style.setProperty('--target-left', `${borderTargetRect.left - 4}px`);
+      borderClone.style.setProperty('--target-width', `${borderTargetRect.width + 8}px`);
+      borderClone.style.setProperty('--target-height', `${borderTargetRect.height + 8}px`);
+      borderClone.style.setProperty('--target-radius', computedBorder.borderRadius || '0px');
+    
+      // Remove card background (fade out)
+      const bgToHide = borderClone.querySelector('.card-bg') as HTMLElement;
+      const textToHide = borderClone.querySelector('.card-text') as HTMLElement;
+      const labelToHide = borderClone.querySelector('.label-circle') as HTMLElement;
+      if (bgToHide && textToHide && labelToHide) {
+        textToHide.style.opacity = '0';
+        bgToHide.style.opacity = '0';
+        labelToHide.style.opacity = '0';
+      }
+    
+      container.appendChild(borderClone);
 
+      const morphClone = fullscreenCard.cloneNode(true) as HTMLElement;
+      morphClone.classList.remove('fullscreen');
+      morphClone.classList.add('morph-animate');
+      
+      if (morphClone) {
+        morphClone.addEventListener('animationend', () => {
+          morphClone.classList.add('fade-out-opacity');
+          pageContent.classList.add('visible');
+          setTimeout(() => {
+            morphClone.remove();
+          }, 1000);
+        }, {once: true});
+      }
+
+      Object.assign(morphClone.style, {
+        position: 'fixed',
+        top: `${sourceRect.top}px`,
+        left: `${sourceRect.left}px`,
+        width: `${sourceRect.width}px`,
+        height: `${sourceRect.height}px`,
+        margin: '0',
+        transform: 'translate(0, 0)',
+        zIndex: '9998',
+        pointerEvents: 'none',
+        transition: 'none'
+      });
+      
       morphClone.style.setProperty('--target-top', `${targetRect.top}px`);
       morphClone.style.setProperty('--target-left', `${targetRect.left}px`);
       morphClone.style.setProperty('--target-width', `${targetRect.width}px`);
       morphClone.style.setProperty('--target-height', `${targetRect.height}px`);
       morphClone.style.setProperty('--target-radius', computedTarget.borderRadius);
+      
+      const borderEl = morphClone.querySelector('.inset-border') as HTMLElement;
+      if (borderEl) {
+        borderEl.style.opacity = '0';
+      }
 
       container.appendChild(morphClone);
 
       fullscreenCard.style.transition = 'none';
       fullscreenCard.style.opacity = '0';
+      this.transitionService.cleanup();
 
       console.log('[Morph] Animation launched');
     };

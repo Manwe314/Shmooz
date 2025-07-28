@@ -61,7 +61,6 @@ to-do:
         deck wheel placement.
     
     project card: 
-        transition animation into project page.
         preserving hand state after navigation
         
     backend:
@@ -77,5 +76,4 @@ to-do:
 
 
 for tomorrow:
-    project page transition animation.
     
