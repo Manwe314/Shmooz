@@ -55,7 +55,7 @@
                     'align-items': 'center',
                     'gap': '8px',
                     'text-decoration': 'none',
-                    'color': 'inherit'
+                    'color': content.color || 'inherit'
                   }">
                   @if (content.iconUrl) {
                     <img [src]="content.iconUrl" alt="icon" style="width: 24px; height: 24px;" />

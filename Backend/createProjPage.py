@@ -3,7 +3,7 @@
 from portfolio.models import PagesModel, ProjectCard
 from django.utils import timezone
 
-PROJECT_CARD_ID = 4
+PROJECT_CARD_ID = 6
 
 try:
     project_card = ProjectCard.objects.get(id=PROJECT_CARD_ID)
@@ -15,10 +15,10 @@ except ProjectCard.DoesNotExist:
 page_content = [
     {
         "id": "block-001",
-        "backgroundColor": "rgba(43,17,28,0.15)",
-        "borderColor": "#F0F0DD",
+        "backgroundColor": "rgba(43,17,28,0.25)",
+        "borderColor": "#02096b",
         "gridTemplateColumns": "4fr 10px 6fr",
-        "gridTemplateRows": "auto auto auto",
+        "gridTemplateRows": "4fr 10px auto",
         "tag": "borderTarget",
         "content": [
             {
@@ -26,9 +26,11 @@ page_content = [
                 "type": "text",
                 "text": "Welcome to PROJECTS",
                 "rowStart": 1,
-                "colStart": 3,
+                "colStart": 1,
                 "tag": "h1",
-                "textAlign": "center",
+                "textAlign": "right",
+                "verticalAlign": "top",
+                "horizontalAlign": "left",
                 "color": "#f0f0DD"
             },
             {
@@ -38,17 +40,19 @@ page_content = [
                 "url": "/media/1.png",
                 "alt": "Cover Image",
                 "rowStart": 1,
-                "colStart": 1,
+                "colStart": 3,
                 "rowSpan": 2,
-                "borderRadius": "8px"
+                "borderRadius": "30px"
             },
             {
                 "id": "link-001",
                 "type": "link",
-                "rowStart": 2,
-                "colStart": 3,
+                "rowStart": 3,
+                "colStart": 1,
                 "text": "visit our swagger",
-                "url": "http://localhost:8000/api/docs/"
+                "url": "http://localhost:8000/api/docs/",
+                "color": "#f0f0DD",
+                "iconUrl": "/media/code.png"
             },
         ]
     }

@@ -62,6 +62,7 @@ to-do:
     
     project card: 
         preserving hand state after navigation
+        visual update of text and label.
         
     backend:
         get filters by time (create / edit)
@@ -76,4 +77,6 @@ to-do:
 
 
 for tomorrow:
+    page text alignment upgrade. 
+    add page padding / margin upgrade.
     
