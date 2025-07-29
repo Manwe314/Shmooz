@@ -28,9 +28,13 @@
                       'grid-column': content.colStart + ' / span ' + (content.colSpan || 1),
                       'grid-row': content.rowStart + ' / span ' + (content.rowSpan || 1),
                       'border-radius': content.borderRadius || '8px',
-                      'width': '100%',
-                      'height': 'auto',
-                      'object-fit': 'cover'
+                      'margin': content.margin || 0,
+                      'padding': content.padding || 0,
+                      'width': content.width || '100%',
+                      'height': content.height || 'auto',
+                      'object-fit': content.objectFit || 'cover',
+                      'object-position': content.objectPosition || 'center',
+                      'overflow': content.overflow || 'hidden'
                     }" />
               }
 
@@ -48,15 +52,8 @@
                 <a [href]="content.url"
                   target="_blank"
                   rel="noopener"
-                  [ngStyle]="{
-                    'grid-column': content.colStart + ' / span ' + (content.colSpan || 1),
-                    'grid-row': content.rowStart + ' / span ' + (content.rowSpan || 1),
-                    'display': 'flex',
-                    'align-items': 'center',
-                    'gap': '8px',
-                    'text-decoration': 'none',
-                    'color': content.color || 'inherit'
-                  }">
+                  [ngStyle]="getLinkStyles(content)"
+                  >
                   @if (content.iconUrl) {
                     <img [src]="content.iconUrl" alt="icon" style="width: 24px; height: 24px;" />
                   }

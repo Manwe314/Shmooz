@@ -22,6 +22,8 @@ export interface BaseContent {
   colStart: number;
   rowSpan?: number;
   colSpan?: number;
+  margin?: string;
+  padding?: string;
 }
 
 export interface ImageContent extends BaseContent {
@@ -30,6 +32,11 @@ export interface ImageContent extends BaseContent {
   url: string;
   alt?: string;
   borderRadius?: string;
+  objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  objectPosition?: string;
+  overflow?: 'visible' | 'hidden' | 'scroll';
+  width?: string;
+  height?: string;
 }
 
 export interface TextContent extends BaseContent {
@@ -48,6 +55,8 @@ export interface LinkContent extends BaseContent {
   text: string;
   iconUrl?: string;
   color?: string;
+  horizontalAlign?: 'left' | 'center' | 'right';
+  verticalAlign?: 'top' | 'center' | 'bottom';
 }
 
 
