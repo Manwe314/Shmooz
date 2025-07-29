@@ -23,7 +23,7 @@ from rest_framework_simplejwt.views import (
 from django.conf import settings
 from django.conf.urls.static import static
 from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView, DeckUpdateDeleteView, ProjectCardUpdateDeleteView, SlugCreateView, PageUploadView, PagesModelUpdateDeleteView
-from portfolio.views import GradientColorView, DeckListView, ProjectCardListView, SlugListView, PageNamesView, PageFetchView, ProjectPageFetchView
+from portfolio.views import GradientColorView, DeckListView, ProjectCardListView, SlugListView, PageNamesView, PageFetchView, ProjectPageFetchView, ImageListView
 
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -66,6 +66,8 @@ urlpatterns = [
     path('api/deck/<slug:slug>', DeckListView.as_view(), name='get_deck_sluged'),
 
     path('api/projects/<slug:slug>', ProjectCardListView.as_view(), name='get_projects_sluged'),
+
+    path('api/images/', ImageListView.as_view(), name='image_list'),
 ]
 
 urlpatterns += [

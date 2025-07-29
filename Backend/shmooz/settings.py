@@ -28,6 +28,15 @@ SECRET_KEY = 'django-insecure-^5q41@v#hu$#a&f8oe0&wfgfb%dun8v#&=o0i)2!xvn1qrf&hl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Shmooz API',
+    'DESCRIPTION': 'API for managing dynamic decks, pages and media content',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': '/api',
+}
+
 ALLOWED_HOSTS = ['*']
 
 REST_FRAMEWORK = {
