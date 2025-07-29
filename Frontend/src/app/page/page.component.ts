@@ -29,9 +29,15 @@ export class PageComponent {
 
     const fullscreenCard = document.querySelector('.hand-card-clone.fullscreen') as HTMLElement;
     const targetEl = document.querySelector('[data-tag="imageTarget"]') as HTMLElement;
+    const borderTarget = document.querySelector('[data-tag="borderTarget"]') as HTMLElement;
 
-    if (!fullscreenCard || !targetEl) {
+    if (!fullscreenCard || !targetEl || !borderTarget) {
       console.warn('[Morph] Required elements not found');
+      fullscreenCard.style.transition = 'opacity 0.8s ease';
+      fullscreenCard.style.opacity = '0';
+      setTimeout(() => {
+        this.transitionService.cleanup();
+      }, 800);
       return;
     }
 
@@ -51,7 +57,6 @@ export class PageComponent {
     const startMorphAnimation = (targetRect: DOMRect) => {
       const sourceRect = fullscreenCard.getBoundingClientRect();
       const computedTarget = getComputedStyle(targetEl);
-      const borderTarget = document.querySelector('[data-tag="borderTarget"]') as HTMLElement;
       const pageContent = this.elRef.nativeElement.querySelector('.page-content') as HTMLElement;
 
       const borderClone = fullscreenCard.cloneNode(true) as HTMLElement;
@@ -162,14 +167,29 @@ export class PageComponent {
   }
 
   getTextStyles(content: any) {
+    const justifyMap: Record<string, string> = {
+      left: 'flex-start',
+      center: 'center',
+      right: 'flex-end'
+    };
+
+    const alignMap: Record<string, string> = {
+      top: 'flex-start',
+      center: 'center',
+      bottom: 'flex-end'
+    };
+
+    const hAlign = content.horizontalAlign ?? 'left';
+    const vAlign = content.verticalAlign ?? 'top';
+
     return {
       'grid-column': `${content.colStart} / span ${content.colSpan || 1}`,
       'grid-row': `${content.rowStart} / span ${content.rowSpan || 1}`,
       'color': content.color || 'inherit',
-      'text-align': content.textAlign || 'left'
+      'display': 'flex',
+      'justify-content': justifyMap[hAlign],
+      'align-items': alignMap[vAlign],
+      'text-align': content.textAlign ?? 'center' 
     };
   }
-  
-    
-
 }

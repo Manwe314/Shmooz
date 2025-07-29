@@ -4,12 +4,28 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny 
 from .models import Deck, ProjectCard, SlugEntry, PagesModel, BackgroundData
-from administration.serializers import DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer, PageNamesSerializer, GradientColorsSerializer, BackgroundDataSerializer
+from administration.models import ImageUpload
+from administration.serializers import DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer, PageNamesSerializer, GradientColorsSerializer, BackgroundDataSerializer, ImageUploadSerializer
 import sys
 from django.shortcuts import get_object_or_404
+
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+    OpenApiParameter,
+    OpenApiExample,
+    OpenApiResponse
+)
 # Create your views here.
 
-
+@extend_schema(
+    summary="Get gradient background colors by slug",
+    description="Retrieves gradient background configuration for a given user slug.",
+    parameters=[
+        OpenApiParameter(name='slug', location=OpenApiParameter.PATH, description='Owner slug', required=True, type=str),
+    ],
+    responses={200: GradientColorsSerializer}
+)
 class GradientColorView(APIView):
     permission_classes = [AllowAny]
 
@@ -18,6 +34,14 @@ class GradientColorView(APIView):
         serializer = GradientColorsSerializer(background)
         return Response(serializer.data)
 
+@extend_schema(
+    summary="Get background page names",
+    description="Returns page name configuration (page1 and page2) associated with a user's background data.",
+    parameters=[
+        OpenApiParameter(name="slug", location=OpenApiParameter.PATH, description="Owner slug", required=True, type=str),
+    ],
+    responses={200: PageNamesSerializer}
+)
 class PageNamesView(APIView):
     permission_classes = [AllowAny]
 
@@ -26,7 +50,15 @@ class PageNamesView(APIView):
         serializer = PageNamesSerializer(names)
         return Response(serializer.data)
         
-        
+
+@extend_schema(
+    summary="List decks for a given owner",
+    description="Returns all decks for the given owner slug.",
+    parameters=[
+        OpenApiParameter(name="slug", location=OpenApiParameter.PATH, description="Owner slug", required=True, type=str),
+    ],
+    responses={200: DeckSerializer(many=True)}
+)
 class DeckListView(ListAPIView):
     serializer_class = DeckSerializer
     permission_classes = [AllowAny]
@@ -38,7 +70,19 @@ class DeckListView(ListAPIView):
         return Deck.objects.all()
 
 
-
+@extend_schema(
+    summary="Get project cards by slug and deck ID",
+    description="Returns a list of project cards for a given owner slug and deck ID passed in the `X-deck-id` header.",
+    parameters=[
+        OpenApiParameter(name='slug', location=OpenApiParameter.PATH, description='Owner slug', required=True, type=str),
+        OpenApiParameter(name='X-deck-id', location=OpenApiParameter.HEADER, description='Deck ID used to filter project cards', required=True, type=int),
+    ],
+    responses={
+        200: ProjectCardSerializer(many=True),
+        404: OpenApiResponse(description="Not Found"),
+        400: OpenApiResponse(description="Bad request or missing header"),
+    }
+)
 class ProjectCardListView(ListAPIView):
     serializer_class = ProjectCardSerializer
     permission_classes = [AllowAny]
@@ -51,6 +95,11 @@ class ProjectCardListView(ListAPIView):
             return ProjectCard.objects.filter(owner=owner, deck_id=deck_id)
         return ProjectCard.objects.none()  
 
+@extend_schema(
+    summary="List all available slugs",
+    description="Returns all slugs registered in the system.",
+    responses={200: SlugEntrySerializer(many=True)}
+)
 class SlugListView(APIView):
     permission_classes = [AllowAny]
 
@@ -59,6 +108,19 @@ class SlugListView(APIView):
         serializer = SlugEntrySerializer(slugs, many=True)
         return Response(serializer.data)
 
+@extend_schema(
+    summary="Get a page by slug and category",
+    description="Returns a page (page_one or page_two) for a given slug and category.",
+    parameters=[
+        OpenApiParameter(name="slug", location=OpenApiParameter.PATH, description="Owner slug", required=True, type=str),
+        OpenApiParameter(name="category", location=OpenApiParameter.PATH, description="Page category: 'page_one' or 'page_two'", required=True, type=str),
+    ],
+    responses={
+        200: PagesModelSerializer,
+        404: OpenApiResponse(description="Page not found"),
+        400: OpenApiResponse(description="Missing or invalid category/slug")
+    }
+)
 class PageFetchView(APIView):
     permission_classes = [AllowAny]
 
@@ -68,7 +130,18 @@ class PageFetchView(APIView):
             return Response({"detail": "Missing category or slug"}, status=400)
         page = get_object_or_404(PagesModel, owner=slug, category=category)
         return Response(PagesModelSerializer(page).data)
-    
+
+@extend_schema(
+    summary="Get a page linked to a project card",
+    description="Fetches the page associated with a given project card ID.",
+    parameters=[
+        OpenApiParameter(name="id", location=OpenApiParameter.PATH, description="ProjectCard ID", required=True, type=int),
+    ],
+    responses={
+        200: PagesModelSerializer,
+        404: OpenApiResponse(description="No page found for this project card")
+    }
+)
 class ProjectPageFetchView(APIView):
     permission_classes = [AllowAny]
 
@@ -80,3 +153,14 @@ class ProjectPageFetchView(APIView):
             return Response({"detail": "Page for this project card does not exist."}, status=404)
 
         return Response(PagesModelSerializer(page).data)
+
+@extend_schema(
+    summary="List all uploaded images",
+    description="Returns a list of all uploaded images with their ID and public URL.",
+    responses={200: ImageUploadSerializer(many=True)}
+)
+class ImageListView(ListAPIView):
+    permission_classes = [AllowAny]
+
+    queryset = ImageUpload.objects.all()
+    serializer_class = ImageUploadSerializer

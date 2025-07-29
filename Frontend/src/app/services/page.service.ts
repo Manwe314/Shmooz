@@ -37,6 +37,8 @@ export interface TextContent extends BaseContent {
   text: string;
   color?: string;
   tag?: 'p' | 'h1' | 'h2' | 'span' | 'div';
+  horizontalAlign?: 'left' | 'center' | 'right';
+  verticalAlign?: 'top' | 'center' | 'bottom';
   textAlign?: 'left' | 'center' | 'right';
 }
 
@@ -45,6 +47,7 @@ export interface LinkContent extends BaseContent {
   url: string;
   text: string;
   iconUrl?: string;
+  color?: string;
 }
 
 
