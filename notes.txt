@@ -45,7 +45,7 @@ For Admin panel:
         image id of the image uploaded
 
     Pages:
-        TBD.
+        schema in swagger.
  
 
 to-do:
@@ -53,7 +53,6 @@ to-do:
     change "COMPANY" (default search) with actaul default target
     navigation buttons visual update
     slug guard based on slug registry in slug resolver
-    add app-root cloner to eliminate flickering on routing.
     
     Deck:
         deck visual update: box shadow, placement, text, more...
@@ -70,13 +69,7 @@ to-do:
         add alter endpoint for all models
     
     Pages:
-        visual overhaul
-        upgrade customization
-        fix scrolling
-        enforce owner - category uniqinuess with project pages as well. have guards.
 
 
 for tomorrow:
-    page text alignment upgrade. 
-    add page padding / margin upgrade.
-    
+    decks overhaul
