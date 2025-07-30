@@ -30,7 +30,10 @@ page_content = [
                 "verticalAlign": "center",
                 "horizontalAlign": "right",
                 "color": "#f0f0DD",
-                "padding": "10px"
+                "padding": "10px",
+                "fontFamily": "'Open sans', sans-serif",
+                "fontSize": "2rem",
+                "fontWeight": "600"
             },
             {
                 "id": "img-001",
@@ -50,13 +53,16 @@ page_content = [
                 "type": "link",
                 "rowStart": 2,
                 "colStart": 1,
-                "text": "visit our swagger",
+                "text": "Hey check this out",
                 "url": "http://localhost:8000/api/docs/",
                 "color": "#f0f0DD",
                 "iconUrl": "/media/code.png",
                 "padding": "10px",
                 "verticalAlign": "top",
-                "horizontalAlign": "center"
+                "horizontalAlign": "center",
+                "iconPosition": "right",
+                "fontFamily": "'Times New Roman', Times, serif",
+                "fontWeight": "500"
             },
         ]
     }

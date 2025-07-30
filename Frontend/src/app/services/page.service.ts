@@ -47,6 +47,9 @@ export interface TextContent extends BaseContent {
   horizontalAlign?: 'left' | 'center' | 'right';
   verticalAlign?: 'top' | 'center' | 'bottom';
   textAlign?: 'left' | 'center' | 'right';
+  fontSize?: string;
+  fontWeight?: string | number;
+  fontFamily?: string;
 }
 
 export interface LinkContent extends BaseContent {
@@ -57,6 +60,10 @@ export interface LinkContent extends BaseContent {
   color?: string;
   horizontalAlign?: 'left' | 'center' | 'right';
   verticalAlign?: 'top' | 'center' | 'bottom';
+  fontSize?: string;
+  fontWeight?: string | number;
+  fontFamily?: string;
+  iconPosition?: 'left' | 'right';
 }
 
 

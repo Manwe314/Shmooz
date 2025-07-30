@@ -192,7 +192,10 @@ export class PageComponent {
       'align-items': alignMap[vAlign],
       'text-align': content.textAlign || 'center',
       'margin': content.margin || '0' ,
-      'padding': content.padding || '0'
+      'padding': content.padding || '0',
+      'font-size': content.fontSize || 'inherit',
+      'font-weight': content.fontWeight || 'inherit',
+      'font-family': content.fontFamily || 'inherit'
     };
   }
 
@@ -221,7 +224,10 @@ export class PageComponent {
       'text-decoration': 'none',
       'color': content.color || 'inherit',
       'margin': content.margin || '0',
-      'padding': content.padding || '0'
+      'padding': content.padding || '0',
+      'font-size': content.fontSize || 'inherit',
+      'font-weight': content.fontWeight || 'inherit',
+      'font-family': content.fontFamily || 'inherit'
     };
   }
 }

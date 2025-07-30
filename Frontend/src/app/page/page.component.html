@@ -54,10 +54,15 @@
                   rel="noopener"
                   [ngStyle]="getLinkStyles(content)"
                   >
-                  @if (content.iconUrl) {
+                  @if (content.iconUrl && (content.iconPosition || 'left') === 'left') {
                     <img [src]="content.iconUrl" alt="icon" style="width: 24px; height: 24px;" />
                   }
+                
                   <span>{{ content.text }}</span>
+                
+                  @if (content.iconUrl && content.iconPosition === 'right') {
+                    <img [src]="content.iconUrl" alt="icon" style="width: 24px; height: 24px;" />
+                  }
                 </a>
               }
             }

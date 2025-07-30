@@ -9,6 +9,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework import status
 from portfolio.models import Deck, ProjectCard, SlugEntry, PagesModel
 from django.utils import timezone 
+from docs.schema import PageSchema
 
 from drf_spectacular.utils import (
     extend_schema,
@@ -162,68 +163,13 @@ class ProjectCardCreateView(APIView):
         return Response(serializer.errors, status=400)
 
 @extend_schema(
-    summary="Upload a page",
-    description="Creates a page document (JSON-based layout) and optionally links it to a project card.",
-    request=PagesModelSerializer,
+    summary="Upload a page layout",
+    description="Creates a new page layout with a list of blocks and block contents.",
+    request=PageSchema,
     responses={
         201: PagesModelSerializer,
-        400: OpenApiResponse(description="Validation error in layout or project_card_id"),
-    },
-    examples=[
-        OpenApiExample(
-            "Example Page Creation",
-            value={
-                "owner": "kuxi",
-                "category": "project_0",
-                "project_card_id": 0,
-                "content": [
-                    {
-                        "id": "block-001",
-                        "backgroundColor": "rgba(43,17,28,0.25)",
-                        "borderColor": "#02096b",
-                        "gridTemplateColumns": "4fr 10px 6fr",
-                        "gridTemplateRows": "4fr 10px auto",
-                        "tag": "borderTarget",
-                        "content": [
-                            {
-                                "id": "txt-001",
-                                "type": "text",
-                                "text": "Welcome to PROJECTS",
-                                "rowStart": 1,
-                                "colStart": 1,
-                                "tag": "h1",
-                                "textAlign": "right",
-                                "verticalAlign": "top",
-                                "horizontalAlign": "left",
-                                "color": "#f0f0DD"
-                            },
-                            {
-                                "id": "img-001",
-                                "type": "image",
-                                "tag": "imageTarget",
-                                "url": "/media/1.png",
-                                "alt": "Cover Image",
-                                "rowStart": 1,
-                                "colStart": 3,
-                                "rowSpan": 2,
-                                "borderRadius": "30px"
-                            },
-                            {
-                                "id": "link-001",
-                                "type": "link",
-                                "rowStart": 3,
-                                "colStart": 1,
-                                "text": "visit our swagger",
-                                "url": "http://localhost:8000/api/docs/",
-                                "color": "#f0f0DD",
-                                "iconUrl": "/media/code.png"
-                            },
-                        ]
-                    }
-                ]
-            }
-        )
-    ]
+        400: OpenApiResponse(description="Validation error"),
+    }
 )
 class PageUploadView(APIView):
     #permission_classes = [IsAuthenticated]
