@@ -132,17 +132,18 @@ export class PageComponent {
         pointerEvents: 'none',
         transition: 'none'
       });
-      
       morphClone.style.setProperty('--target-top', `${targetRect.top}px`);
       morphClone.style.setProperty('--target-left', `${targetRect.left}px`);
       morphClone.style.setProperty('--target-width', `${targetRect.width}px`);
       morphClone.style.setProperty('--target-height', `${targetRect.height}px`);
-      morphClone.style.setProperty('--target-radius', computedTarget.borderRadius);
+      morphClone.style.setProperty('--target-radius', computedTarget.borderRadius || '0px');
       
       const borderEl = morphClone.querySelector('.inset-border') as HTMLElement;
       if (borderEl) {
         borderEl.style.opacity = '0';
       }
+
+      console.log(`target radius for imgu ${computedTarget.borderRadius}`);
 
       container.appendChild(morphClone);
 
@@ -189,7 +190,44 @@ export class PageComponent {
       'display': 'flex',
       'justify-content': justifyMap[hAlign],
       'align-items': alignMap[vAlign],
-      'text-align': content.textAlign ?? 'center' 
+      'text-align': content.textAlign || 'center',
+      'margin': content.margin || '0' ,
+      'padding': content.padding || '0',
+      'font-size': content.fontSize || 'inherit',
+      'font-weight': content.fontWeight || 'inherit',
+      'font-family': content.fontFamily || 'inherit'
+    };
+  }
+
+  getLinkStyles(content: any) {
+    const justifyMap: Record<string, string> = {
+      left: 'flex-start',
+      center: 'center',
+      right: 'flex-end'
+    };
+
+    const alignMap: Record<string, string> = {
+      top: 'flex-start',
+      center: 'center',
+      bottom: 'flex-end'
+    };
+    const hAlign = content.horizontalAlign ?? 'left';
+    const vAlign = content.verticalAlign ?? 'top';
+
+    return {
+      'grid-column': `${content.colStart} / span ${content.colSpan || 1}`,
+      'grid-row': `${content.rowStart} / span ${content.rowSpan || 1}`,
+      'display': 'flex',
+      'justify-content': justifyMap[hAlign],
+      'align-items': alignMap[vAlign],
+      'gap': '8px',
+      'text-decoration': 'none',
+      'color': content.color || 'inherit',
+      'margin': content.margin || '0',
+      'padding': content.padding || '0',
+      'font-size': content.fontSize || 'inherit',
+      'font-weight': content.fontWeight || 'inherit',
+      'font-family': content.fontFamily || 'inherit'
     };
   }
 }

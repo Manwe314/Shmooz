@@ -55,7 +55,7 @@
     filter: brightness(1);
   }
   50% {
-    filter: brightness(1.1);
+    filter: brightness(1.4);
   }
 }
 
@@ -64,7 +64,7 @@
         --y: 130%
     }
     50% {
-        --: 120%
+        --y: 120%
     }
 }
 

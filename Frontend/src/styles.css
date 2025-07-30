@@ -12,7 +12,7 @@ html, body {
     backface-visibility: hidden;
 }  
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Open sans", sans-serif; }
 
 
 /* ==== Global transition animation styles ==== */
@@ -132,6 +132,13 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 }
 
+@keyframes morphborderradius {
+  100% {
+    border-radius: var(--target-radius);
+  }
+}
+
+
 .hand-card-clone.fade-out-opacity {
   transition: opacity 1s ease-in-out !important;
   opacity: 0;
@@ -143,6 +150,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .hand-card-clone.morph-animate {
   animation: morphToTarget 1.5s cubic-bezier(.39,.04,.05,.57) forwards;
+}
+.hand-card-clone.morph-animate .card {
+  animation: morphborderradius 1.5s cubic-bezier(.39,.04,.05,.57) forwards;
 }
 
 .hand-card-clone.fullscreen .label-circle,
