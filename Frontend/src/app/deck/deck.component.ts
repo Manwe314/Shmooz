@@ -22,7 +22,7 @@ export class DeckComponent {
     const img_alpha = [0.2, 0.25, 0.3, 0.3];
     const xpos = [9, 17, -4, -15];
     const ypos = [14, 18, 0, -10];
-    const rotation = [95, 98, 88, 85];
+    const rotation = [5, 8, -2, -5];
     const brightness = 0.85 - (0.05 * card);
     return {
       'z-index': `${index}`,

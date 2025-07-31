@@ -1,6 +1,6 @@
 .deck-container {
-  width: 192px;
-  height: 269px;
+  width: 269px;
+  height: 192px;
   position: fixed;
   justify-content: center;
   cursor: pointer;
@@ -14,8 +14,8 @@
 }
 
 .card {
-  width: 192px;
-  height: 269px;
+  width: 269px;
+  height: 192px;
   border-radius: 18px;
   position: absolute;
   top: 0;
@@ -31,7 +31,6 @@
 /* Top card (with actual image tag inside) */
 .card-on-top {
   z-index: 500;
-  transform: rotate(90deg);
 }
 
 .card-on-top img {
@@ -42,10 +41,11 @@
 }
 
 .deck-label {
-  transform: translate(0%, -800%) rotate(-90deg);
-  justify-content: center;
-  align-content: center;
+  position: absolute;
+  left: 134px;
+  top: 96px;
   text-align: center;
+  transform: translate(-50%, -50%);
   font-weight: bold;
   color: white;
   font-size: 16px;
