@@ -24,6 +24,7 @@
   align-content: center;
   height: 100%;
   will-change: transform;
+  padding-top: 30px;
 }
 
 .deck-slide {

@@ -1,6 +1,7 @@
 from django.db import models
 from administration.models import ImageUpload
 from django.utils import timezone
+from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 
@@ -16,6 +17,20 @@ class Deck(models.Model):
         blank=True,
         related_name='decks'
     )
+    hover_img = models.ForeignKey(
+        'administration.ImageUpload',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='hover_decks'
+    )
+
+    card_amount = models.IntegerField(null=True, blank=True)
+    x_offsets = ArrayField(models.FloatField(), blank=True, default=list)
+    y_offsets = ArrayField(models.FloatField(), blank=True, default=list)
+    rotations = ArrayField(models.FloatField(), blank=True, default=list)
+    alphas = ArrayField(models.FloatField(), blank=True, default=list)
+    brightness = ArrayField(models.FloatField(), blank=True, default=list)
 
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(null=True, blank=True)

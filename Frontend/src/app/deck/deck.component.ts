@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Deck } from '../services/deck.service';
 
 @Component({
   selector: 'app-deck',
@@ -8,27 +9,50 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./deck.component.css'],
 })
 export class DeckComponent {
-  @Input() displayName: string = '';
-  @Input() imageUrl: string = ''; 
-  @Input() id?: string;
+  id: string = '';
+  displayName: string = '';
+  imageUrl: string = '';
+  hoverImg: string = '';
+  card_amount: number = 4;
+  x_offsets: number[] = [];
+  y_offsets: number[] = [];
+  rotations: number[] = [];
+  alphas: number[] = [];
+  brightness: number[] = [];
+  cards: number[] = [];
+
   @Output() deckSelected = new EventEmitter<{ id: string; origin: { x: number; y: number } }>();
   @ViewChild('deckEl', { static: true }) deckEl!: ElementRef<HTMLDivElement>;
 
+  @Input()
+  set deck(value: Deck)
+  {
+    this.id = value.id;
+    this.displayName = value.displayed_name;
+    this.imageUrl = this.getImageUrl(value.image_url ?? '');
+    this.hoverImg = this.getImageUrl(value.hover_img_url ?? '');
+    this.card_amount = value.card_amount ?? 4;
+    this.x_offsets = (Array.isArray(value.x_offsets) && value.x_offsets.length > 0 && this.card_amount != 0) ? value.x_offsets : [3, 5, 1, -10];
+    this.y_offsets = (Array.isArray(value.y_offsets) && value.y_offsets.length > 0 && this.card_amount != 0) ? value.y_offsets : [1, 0, 4, 1];
+    this.rotations = (Array.isArray(value.rotations) && value.rotations.length > 0 && this.card_amount != 0) ? value.rotations : [-3, -9, 2, 7];
+    this.alphas = (Array.isArray(value.alphas) && value.alphas.length > 0 && this.card_amount != 0) ? value.alphas : [0.2, 0.25, 0.3, 0.3];
+    this.brightness = (Array.isArray(value.brightness) && value.brightness.length > 0 && this.card_amount != 0) ? value.brightness : [0.85, 0.80, 0.75, 0.70];
+    this.cards = Array.from({ length: this.card_amount }, (_, i) => i);
+    console.log('[DeckComponent] hoverImg resolved to:', value.hover_img_url);
+  }
+
+
   hovered = false;
-  cards = [0, 1, 2, 3];  
 
   getDeckCardsStyle(card: number): Record<string, string> {
+    if (card >= this.card_amount)
+      card = this.card_amount;
     const index = 40 - (10 * card);
-    const img_alpha = [0.2, 0.25, 0.3, 0.3];
-    const xpos = [9, 17, -4, -15];
-    const ypos = [14, 18, 0, -10];
-    const rotation = [5, 8, -2, -5];
-    const brightness = 0.85 - (0.05 * card);
     return {
       'z-index': `${index}`,
-      'background-image': `linear-gradient(rgba(0,0,0,${img_alpha[card]}), rgba(0,0,0,${img_alpha[card]})), url('${this.imageUrl}')`,
-      'transform': `translateX(${xpos[card]}px) translateY(${ypos[card]}px) rotate(${rotation[card]}deg)`,
-      'filter': `brightness(${brightness})`,
+      'background-image': `linear-gradient(rgba(0,0,0,${this.alphas[card]}), rgba(0,0,0,${this.alphas[card]})), url('${this.imageUrl}')`,
+      'transform': `translateX(${this.x_offsets[card]}px) translateY(${this.y_offsets[card]}px) rotate(${this.rotations[card]}deg)`,
+      'filter': `brightness(${this.brightness[card]})`,
     }
   }
 
@@ -42,5 +66,10 @@ export class DeckComponent {
     this.deckSelected.emit({ id: this.id!, origin });
   
     console.log('Deck clicked:', this.id, 'at', origin);
+  }
+
+  getImageUrl(path: string): string {
+    //URL
+    return `https://127.0.0.1:8080${path}`
   }
 }

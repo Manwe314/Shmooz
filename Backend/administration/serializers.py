@@ -101,29 +101,102 @@ class BackgroundDataSerializer(serializers.ModelSerializer):
 
 class DeckSerializer(serializers.ModelSerializer):
     image_id = serializers.IntegerField(write_only=True, required=True)
+    hover_img_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+    
     image_url = serializers.SerializerMethodField()
+    hover_img_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Deck
         fields = [
             'id', 'title', 'displayed_name', 'owner',
-            'image', 'image_id', 'image_url', 'created_at'
+            'image', 'image_id', 'image_url',
+            'hover_img', 'hover_img_id', 'hover_img_url',
+            'card_amount', 'x_offsets', 'y_offsets',
+            'rotations', 'alphas', 'brightness',
+            'created_at'
         ]
-        read_only_fields = ['id', 'image', 'created_at']
+        read_only_fields = ['id', 'image_url', 'hover_img_url', 'created_at']
 
     def create(self, validated_data):
         image_id = validated_data.pop('image_id')
+        hover_img_id = validated_data.pop('hover_img_id', None)
+
         try:
             image = ImageUpload.objects.get(id=image_id)
         except ImageUpload.DoesNotExist:
-            raise ValidationError("Invalid image_id")
-        deck = Deck.objects.create(image=image, **validated_data)
-        return deck
+            raise serializers.ValidationError("Invalid image_id")
+
+        hover_img = None
+        if hover_img_id:
+            try:
+                hover_img = ImageUpload.objects.get(id=hover_img_id)
+            except ImageUpload.DoesNotExist:
+                raise serializers.ValidationError("Invalid hover_img_id")
+
+        return Deck.objects.create(image=image, hover_img=hover_img, **validated_data)
+
+    def validate(self, data):
+        card_amount = data.get('card_amount')
+
+        arrays = {
+            'x_offsets': data.get('x_offsets'),
+            'y_offsets': data.get('y_offsets'),
+            'rotations': data.get('rotations'),
+            'alphas': data.get('alphas'),
+            'brightness': data.get('brightness'),
+        }
+
+        if card_amount is None:
+            if arrays is None:
+                raise serializers.ValidationError({
+                        f"Must define card_amount with optional modifiers"
+                    })
+            return data
+
+        for field_name, arr in arrays.items():
+            if arr is not None and len(arr) < card_amount:
+                raise serializers.ValidationError({
+                    field_name: f"Must have at least {card_amount} entries."
+                })
+
+        return data
+    
+    def update(self, instance, validated_data):
+        image_id = validated_data.pop('image_id', None)
+        hover_img_id = validated_data.pop('hover_img_id', None)
+
+        if image_id:
+            try:
+                instance.image = ImageUpload.objects.get(id=image_id)
+            except ImageUpload.DoesNotExist:
+                raise serializers.ValidationError("Invalid image_id")
+
+        if hover_img_id is not None:
+            if hover_img_id:
+                try:
+                    instance.hover_img = ImageUpload.objects.get(id=hover_img_id)
+                except ImageUpload.DoesNotExist:
+                    raise serializers.ValidationError("Invalid hover_img_id")
+            else:
+                instance.hover_img = None
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+    def _get_image_url(self, image_obj):
+        if image_obj and image_obj.image:
+            return image_obj.image.url
+        return None
 
     def get_image_url(self, obj):
-        if obj.image and obj.image.image:
-            return obj.image.image.url
-        return None
+        return self._get_image_url(obj.image)
+
+    def get_hover_img_url(self, obj):
+        return self._get_image_url(obj.hover_img)
     
 
 class ProjectCardSerializer(serializers.ModelSerializer):

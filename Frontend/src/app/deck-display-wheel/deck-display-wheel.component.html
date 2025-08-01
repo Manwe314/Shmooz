@@ -13,9 +13,7 @@
       @for (deck of decks; track $index) {
         <app-deck
           class="deck-slide"
-          [displayName]="deck.displayed_name"
-          [imageUrl]="getImageUrl(deck.image_url)"
-          [id]="deck.id"
+          [deck]="deck"
           (deckSelected)="onDeckClicked($event)"
         />
       }
