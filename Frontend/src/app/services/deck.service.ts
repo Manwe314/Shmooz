@@ -17,6 +17,10 @@ export interface Deck {
   rotations?: number[];
   alphas?: number[];
   brightness?: number[];
+  hover_x_offsets?: number[];
+  hover_y_offsets?: number[];
+  hover_rotations?: number[];
+  hover_brightness?: number[];
 }
 
 @Injectable({

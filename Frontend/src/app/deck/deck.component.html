@@ -3,7 +3,7 @@
     <div class="card" [ngStyle]="getDeckCardsStyle(i)"></div>
   }
   <div class="card card-on-top">
-    <img [src]="imageUrl" alt="Card Image" />
+    <img [src]="imageUrl" alt="Card Image" class="deck-cover"/>
     <img class="hover-overlay-img" [src]="hoverImg" alt="Hover Image" />
     <div class="deck-label">{{ displayName }}</div>
   </div>

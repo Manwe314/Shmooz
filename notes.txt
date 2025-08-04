@@ -10,7 +10,6 @@ For Production:
     an env variable. OR just update api service.
     add back jwt is authenticated!
     chnage DockerFiles to copy files
-    wrap ProjectCard data wityh animatioed project card to add animation specific data
     ctrl + f "URL"
 
 
@@ -50,13 +49,13 @@ For Admin panel:
 
 to-do:
     chose a font and use it.
+    text overhaul
     change "COMPANY" (default search) with actaul default target
     navigation buttons visual update
     slug guard based on slug registry in slug resolver
     check refresh on project pages.
     
     Deck:
-        deck visual update: box shadow, placement, text, more...
         deck wheel animation polish. ?upgrade to be flat wheel
         deck wheel placement.
     
@@ -73,4 +72,4 @@ to-do:
 
 
 for tomorrow:
-    decks overhaul
+    deck wheel upgrade

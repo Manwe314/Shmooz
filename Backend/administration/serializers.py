@@ -113,8 +113,8 @@ class DeckSerializer(serializers.ModelSerializer):
             'image', 'image_id', 'image_url',
             'hover_img', 'hover_img_id', 'hover_img_url',
             'card_amount', 'x_offsets', 'y_offsets',
-            'rotations', 'alphas', 'brightness',
-            'created_at'
+            'rotations', 'alphas', 'brightness', 'hover_x_offsets', 'hover_y_offsets',
+            'hover_rotations', 'hover_brightness', 'created_at'
         ]
         read_only_fields = ['id', 'image_url', 'hover_img_url', 'created_at']
 

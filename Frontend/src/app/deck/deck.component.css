@@ -4,14 +4,11 @@
   position: fixed;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s ease;
-  box-shadow: 0 10px 25px #00000033;
+  transition: transform 1.2s cubic-bezier(.48,.55,.68,.18);
+  box-shadow: 0 0px 25px #00000033;
   z-index: 500;
 }
 
-.deck-container:hover {
-  transform: scale(1);
-}
 
 .card-on-top .hover-overlay-img {
   position: absolute;
@@ -22,21 +19,30 @@
   object-fit: cover;
   border-radius: 18px;
   opacity: 0;
-  transition: transform 0.5s ease-in-out, opacity 0.3s ease-in-out;
+  transition: opacity 2.1s cubic-bezier(.48,.55,.68,.18);
   pointer-events: none; /* Let mouse events pass through */
   z-index: 501;
   overflow: visible;
-  transform: scale(0.2);
+  transform: scale(1.2);
 }
 
 /* Show the hover image when parent is hovered */
 .deck-container:hover .card-on-top .hover-overlay-img {
+  filter: drop-shadow(0 0 15px rgb(224, 248, 4));
   opacity: 1;
-  transform: scale(1.2);
+}
+
+.deck-container:hover .card-on-top .deck-cover {
+  transition: filter 1s ease-in-out;
+  filter: blur(0.5px);
 }
 
 .deck-container:hover .card-on-top .deck-label {
   opacity: 0;
+}
+
+.card:hover img {
+  filter: blur(0.45px);
 }
 
 .card {
@@ -49,15 +55,20 @@
   left: 0;
   background-size: cover;
   background-position: center;
-  transition: transform 0.3s ease, filter 0.3s ease;
+  transition: transform 1.3s cubic-bezier(.52,-0.01,.13,.32), filter 0.3s ease;
   will-change: transform, filter;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0px 12px rgba(0, 0, 0, 0.4);
   z-index: 400;
 }
 
 /* Top card (with actual image tag inside) */
 .card-on-top {
   z-index: 500;
+}
+
+.card-on-top:hover {
+  transition: transform 0.7s cubic-bezier(.48,.55,.68,.18);
+  transform: scale(1.01);
 }
 
 .card-on-top img {
@@ -68,7 +79,7 @@
 }
 
 .deck-label {
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 1.2s cubic-bezier(.88,.57,1,.74);
   position: absolute;
   left: 134px;
   top: 96px;
