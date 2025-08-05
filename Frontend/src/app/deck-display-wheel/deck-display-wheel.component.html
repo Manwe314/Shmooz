@@ -1,24 +1,24 @@
 <div class="deck-pager">
-  <button class="nav-button" (click)="prevPage()" [disabled]="!canScrollPrev">‹</button>
 
   <div #deckMaskRef class="deck-mask">
-    <div
-      class="deck-slider"
-      [style.transform]="getTransform()"
-      [style.gap.px]="actualGap"
-      [style.transition]="'transform 0.4s ease'"
-      [style.padding-left.px]="actualGap"
-      [style.padding-right.px]="actualGap"
-    >
-      @for (deck of decks; track $index) {
-        <app-deck
-          class="deck-slide"
-          [deck]="deck"
-          (deckSelected)="onDeckClicked($event)"
-        />
+      @for (deck of decks; track $index; let i = $index) {
+        <div class="deck-slide" [ngStyle]="getEllipseDeckStyle(i)">
+          <app-deck
+            [deck]="deck"
+            (deckSelected)="onDeckClicked($event)"
+          />
+        </div>
       }
-    </div>
   </div>
+  <div class="deck-controls">
+    <button class="nav-button" (click)="prevPage()" [disabled]="!canScrollPrev">
+      ‹
+    </button>
 
-  <button class="nav-button" (click)="nextPage()" [disabled]="!canScrollNext">›</button>
+    <button class="nav-button" (click)="nextPage()" [disabled]="!canScrollNext">
+      ›
+    </button>
+  </div>
 </div>
+
+

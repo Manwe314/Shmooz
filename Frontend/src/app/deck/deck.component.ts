@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Deck } from '../services/deck.service';
 
 @Component({
+  standalone: true,
   selector: 'app-deck',
   imports: [CommonModule],
   templateUrl: './deck.component.html',

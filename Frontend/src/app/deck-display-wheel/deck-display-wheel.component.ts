@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-deck-display-wheel',
-  imports: [DeckComponent],
+  imports: [DeckComponent, CommonModule],
   templateUrl: './deck-display-wheel.component.html',
   styleUrl: './deck-display-wheel.component.css',
 })
@@ -20,6 +20,13 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   maxVisibleDecks = 1;
   currentPage = 0;
   actualGap = 50;
+  ellipseRadiusX = 0;
+  ellipseRadiusY = 0;
+  ellipseStepAngle = 0.13;
+  //BASE + backend.
+  ellipseXPadding = 0;
+  ellipseYPadding = 0;
+
 
   constructor(
     private deckService: DeckService,
@@ -37,6 +44,78 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
     if (typeof window !== 'undefined') {
       this.resizeSub = fromEvent(window, 'resize').subscribe(() => this.updateLayout());
     }
+  }
+
+  getEllipseDeckStyle(index: number): Record<string, string> {
+    const deckCount = this.decks.length;
+    const visibleCount = Math.min(deckCount, this.maxVisibleDecks);
+
+    // Actual decks being rendered in this page:
+    const firstVisibleDeck = this.currentPage;
+    const lastVisibleDeck = Math.min(this.currentPage + visibleCount - 1, deckCount - 1);
+
+    // This card’s index within the visible set:
+    const relativeIndex = index - firstVisibleDeck;
+
+    // Calculate center shift
+    const mid = (visibleCount - 1) / 2;
+
+    // This determines the card's angle on the ellipse
+    let angle: number;
+    if (visibleCount % 2 === 1) {
+      angle = (relativeIndex - mid) * this.ellipseStepAngle;
+    } else {
+      const half = visibleCount / 2;
+      if (relativeIndex < half)
+        angle = ((-(half - relativeIndex)) * this.ellipseStepAngle) + (this.ellipseStepAngle / 2);
+      else
+        angle = ((relativeIndex - half + 1) * this.ellipseStepAngle) - (this.ellipseStepAngle / 2);
+    }
+
+    // Position on ellipse
+    const x = this.ellipseRadiusX * Math.sin(angle);
+    const y = -this.ellipseRadiusY * (1 - Math.cos(angle)) + 40; // lift the arc slightly
+
+    // Tangent rotation angle (but very small adjustment only)
+    const dx = this.ellipseRadiusX * Math.cos(angle);
+    const dy = -this.ellipseRadiusY * Math.sin(angle);
+    const tangentAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+    const rotation = tangentAngle; // Subtract 90 so default is upright
+
+    // Handle offscreen decks (before/after visible range)
+    if (relativeIndex < 0) {
+      return {
+        transform: `translate(-50%, -50%) translateX(-2000px)`,
+        transition: 'transform 0.5s ease',
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+      };
+    }
+
+    if (relativeIndex >= visibleCount) {
+      return {
+        transform: `translate(-50%, -50%) translateX(2000px)`,
+        transition: 'transform 0.5s ease',
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+      };
+    }
+
+    // Default visible cards
+    return {
+      transform: `
+        translate(-50%, -50%)
+        translateX(${x}px)
+        translateY(${y}px)
+        rotate(${rotation}deg)
+      `,
+      transition: 'transform 0.5s ease',
+      position: 'absolute',
+      left: '50%',
+      top: '20%',
+    };
   }
 
   ngOnDestroy(): void {
@@ -90,6 +169,14 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
 
     this.actualGap = Math.round(leftoverSpace / gaps);
 
+    this.ellipseRadiusX = window.innerWidth + this.ellipseXPadding;
+    this.ellipseRadiusY = (this.deckMaskRef.nativeElement.offsetHeight / 2) + this.ellipseYPadding;
+    if (this.ellipseRadiusX > 0) {
+      this.ellipseStepAngle = (this.deckWidth + this.actualGap) / this.ellipseRadiusX;
+    } else {
+      console.warn('⚠️ ellipseRadiusX is 0! Step angle is using default value.');
+    }
+ 
     this.currentPage = 0;
   }
   

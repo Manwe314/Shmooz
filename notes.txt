@@ -54,10 +54,15 @@ to-do:
     navigation buttons visual update
     slug guard based on slug registry in slug resolver
     check refresh on project pages.
+    optimise for phone performance
+    optimase for phone layout
+
     
     Deck:
         deck wheel animation polish. ?upgrade to be flat wheel
         deck wheel placement.
+        remove hover image bug when none is provided.
+        add the backend padding option.
     
     project card: 
         preserving hand state after navigation

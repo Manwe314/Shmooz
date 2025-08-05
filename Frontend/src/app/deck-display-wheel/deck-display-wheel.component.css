@@ -1,39 +1,28 @@
 .deck-pager {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 50%;
+    align-items: flex-start;
+    justify-content: center;
+    height: 60vh;
     width: 100%;
     gap: 20px;
-    padding: 0 12px;
     box-sizing: border-box;
-    margin-top: 50px;
+    padding-top: 50px;
     z-index: 500;
     position: absolute;
+    overflow: visible;
 }
 
 .deck-mask {
-  overflow: hidden;
+  overflow: visible;
   flex: 1;
   position: relative;
   height: 100%;
 }
 
-.deck-slider {
-  display: flex;
-  align-content: center;
-  height: 100%;
-  will-change: transform;
-  padding-top: 30px;
-}
 
 .deck-slide {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  width: 330px;
-  height: 228px;
+  width: 269px;
+  height: 192px;
 }
 
 .nav-button {
@@ -49,4 +38,14 @@
 .nav-button:disabled {
   opacity: 0;
   cursor: auto;
+}
+
+.deck-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
 }
