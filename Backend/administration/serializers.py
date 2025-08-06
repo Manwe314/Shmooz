@@ -94,10 +94,15 @@ class GradientColorsSerializer(serializers.ModelSerializer):
         model = BackgroundData
         fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3']
 
+class PageDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BackgroundData
+        fields = ['id', 'navColor', 'arrowColor', 'ellipseWidth', 'ellipseHeight']
+
 class BackgroundDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = BackgroundData
-        fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3', 'page1', 'page2']
+        fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3', 'page1', 'page2', 'navColor', 'arrowColor', 'ellipseWidth', 'ellipseHeight']
 
 class DeckSerializer(serializers.ModelSerializer):
     image_id = serializers.IntegerField(write_only=True, required=True)

@@ -19,7 +19,7 @@
   object-fit: cover;
   border-radius: 18px;
   opacity: 0;
-  transition: opacity 2.1s cubic-bezier(.48,.55,.68,.18);
+  transition: opacity 1.7s cubic-bezier(.48,.55,.68,.18);
   pointer-events: none; /* Let mouse events pass through */
   z-index: 501;
   overflow: visible;

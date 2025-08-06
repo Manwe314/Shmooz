@@ -62,6 +62,11 @@ class BackgroundData(models.Model):
     page1 = models.CharField(max_length=50)
     page2 = models.CharField(max_length=50)
 
+    navColor = models.CharField(max_length=50, default="#000000")
+    arrowColor = models.CharField(max_length=50, default="#FFFFFF")
+    ellipseWidth = models.IntegerField(default=0)
+    ellipseHeight = models.IntegerField(default=0)
+
     def __str__(self):
         return self.owner
 

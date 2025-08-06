@@ -17,6 +17,13 @@ export interface PageInfo {
   page2: string;
 }
 
+export interface PageDetails {
+  navColor: string;
+  arrowColor: string;
+  ellipseWidth: number;
+  ellipseHeight: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -25,6 +32,7 @@ export class BackgroundService {
   private api = inject(ApiService);
   private gradient: GradientColors | null = null;
   private pageNames: PageInfo | null = null;
+  private pageDetails: PageDetails | null = null;
   
   setResolvedGradient(data: GradientColors) {
     this.gradient = data;
@@ -41,7 +49,15 @@ export class BackgroundService {
   getPageNames(): PageInfo | null {
     return this.pageNames;
   }
-  
+
+  setResolvedPageDetails(data: PageDetails) {
+    this.pageDetails = data;
+  }
+
+  getPageDetail(): PageDetails | null {
+    return this.pageDetails;
+  }
+
   getGradientColors(path: string = ''): Observable<GradientColors> {
     const endpoint = path ? this.api.buildUrl(`gradient-colors/${path}`) : this.api.buildUrl('gradient-colors/COMPANY');
     return this.http.get<GradientColors>(endpoint);
@@ -50,5 +66,10 @@ export class BackgroundService {
   getPageInfo(path: string = ''): Observable<PageInfo> {
     const endpoint = path ? this.api.buildUrl(`page-names/${path}`) : this.api.buildUrl('page-names/COMPANY');
     return this.http.get<PageInfo>(endpoint);
+  }
+
+  getPageDetails(path: string = ''): Observable<PageDetails> {
+    const endpoint = path ? this.api.buildUrl(`page-details/${path}`) : this.api.buildUrl('page-details/COMPANY')
+    return this.http.get<PageDetails>(endpoint);
   }
 }

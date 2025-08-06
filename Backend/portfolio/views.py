@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny 
 from .models import Deck, ProjectCard, SlugEntry, PagesModel, BackgroundData
 from administration.models import ImageUpload
-from administration.serializers import DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer, PageNamesSerializer, GradientColorsSerializer, BackgroundDataSerializer, ImageUploadSerializer
+from administration.serializers import DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer, PageNamesSerializer, GradientColorsSerializer, BackgroundDataSerializer, ImageUploadSerializer, PageDetailsSerializer
 import sys
 from django.shortcuts import get_object_or_404
 
@@ -49,7 +49,22 @@ class PageNamesView(APIView):
         names = get_object_or_404(BackgroundData, owner=slug)
         serializer = PageNamesSerializer(names)
         return Response(serializer.data)
-        
+
+@extend_schema(
+    summary="Get landing page details",
+    description="Returns page navigation text color, deck nav color, and elliptical height and width offsets",
+    parameters=[
+        OpenApiParameter(name="slug", location=OpenApiParameter.PATH, description="Owner slug", required=True, type=str),
+    ],
+    responses={200: PageDetailsSerializer}
+)
+class PageDetailsView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, slug=None):
+        details = get_object_or_404(BackgroundData, owner=slug)
+        serializer = PageDetailsSerializer(details)
+        return Response(serializer.data)
 
 @extend_schema(
     summary="List decks for a given owner",

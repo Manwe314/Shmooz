@@ -1,10 +1,15 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, signal, effect, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, signal, effect, OnInit, Output, EventEmitter, ViewChildren, QueryList  } from '@angular/core';
 import { DeckService, Deck } from '../services/deck.service';
 import { SlugService } from '../services/slug.service';
 import { DeckComponent } from '../deck/deck.component';
-import { filter, switchMap } from 'rxjs';
+import { filter, switchMap} from 'rxjs';
 import { fromEvent, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { NgZone } from '@angular/core';
+import { first } from 'rxjs/operators';
+import { PageDetails } from '../services/background.service';
+import { BackgroundService } from '../services/background.service';
+
 
 @Component({
   selector: 'app-deck-display-wheel',
@@ -23,24 +28,38 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   ellipseRadiusX = 0;
   ellipseRadiusY = 0;
   ellipseStepAngle = 0.13;
-  //BASE + backend.
-  ellipseXPadding = 0;
-  ellipseYPadding = 0;
-
-
+  has_fadedin = false;
+  has_animation = false;
+  arrowColor = "";
+  
   constructor(
     private deckService: DeckService,
     private slugService: SlugService,
+    private zone: NgZone,
+    private backGround: BackgroundService,
   ) {}
   private resizeSub?: Subscription;
-
+  
   @ViewChild('deckContainer', { static: true }) deckContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('deckMaskRef') deckMaskRef!: ElementRef<HTMLDivElement>;
+  @ViewChildren('deckSlideRef') deckSlides!: QueryList<ElementRef<HTMLDivElement>>;
   @Output() deckSelected = new EventEmitter<{ id: string; origin: { x: number; y: number } }>();
-
+  
+  ellipseXPadding = 0;
+  ellipseYPadding = 0;
+  
   ngAfterViewInit() {
+    const backgroundDetails = this.backGround.getPageDetail();
+    this.ellipseXPadding = backgroundDetails!.ellipseWidth;
+    this.ellipseRadiusY = backgroundDetails!.ellipseHeight;
+    this.arrowColor = backgroundDetails!.arrowColor;
     this.decks = this.deckService.getResolvedDeck();
-    setTimeout(() => this.updateLayout(), 0);
+    setTimeout(() => {
+      this.updateLayout();
+      this.zone.onStable.pipe(first()).subscribe(() => {
+      this.enableTransitions();
+    });
+    }, 0);
     if (typeof window !== 'undefined') {
       this.resizeSub = fromEvent(window, 'resize').subscribe(() => this.updateLayout());
     }
@@ -49,18 +68,12 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   getEllipseDeckStyle(index: number): Record<string, string> {
     const deckCount = this.decks.length;
     const visibleCount = Math.min(deckCount, this.maxVisibleDecks);
-
-    // Actual decks being rendered in this page:
     const firstVisibleDeck = this.currentPage;
-    const lastVisibleDeck = Math.min(this.currentPage + visibleCount - 1, deckCount - 1);
 
-    // This card’s index within the visible set:
     const relativeIndex = index - firstVisibleDeck;
 
-    // Calculate center shift
     const mid = (visibleCount - 1) / 2;
 
-    // This determines the card's angle on the ellipse
     let angle: number;
     if (visibleCount % 2 === 1) {
       angle = (relativeIndex - mid) * this.ellipseStepAngle;
@@ -72,38 +85,46 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
         angle = ((relativeIndex - half + 1) * this.ellipseStepAngle) - (this.ellipseStepAngle / 2);
     }
 
-    // Position on ellipse
     const x = this.ellipseRadiusX * Math.sin(angle);
-    const y = -this.ellipseRadiusY * (1 - Math.cos(angle)) + 40; // lift the arc slightly
+    const y = -this.ellipseRadiusY * (1 - Math.cos(angle)) + 40;
 
-    // Tangent rotation angle (but very small adjustment only)
     const dx = this.ellipseRadiusX * Math.cos(angle);
     const dy = -this.ellipseRadiusY * Math.sin(angle);
     const tangentAngle = Math.atan2(dy, dx) * (180 / Math.PI);
-    const rotation = tangentAngle; // Subtract 90 so default is upright
+    const rotation = tangentAngle;
 
-    // Handle offscreen decks (before/after visible range)
     if (relativeIndex < 0) {
+      const point = this.getOffscreenPoint('left');
       return {
-        transform: `translate(-50%, -50%) translateX(-2000px)`,
-        transition: 'transform 0.5s ease',
+        transform: `
+          translate(-50%, -50%)
+          translateX(${point.x}px)
+          translateY(${point.y}px)
+          rotate(${point.rotation}deg)
+        `,
         position: 'absolute',
         left: '50%',
-        top: '50%',
+        top: '27%',
+        opacity: this.has_fadedin ? '1' : '0',
       };
     }
 
     if (relativeIndex >= visibleCount) {
+      const point = this.getOffscreenPoint('right');
       return {
-        transform: `translate(-50%, -50%) translateX(2000px)`,
-        transition: 'transform 0.5s ease',
+        transform: `
+          translate(-50%, -50%)
+          translateX(${point.x}px)
+          translateY(${point.y}px)
+          rotate(${point.rotation}deg)
+        `,
         position: 'absolute',
         left: '50%',
-        top: '50%',
+        top: '27%',
+        opacity: this.has_fadedin ? '1' : '0',
       };
     }
 
-    // Default visible cards
     return {
       transform: `
         translate(-50%, -50%)
@@ -111,11 +132,24 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
         translateY(${y}px)
         rotate(${rotation}deg)
       `,
-      transition: 'transform 0.5s ease',
       position: 'absolute',
       left: '50%',
-      top: '20%',
+      top: '27%',
+      opacity: this.has_fadedin ? '1' : '0'
     };
+  }
+
+  getOffscreenPoint(direction: 'left' | 'right') {
+    const angleOffset = ((this.maxVisibleDecks / 2) + 1.5) * this.ellipseStepAngle * (direction === 'left' ? -1 : 1);
+
+    const x = this.ellipseRadiusX * Math.sin(angleOffset);
+    const y = -this.ellipseRadiusY * (1 - Math.cos(angleOffset)) + 40;
+
+    const dx = this.ellipseRadiusX * Math.cos(angleOffset);
+    const dy = -this.ellipseRadiusY * Math.sin(angleOffset);
+    const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
+
+    return { x, y, rotation };
   }
 
   ngOnDestroy(): void {
@@ -133,12 +167,32 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   get canScrollPrev(): boolean {
     return this.currentPage > 0;
   }
+ 
+  enableTransitions() {
+    this.deckSlides?.forEach((el: ElementRef<HTMLDivElement>) => {
+      el.nativeElement.style.transition = 'opacity 0.8s ease';
+      el.nativeElement.style.opacity = '1';
+      this.has_fadedin = true;
+    });
+  }
 
   prevPage() {
+    if (!this.has_animation) {
+      this.deckSlides?.forEach((el: ElementRef<HTMLDivElement>) => {
+        el.nativeElement.style.transition = 'transform 0.7s cubic-bezier(.42,.19,.5,1.37)';
+      });
+      this.has_animation = true;
+    }
     this.currentPage = Math.max(this.currentPage - 1, 0);
   }
 
   nextPage() {
+    if (!this.has_animation) {
+      this.deckSlides?.forEach((el: ElementRef<HTMLDivElement>) => {
+        el.nativeElement.style.transition = 'transform 0.7s cubic-bezier(.42,.19,.5,1.37)';
+      });
+      this.has_animation = true;
+    }
     const maxPage = this.totalPages - 1;
     this.currentPage = Math.min(this.currentPage + 1, maxPage);
   }
@@ -190,3 +244,5 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   }
 
 }
+
+
