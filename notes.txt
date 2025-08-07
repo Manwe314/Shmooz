@@ -10,7 +10,6 @@ For Production:
     an env variable. OR just update api service.
     add back jwt is authenticated!
     chnage DockerFiles to copy files
-    wrap ProjectCard data wityh animatioed project card to add animation specific data
     ctrl + f "URL"
 
 
@@ -45,21 +44,23 @@ For Admin panel:
         image id of the image uploaded
 
     Pages:
-        TBD.
+        schema in swagger.
  
 
 to-do:
     chose a font and use it.
+    text overhaul
     change "COMPANY" (default search) with actaul default target
-    navigation buttons visual update
     slug guard based on slug registry in slug resolver
-    add app-root cloner to eliminate flickering on routing.
+    check refresh on project pages.
+    optimise for phone performance
+    optimase for phone layout
+
     
     Deck:
-        deck visual update: box shadow, placement, text, more...
-        deck wheel animation polish. ?upgrade to be flat wheel
-        deck wheel placement.
-    
+        remove hover image bug when none is provided.
+        fix small/thin screen arrow.
+
     project card: 
         preserving hand state after navigation
         visual update of text and label.
@@ -70,13 +71,8 @@ to-do:
         add alter endpoint for all models
     
     Pages:
-        visual overhaul
-        upgrade customization
-        fix scrolling
-        enforce owner - category uniqinuess with project pages as well. have guards.
 
 
 for tomorrow:
-    page text alignment upgrade. 
-    add page padding / margin upgrade.
+    page navigation transition animation. 
     

@@ -10,6 +10,17 @@ export interface Deck {
   owner: string;
   image_url: string;
   image: string;
+  hover_img_url?: string;
+  card_amount?: number;
+  x_offsets?: number[];
+  y_offsets?: number[];
+  rotations?: number[];
+  alphas?: number[];
+  brightness?: number[];
+  hover_x_offsets?: number[];
+  hover_y_offsets?: number[];
+  hover_rotations?: number[];
+  hover_brightness?: number[];
 }
 
 @Injectable({
