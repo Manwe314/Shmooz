@@ -11,8 +11,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 50% 130%, #712243 0%, #181532 46%, #050319 71%);
-  animation: pulseGradient 10s ease-in-out infinite, shiftCentre 8s ease-in-out infinite;
+  background-repeat: no-repeat;
+  animation: pulseGradient 10s ease-in-out infinite, shiftCenter 8s ease-in-out infinite;
   z-index: -1;
   transition: background 1s ease-in-out;
   pointer-events: none;
@@ -53,12 +53,18 @@
   }
 }
 
+@property --y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 130%;
+}
+
 @keyframes shiftCenter {
     0%, 100% {
         --y: 130%
     }
     50% {
-        --y: 120%
+        --y: 115%
     }
 }
 

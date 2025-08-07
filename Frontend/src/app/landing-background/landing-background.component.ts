@@ -40,11 +40,11 @@ export class LandingBackgroundComponent implements OnInit{
 
     this.pageSwitcher.nativeElement.style.transform = `translateX(-${offset}px)`;
   }
-  
+
   ngOnInit() {
     const gradient = this.backgroundService.getGradient();
     if (gradient)
-      this.gradientStyle = `radial-gradient(circle at 50% 130%, ${gradient.color1} ${gradient.position1}, ${gradient.color2} ${gradient.position2}, ${gradient.color3} ${gradient.position3})`;
+      this.gradientStyle = `radial-gradient(circle at 50% var(--y), ${gradient.color1} ${gradient.position1}, ${gradient.color2} ${gradient.position2}, ${gradient.color3} ${gradient.position3})`;
     const names = this.backgroundService.getPageNames();
     if (names)
       this.pageNames = names;
