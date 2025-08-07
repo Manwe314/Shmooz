@@ -60,7 +60,6 @@ to-do:
     Deck:
         remove hover image bug when none is provided.
         fix small/thin screen arrow.
-        fix arrow over cards layering
 
     project card: 
         preserving hand state after navigation
@@ -75,6 +74,5 @@ to-do:
 
 
 for tomorrow:
-    navigation buttons visual update
     page navigation transition animation. 
     

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { BackgroundService, GradientColors, PageInfo } from '../services/background.service';
 import { CommonModule } from '@angular/common';
 import { error } from 'console';
@@ -18,6 +18,10 @@ export class LandingBackgroundComponent implements OnInit{
   currentPage: 'home' | 'page1' | 'page2' = 'home';
   pageNames: PageInfo = {page1: 'page one', page2: 'page two'};
   otherPages: { path: 'home' | 'page1' | 'page2'; label: string }[] = [];
+  navColor = "#fff"
+
+  @ViewChild('firstBtn') firstBtn!: ElementRef<HTMLButtonElement>;
+  @ViewChild('pageSwitcher') pageSwitcher!: ElementRef<HTMLElement>;
 
   constructor(
     private backgroundService: BackgroundService,
@@ -25,6 +29,18 @@ export class LandingBackgroundComponent implements OnInit{
     private router: Router,
   ) {}
 
+  ngAfterViewInit() {
+    setTimeout(() => this.centerByGap(), 0);
+  }
+
+  centerByGap() {
+    const firstWidth = this.firstBtn?.nativeElement?.offsetWidth ?? 0;
+    const gap = 24;
+    const offset = firstWidth + gap / 2;
+
+    this.pageSwitcher.nativeElement.style.transform = `translateX(-${offset}px)`;
+  }
+  
   ngOnInit() {
     const gradient = this.backgroundService.getGradient();
     if (gradient)
@@ -32,6 +48,10 @@ export class LandingBackgroundComponent implements OnInit{
     const names = this.backgroundService.getPageNames();
     if (names)
       this.pageNames = names;
+  
+    const details = this.backgroundService.getPageDetail();
+    if (details) 
+      this.navColor = details.navColor;
 
     this.updateCurrentPageAndOthers();
 

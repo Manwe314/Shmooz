@@ -10,6 +10,7 @@
     z-index: 500;
     position: absolute;
     overflow: visible;
+    pointer-events: none;
 }
 
 .deck-mask {
@@ -17,12 +18,14 @@
   flex: 1;
   position: relative;
   height: 100%;
+  
 }
 
 
 .deck-slide {
   width: 269px;
   height: 192px;
+  pointer-events: auto;
 }
 
 .nav-button-left {
@@ -257,8 +260,8 @@
 
 .deck-controls {
   position: absolute;
-  top: 60%;
+  top: 45%;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10 !important;
+  z-index: 10;
 }

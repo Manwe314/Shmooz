@@ -1,12 +1,12 @@
 <div class="background" [ngStyle]="{'background': gradientStyle}"></div>
 
-<div class="page-switcher top">
-    @for (page of otherPages; let i = $index; let last = $last; track page.path) {
-      <button class="text-button" (click)="navigateTo(page.path)">
+<div class="page-switcher top" #pageSwitcher>
+    @for (page of otherPages; let i = $index; track page.path) {
+      <button class="text-button" #firstBtn *ngIf="i === 0" [ngStyle]="{'color': navColor, 'border-color': navColor}" (click)="navigateTo(page.path)">
         {{ page.label }}
       </button>
-      @if (!last) {
-        <span class="separator">|</span>
-      }
+      <button class="text-button" *ngIf="i !== 0" [ngStyle]="{'color': navColor, 'border-color': navColor}" (click)="navigateTo(page.path)">
+        {{ page.label }}
+      </button>
     }
 </div>
