@@ -7,6 +7,7 @@ import { SlugService } from '../services/slug.service';
 import { ProjectCardsService } from '../services/project-cards.service';
 import { ProjectCard } from '../services/project-cards.service';
 import { filter, switchMap } from 'rxjs';
+import { TransitionService } from '../services/transition.service';
 
 
 
@@ -25,7 +26,20 @@ export class LandingPageComponent {
   constructor(
     private projectCardService: ProjectCardsService,
     private slugService: SlugService,
+    private transitionService: TransitionService
   ) {}
+
+  
+  ngAfterViewInit(): void {
+    const gradient = document.querySelector('.background-clone.come-in') as HTMLElement;
+    if (!gradient)
+      return;
+    gradient.classList.remove('come-in');
+    gradient.classList.add('go-out');
+    setTimeout(() => {
+      this.transitionService.cleanup();
+    }, 1000);
+  }
 
   onDeckSelected(deckData: { id: string; origin: { x: number; y: number } }) {
     if (this.isTransitioning) {

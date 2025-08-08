@@ -5,11 +5,11 @@ import { ApiService } from './api.service';
 
 export interface GradientColors {
   color1: string;
-  position1: number;
+  position1: string;
   color2: string;
-  position2: number;
+  position2: string;
   color3: string;
-  position3: number;
+  position3: string;
 }
 
 export interface PageInfo {

@@ -7,7 +7,7 @@ import { SlugService } from '../services/slug.service';
 import { LandingBackgroundComponent } from '../landing-background/landing-background.component';
 import { ApiService } from '../services/api.service';
 import { Block, PageService } from '../services/page.service';
-import { AfterViewInit, ElementRef } from '@angular/core';
+import { AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { TransitionService } from '../services/transition.service';
 
 @Component({
@@ -30,6 +30,19 @@ export class PageComponent {
     const fullscreenCard = document.querySelector('.hand-card-clone.fullscreen') as HTMLElement;
     const targetEl = document.querySelector('[data-tag="imageTarget"]') as HTMLElement;
     const borderTarget = document.querySelector('[data-tag="borderTarget"]') as HTMLElement;
+    const gradient = document.querySelector('.background-clone.come-in') as HTMLElement;
+
+    if (!fullscreenCard && !gradient){
+      return;
+    }
+
+    if (gradient) {
+      gradient.classList.remove('come-in');
+      gradient.classList.add('go-out');
+      setTimeout(() => {
+        this.transitionService.cleanup();
+      }, 1000);
+    }
 
     if (!fullscreenCard || !targetEl || !borderTarget) {
       console.warn('[Morph] Required elements not found');
