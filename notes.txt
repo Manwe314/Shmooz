@@ -55,11 +55,13 @@ to-do:
     check refresh on project pages.
     optimise for phone performance
     optimase for phone layout
+    OPTIMISE in General (images lag?)
 
     
     Deck:
         remove hover image bug when none is provided.
         fix small/thin screen arrow.
+        fix arrow showing up when navigation is impossible only once. 
 
     project card: 
         preserving hand state after navigation
@@ -74,5 +76,4 @@ to-do:
 
 
 for tomorrow:
-    page navigation transition animation. 
-    
+    moving on to misc stuff.

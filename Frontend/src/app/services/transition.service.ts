@@ -1,28 +1,31 @@
 import { Injectable } from '@angular/core';
-import { Subject, Observable, take } from 'rxjs';
+import { BehaviorSubject, Observable, filter, take } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TransitionService {
   private activeClone?: HTMLElement;
-  private unblock$ = new Subject<boolean>();
+  private gate$ = new BehaviorSubject<boolean>(true);
 
   waitForUnblock(): Observable<boolean> {
-    return this.unblock$.asObservable().pipe(take(1));
+    return this.gate$.pipe(
+      filter((v: boolean) => v === true),
+      take(1)
+    );
   }
 
   /** Called after animation finishes */
   unblockRoute(): void {
-    this.unblock$.next(true);
+    this.gate$.next(true);
   }
 
   blockNavigation(): void {
-    this.unblock$ = new Subject<boolean>();
+    this.gate$.next(false);
   }
 
-  resetBlock(): void {
-    this.unblock$ = new Subject<boolean>();
+  get isBlocked(): boolean {
+    return this.gate$.getValue() === false;
   }
 
   createClone(el: HTMLElement): HTMLElement {
@@ -45,6 +48,63 @@ export class TransitionService {
       zIndex: '9997',
       pointerEvents: 'none'
     });
+
+    container?.appendChild(clone);
+    this.activeClone = clone;
+    return clone;
+  }
+
+  cloneGradient(el: HTMLElement): HTMLElement {
+    const container = document.getElementById('transition-overlay-container');
+    const clone = el.cloneNode(false) as HTMLElement;
+    const rect = el.getBoundingClientRect();
+    const cs = getComputedStyle(el);
+
+    const c1 = cs.getPropertyValue('--c1').trim();
+    const c2 = cs.getPropertyValue('--c2').trim();
+    const c3 = cs.getPropertyValue('--c3').trim();
+    const p1 = cs.getPropertyValue('--p1').trim();
+    const p2 = cs.getPropertyValue('--p2').trim();
+    const p3 = cs.getPropertyValue('--p3').trim();
+
+    clone.classList.remove('background');
+    clone.classList.add('background-clone');
+
+    const c2a = this.toRgba(c2, 0.4);
+    const c3a = this.toRgba(c3, 0.2); 
+
+
+    Object.assign(clone.style, {
+      position: 'fixed',
+      top: `${rect.top}px`,
+      left: `${rect.left}px`,
+      width: `${rect.width}px`,
+      height: `${rect.height}px`,
+      transition: 'opacity 1s cubic-bezier(0,-0.21,0,.41)',
+      opacity: '0',
+      zIndex: '100000',
+      pointerEvents: 'none'
+    } as CSSStyleDeclaration);
+
+    clone.style.setProperty('--clone-c1', c1);
+    clone.style.setProperty('--clone-c2', c2a);
+    clone.style.setProperty('--clone-c3', c3a);
+    clone.style.setProperty('--clone-p1', p1);
+    clone.style.setProperty('--clone-p2', p2);
+    clone.style.setProperty('--clone-p3', p3);
+    clone.style.setProperty('--clone-y', '250%');
+
+    clone.style.backgroundImage = `
+      radial-gradient(
+        circle at 50% var(--clone-y),
+        var(--clone-c1) var(--clone-p1),
+        var(--clone-c2) var(--clone-p2),
+        var(--clone-c3) var(--clone-p3)
+      )
+    `;
+    clone.style.backgroundRepeat = 'no-repeat';
+    clone.style.backgroundSize = '100% 100%';
+    clone.style.backgroundPosition = '50% 50%';
 
     container?.appendChild(clone);
     this.activeClone = clone;
@@ -82,60 +142,35 @@ export class TransitionService {
     });
   }
   
-  // createFullscreenClone(el: HTMLElement, className: string): HTMLElement {
-  //   const rect = el.getBoundingClientRect();
-  //   const clone = el.cloneNode(true) as HTMLElement;
+  toRgba(input: string, alpha: number): string {
+    const hex = input.trim();
 
-  //   Object.assign(clone.style, {
-  //     position: 'fixed',
-  //     top: '50%',
-  //     left: '50%',
-  //     width: '100vw',
-  //     height: '100vh',
-  //     margin: '0',
-  //     zIndex: '9998',
-  //     pointerEvents: 'none',
-  //     opacity: '0',
-  //     overflow: 'hidden', // 💡 Prevent overflow
-  //     transform: 'translate(-50%, -50%)',
-  //     transition: 'opacity 10.6s ease'
-  //   });
+    // rgba() already?
+    if (hex.startsWith('rgba')) {
+      return hex.replace(/rgba\(([^)]+)\)/, (_, inner) => {
+        const parts = inner.split(',').map((s: string) => s.trim());
+        return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})`;
+      });
+    }
+    if (hex.startsWith('rgb(')) {
+      return hex.replace(/rgb\(([^)]+)\)/, (_, inner) => `rgba(${inner}, ${alpha})`);
+    }
 
-  //   clone.classList.add('page-element-clone', className);
-  //   return clone;
-  // }
-  // async animateCardToFullscreen(cardEl: HTMLElement): Promise<void> {
-  //   return new Promise(resolve => {
-  //   const targetW = window.innerWidth;
-  //   const targetH = window.innerHeight;
-
-  //   const rect = cardEl.getBoundingClientRect();
-
-  //   // Compute scale to fill screen
-  //   const scaleX = targetW / rect.width;
-  //   const scaleY = targetH / rect.height;
-
-  //   // Compute translation to keep center anchored
-  //   const translateX = (targetW / 2 - (rect.left + rect.width / 2)) / scaleX;
-  //   const translateY = (targetH / 2 - (rect.top + rect.height / 2)) / scaleY;
-
-  //   // Set CSS vars to use in transform
-  //   cardEl.style.setProperty('--scale-x', scaleX.toString());
-  //   cardEl.style.setProperty('--scale-y', scaleY.toString());
-  //   cardEl.style.setProperty('--translate-x', `${translateX}px`);
-  //   cardEl.style.setProperty('--translate-y', `${translateY}px`);
-
-  //   // Trigger transition
-    
-  //   cardEl.classList.add('fullscreen');
-
-  //   // Resolve after transition
-  //   setTimeout(() => {
-  //     resolve();
-  //   }, 180000);
-  // });
-  // }
-
+    // hex variants
+    const clean = hex.replace('#', '');
+    let r: number, g: number, b: number;
+    if (clean.length === 3) {
+      r = parseInt(clean[0] + clean[0], 16);
+      g = parseInt(clean[1] + clean[1], 16);
+      b = parseInt(clean[2] + clean[2], 16);
+    } else {
+      r = parseInt(clean.slice(0, 2), 16);
+      g = parseInt(clean.slice(2, 4), 16);
+      b = parseInt(clean.slice(4, 6), 16);
+    }
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  
   cleanup(): void {
     if (this.activeClone) {
       this.activeClone.remove();

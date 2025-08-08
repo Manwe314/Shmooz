@@ -5,7 +5,7 @@ import { error } from 'console';
 import { SlugService } from '../services/slug.service';
 import { filter, switchMap } from 'rxjs/operators';
 import { Router, NavigationEnd } from '@angular/router';
-
+import { TransitionService } from '../services/transition.service';
 
 @Component({
   selector: 'app-landing-background',
@@ -14,19 +14,21 @@ import { Router, NavigationEnd } from '@angular/router';
   styleUrl: './landing-background.component.css'
 })
 export class LandingBackgroundComponent implements OnInit{
-  gradientStyle = '';
   currentPage: 'home' | 'page1' | 'page2' = 'home';
   pageNames: PageInfo = {page1: 'page one', page2: 'page two'};
   otherPages: { path: 'home' | 'page1' | 'page2'; label: string }[] = [];
   navColor = "#fff"
+  isBlocked = true;
 
   @ViewChild('firstBtn') firstBtn!: ElementRef<HTMLButtonElement>;
   @ViewChild('pageSwitcher') pageSwitcher!: ElementRef<HTMLElement>;
+  @ViewChild('bgEl', { static: true }) bgEl!: ElementRef<HTMLDivElement>;
 
   constructor(
     private backgroundService: BackgroundService,
     private slugService: SlugService,
     private router: Router,
+    private transitionService: TransitionService,
   ) {}
 
   ngAfterViewInit() {
@@ -40,11 +42,19 @@ export class LandingBackgroundComponent implements OnInit{
 
     this.pageSwitcher.nativeElement.style.transform = `translateX(-${offset}px)`;
   }
-  
+
   ngOnInit() {
     const gradient = this.backgroundService.getGradient();
-    if (gradient)
-      this.gradientStyle = `radial-gradient(circle at 50% 130%, ${gradient.color1} ${gradient.position1}, ${gradient.color2} ${gradient.position2}, ${gradient.color3} ${gradient.position3})`;
+    if (gradient) {
+      const el = this.bgEl.nativeElement;
+      el.style.setProperty('--c1', gradient.color1);
+      el.style.setProperty('--c2', gradient.color2);
+      el.style.setProperty('--c3', gradient.color3);
+      el.style.setProperty('--p1', gradient.position1);
+      el.style.setProperty('--p2', gradient.position2);
+      el.style.setProperty('--p3', gradient.position3);
+      el.style.setProperty('--y', '130%');
+    }
     const names = this.backgroundService.getPageNames();
     if (names)
       this.pageNames = names;
@@ -54,6 +64,9 @@ export class LandingBackgroundComponent implements OnInit{
       this.navColor = details.navColor;
 
     this.updateCurrentPageAndOthers();
+    setTimeout(() => {
+      this.isBlocked = false;
+    }, 1100);
 
     this.router.events
     .pipe(filter(event => event instanceof NavigationEnd))
@@ -79,19 +92,33 @@ export class LandingBackgroundComponent implements OnInit{
   }
 
   navigateTo(page: 'home' | 'page1' | 'page2') {
+    this.isBlocked = true;
     const pathMap: Record<typeof page, string> = {
       home: '',
       page1: 'page_one',
       page2: 'page_two'
     };
-
     const slug = this.slugService.getCurrentSlug();
     const segments = [pathMap[page], slug].filter(Boolean);
+
+    const el = this.bgEl.nativeElement;
+    const clone = this.transitionService.cloneGradient(el);
+    this.transitionService.blockNavigation();
+    clone.classList.add('come-in');
+    
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        clone.style.opacity = '1';
+      });
+    });
     if (segments.length === 0){
       this.router.navigate(['']);
       return;
     }
-
     this.router.navigate(segments);
+    
+    setTimeout(() => {
+      this.transitionService.unblockRoute();
+    }, 1100);
   }
 }

@@ -1,6 +1,6 @@
-<div class="background" [ngStyle]="{'background': gradientStyle}"></div>
+<div class="background" #bgEl></div>
 
-<div class="page-switcher top" #pageSwitcher>
+<div class="page-switcher top" [class.nav-disabled]="isBlocked" #pageSwitcher>
     @for (page of otherPages; let i = $index; track page.path) {
       <button class="text-button" #firstBtn *ngIf="i === 0" [ngStyle]="{'color': navColor, 'border-color': navColor}" (click)="navigateTo(page.path)">
         {{ page.label }}
