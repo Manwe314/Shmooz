@@ -15,7 +15,7 @@ export class PageResolver implements Resolve<boolean> {
   resolve(route: ActivatedRouteSnapshot): Observable<boolean> {
     const path = route.url[0]?.path ?? '';
     const id = route.paramMap.get('id') ?? undefined;
-    const slug = this.slugService.getCurrentSlug() ?? 'COMPANY';
+    const slug = this.slugService.getCurrentSlug() ?? 'shmooz';
 
 
     return this.pageService.getPageData(path, slug, id).pipe(

@@ -14,12 +14,12 @@ except BackgroundData.DoesNotExist:
 
 # 🔁 Update entry for "COMPANY"
 try:
-    bg2 = BackgroundData.objects.get(owner="COMPANY")
+    bg2 = BackgroundData.objects.get(owner="shmooz")
     bg2.navColor = "#561B39"
     bg2.arrowColor = "#561B39"
     bg2.ellipseWidth = 0
     bg2.ellipseHeight = 0
     bg2.save()
-    print(f"✅ Updated BackgroundData entry for owner 'COMPANY' (ID: {bg2.id})")
+    print(f"✅ Updated BackgroundData entry for owner 'shmooz' (ID: {bg2.id})")
 except BackgroundData.DoesNotExist:
-    print("❌ BackgroundData entry for 'COMPANY' not found.")
+    print("❌ BackgroundData entry for 'shmooz' not found.")

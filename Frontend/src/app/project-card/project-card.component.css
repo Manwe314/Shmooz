@@ -2,7 +2,7 @@
   position: relative;
   width: 205px;
   height: 275px;
-  border-radius: 12px;
+  border-radius: 24px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   display: flex;
@@ -25,29 +25,29 @@
 
 .inset-border {
   position: absolute;
-  top: 4px;
-  left: 4px;
-  right: 4px;
-  bottom: 4px;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
   border: 2px solid;
-  border-radius: 8px;
+  border-radius: 19px;
   pointer-events: none;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.75);
 }
 
 .label-circle {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 30px;
-  height: 30px;
+  top: 12px;
+  left: 12px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  font-weight: bold;
-  font-size: 14px;
+  font-weight: 500;
+  font-size: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.75);
   transition: opacity 0.6s ease-in-out;
 }
 

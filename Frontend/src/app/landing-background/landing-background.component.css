@@ -26,10 +26,12 @@
 
 .background-clone.come-in {
   animation: toCenter 1s cubic-bezier(.21,-0.03,0,.42) forwards;
+  filter: brightness(0.75);
 }
 
 .background-clone.go-out {
   animation: toTop 1s cubic-bezier(.21,-0.03,0,.42) forwards;
+  filter: brightness(0.75);
 }
 
 .page-switcher {

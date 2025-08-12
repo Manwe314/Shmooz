@@ -8,6 +8,8 @@ from administration.models import ImageUpload
 from administration.serializers import DeckSerializer, ProjectCardSerializer, SlugEntrySerializer, PagesModelSerializer, PageNamesSerializer, GradientColorsSerializer, BackgroundDataSerializer, ImageUploadSerializer, PageDetailsSerializer
 import sys
 from django.shortcuts import get_object_or_404
+from django.db.models.functions import Coalesce
+from rest_framework import filters
 
 from drf_spectacular.utils import (
     extend_schema,
@@ -77,12 +79,15 @@ class PageDetailsView(APIView):
 class DeckListView(ListAPIView):
     serializer_class = DeckSerializer
     permission_classes = [AllowAny]
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['id', 'created_at', 'edited_at', 'sort_ts']
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
+        qs = Deck.objects.all()
         if slug:
-            return Deck.objects.filter(owner=slug)
-        return Deck.objects.all()
+            qs = qs.filter(owner=slug)
+        return qs.annotate(sort_ts=Coalesce('edited_at', 'created_at'))
 
 
 @extend_schema(
@@ -102,13 +107,16 @@ class ProjectCardListView(ListAPIView):
     serializer_class = ProjectCardSerializer
     permission_classes = [AllowAny]
 
-    def get_queryset(self):
-        owner = self.kwargs.get('slug', 'COMPANY')
-        deck_id = self.request.headers.get('X-deck-id')
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['id', 'created_at', 'edited_at', 'sort_ts']
 
+    def get_queryset(self):
+        owner = self.kwargs.get('slug', 'shmooz')
+        deck_id = self.request.headers.get('X-deck-id')
+        qs = ProjectCard.objects.none()
         if owner and deck_id:
-            return ProjectCard.objects.filter(owner=owner, deck_id=deck_id)
-        return ProjectCard.objects.none()  
+            qs = ProjectCard.objects.filter(owner=owner, deck_id=deck_id)
+        return qs.annotate(sort_ts=Coalesce('edited_at', 'created_at'))  
 
 @extend_schema(
     summary="List all available slugs",
@@ -179,3 +187,5 @@ class ImageListView(ListAPIView):
 
     queryset = ImageUpload.objects.all()
     serializer_class = ImageUploadSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['id', 'uploaded_at']

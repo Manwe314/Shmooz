@@ -2,6 +2,11 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
+import { map } from 'rxjs/operators';
+
+interface PaginatedResponse<T> {
+  results: T[];
+}
 
 export interface Deck {
   id: string;
@@ -39,8 +44,10 @@ export class DeckService {
     return this.decks ?? [];
   }
 
-  getDecks(path: string) : Observable<Deck[]> {
-    const endpoint = path ? this.api.buildUrl(`deck/${path}`) : this.api.buildUrl(`deck/COMPANY`)
-    return this.http.get<Deck[]>(endpoint);
+  getDecks(path: string): Observable<Deck[]> {
+    const endpoint = path ? this.api.buildUrl(`deck/${path}`) : this.api.buildUrl(`deck/shmooz`);
+    return this.http.get<PaginatedResponse<Deck>>(endpoint).pipe(
+      map((res: PaginatedResponse<Deck>) => res?.results ?? [])
+    );
   }
 }

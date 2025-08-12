@@ -35,6 +35,11 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
     'SCHEMA_PATH_PREFIX': '/api',
+    'ENUM_NAME_OVERRIDES': {
+        'TextAlignEnum': 'TextAlign',
+        'TextAlignEnum_2': 'TextAlign',
+        'TextAlignEnum_3': 'TextAlign',
+    },
 }
 
 ALLOWED_HOSTS = ['*']
@@ -44,6 +49,11 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.OrderingFilter',
+    ],
 }
 # Application definition
 

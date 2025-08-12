@@ -13,7 +13,7 @@ export class deckResolver implements Resolve<boolean> {
   ){}
 
   resolve(){
-    const slug = this.slugService.getCurrentSlug() ?? 'COMPANY'
+    const slug = this.slugService.getCurrentSlug() ?? 'shmooz'
 
     return this.deckService.getDecks(slug).pipe(
       tap(data => this.deckService.setResolvedDecks(data)),

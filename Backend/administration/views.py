@@ -41,6 +41,7 @@ class AdminApiView(APIView):
 @extend_schema(
     summary="Upload an image",
     description="Uploads an image file and associates it with a given slug.",
+    operation_id='upload_image_no_slug',
     parameters=[
         OpenApiParameter(name="slug", location=OpenApiParameter.PATH, description="Slug for image categorization", required=False, type=str),
     ],
@@ -59,7 +60,7 @@ class ImageUploadView(APIView):
         if serializer.is_valid():
             image_instance = serializer.save(commit=False)
 
-            image_instance.upload_slug = slug or 'COMPANY'
+            image_instance.upload_slug = slug or 'shmooz'
 
             image_instance.save()
             return Response({"status": "success", "data": ImageUploadSerializer(image_instance).data}, status=201)
@@ -296,3 +297,67 @@ class PagesModelUpdateDeleteView(APIView):
         page.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+@extend_schema(
+    summary="Update or delete a slug entry",
+    description="PUT: Updates a slug entry's fields.\n\nDELETE: Deletes the specified slug entry.",
+    parameters=[
+        OpenApiParameter(name="id", location=OpenApiParameter.PATH, description="SlugEntry ID", required=True, type=int),
+    ],
+    request=SlugEntrySerializer,
+    responses={
+        200: SlugEntrySerializer,
+        204: OpenApiResponse(description="Successfully deleted"),
+        400: OpenApiResponse(description="Validation error"),
+        404: OpenApiResponse(description="SlugEntry not found"),
+    }
+)
+class SlugEntryUpdateDeleteView(APIView):
+    #permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        slug_entry = get_object_or_404(SlugEntry, pk=pk)
+        serializer = SlugEntrySerializer(slug_entry, data=request.data, partial=True, context={'request': request})
+        if serializer.is_valid():
+            updated = serializer.save()
+            updated.edited_at = timezone.now()
+            updated.save()
+            return Response(SlugEntrySerializer(updated).data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        slug_entry = get_object_or_404(SlugEntry, pk=pk)
+        slug_entry.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(
+    summary="Update or delete background data",
+    description="PUT: Updates background gradient and page-related fields.\n\nDELETE: Deletes the specified background data record.",
+    parameters=[
+        OpenApiParameter(name="id", location=OpenApiParameter.PATH, description="BackgroundData ID", required=True, type=int),
+    ],
+    request=BackgroundDataSerializer,
+    responses={
+        200: BackgroundDataSerializer,
+        204: OpenApiResponse(description="Successfully deleted"),
+        400: OpenApiResponse(description="Validation error"),
+        404: OpenApiResponse(description="BackgroundData not found"),
+    }
+)
+class BackgroundDataUpdateDeleteView(APIView):
+    #permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        background = get_object_or_404(BackgroundData, pk=pk)
+        serializer = BackgroundDataSerializer(background, data=request.data, partial=True, context={'request': request})
+        if serializer.is_valid():
+            updated = serializer.save()
+            updated.edited_at = timezone.now()
+            updated.save()
+            return Response(BackgroundDataSerializer(updated).data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        background = get_object_or_404(BackgroundData, pk=pk)
+        background.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

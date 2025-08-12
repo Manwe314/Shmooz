@@ -19,7 +19,7 @@ print(f"✅ Created BackgroundData entry 1 with ID: {bg1.id}")
 
 # Second entry
 bg2 = BackgroundData.objects.create(
-    owner="COMPANY",
+    owner="shmooz",
     color1="#712243",
     color2="#181532",
     color3="#050319",
