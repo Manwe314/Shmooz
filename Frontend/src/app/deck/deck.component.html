@@ -4,7 +4,7 @@
   }
   <div class="card card-on-top">
     <img [src]="imageUrl" alt="Card Image" class="deck-cover"/>
-    <img class="hover-overlay-img" [src]="hoverImg" alt="Hover Image" />
+    <img *ngIf="hoverImg" class="hover-overlay-img" [src]="hoverImg" alt="Hover Image" />
     <div class="deck-label">{{ displayName }}</div>
   </div>
 </div>

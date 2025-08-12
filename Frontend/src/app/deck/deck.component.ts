@@ -35,7 +35,7 @@ export class DeckComponent {
     this.id = value.id;
     this.displayName = value.displayed_name;
     this.imageUrl = this.getImageUrl(value.image_url ?? '');
-    this.hoverImg = this.getImageUrl(value.hover_img_url ?? '');
+    this.hoverImg = value.hover_img_url ?  this.getImageUrl(value.hover_img_url) : '';
     this.card_amount = value.card_amount ?? 4;
     this.x_offsets = this.ensure(value.x_offsets, [3, 5, 1, -10]);
     this.y_offsets = this.ensure(value.y_offsets, [1, 0, 4, 1]);

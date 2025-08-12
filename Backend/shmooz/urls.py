@@ -22,7 +22,7 @@ from rest_framework_simplejwt.views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
-from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView, DeckUpdateDeleteView, ProjectCardUpdateDeleteView, SlugCreateView, PageUploadView, PagesModelUpdateDeleteView
+from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView, DeckUpdateDeleteView, ProjectCardUpdateDeleteView, SlugCreateView, PageUploadView, PagesModelUpdateDeleteView, SlugEntryUpdateDeleteView, BackgroundDataUpdateDeleteView
 from portfolio.views import GradientColorView, DeckListView, ProjectCardListView, SlugListView, PageNamesView, PageFetchView, ProjectPageFetchView, ImageListView, PageDetailsView
 
 from drf_spectacular.views import (
@@ -44,6 +44,8 @@ urlpatterns = [
     path('api/auth/alter_deck/<int:pk>', DeckUpdateDeleteView.as_view(), name='deck_update_delete'),
     path('api/auth/alter_project_card/<int:pk>', ProjectCardUpdateDeleteView.as_view(), name='project_card_update_delete'),
     path('api/auth/alter_page/<int:pk>', PagesModelUpdateDeleteView.as_view(), name='page_update_delete'),
+    path('api/auth/alter_slug/<int:pk>', SlugEntryUpdateDeleteView.as_view(), name='slug_update_delete'),
+    path('api/auth/alter_background/<int:pk>', BackgroundDataUpdateDeleteView.as_view(), name='background_update_delete'),
 
     path('api/auth/create_slug/', SlugCreateView.as_view(), name='slug_create'),
 

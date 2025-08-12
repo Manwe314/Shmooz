@@ -59,17 +59,17 @@ export class BackgroundService {
   }
 
   getGradientColors(path: string = ''): Observable<GradientColors> {
-    const endpoint = path ? this.api.buildUrl(`gradient-colors/${path}`) : this.api.buildUrl('gradient-colors/COMPANY');
+    const endpoint = path ? this.api.buildUrl(`gradient-colors/${path}`) : this.api.buildUrl('gradient-colors/shmooz');
     return this.http.get<GradientColors>(endpoint);
   }
 
   getPageInfo(path: string = ''): Observable<PageInfo> {
-    const endpoint = path ? this.api.buildUrl(`page-names/${path}`) : this.api.buildUrl('page-names/COMPANY');
+    const endpoint = path ? this.api.buildUrl(`page-names/${path}`) : this.api.buildUrl('page-names/shmooz');
     return this.http.get<PageInfo>(endpoint);
   }
 
   getPageDetails(path: string = ''): Observable<PageDetails> {
-    const endpoint = path ? this.api.buildUrl(`page-details/${path}`) : this.api.buildUrl('page-details/COMPANY')
+    const endpoint = path ? this.api.buildUrl(`page-details/${path}`) : this.api.buildUrl('page-details/shmooz')
     return this.http.get<PageDetails>(endpoint);
   }
 }

@@ -20,15 +20,15 @@ def upload_image(title, filename, slug):
 # img3 = upload_image('three_deck', 'test3.png', 'kuxi')
 # img4 = upload_image('four_deck', 'test4.png', 'kuxi')
 # img5 = upload_image('fixe_deck', 'board.png', 'kuxi')
-# img6 = upload_image('six_deck', 'code.png', 'COMPANY')
-img6 = upload_image('seven_deck', 'top.png', 'COMPANY')
+# img6 = upload_image('six_deck', 'code.png', 'shmooz')
+img6 = upload_image('seven_deck', 'top.png', 'shmooz')
 
 # === Step 2: Create Decks using uploaded images ===
 
 Deck.objects.create(
     title="troll deck",
     displayed_name="troll Projects",
-    owner="COMPANY",
+    owner="shmooz",
     image=img6
 )
 

@@ -5,6 +5,7 @@ import { ProjectCardComponent } from '../project-card/project-card.component';
 import { Router } from '@angular/router';
 import { SlugService } from '../services/slug.service';
 import { TransitionService } from '../services/transition.service';
+import { HandStateService } from '../services/hand-state.service';
 
 @Component({
   selector: 'app-hand',
@@ -14,9 +15,10 @@ import { TransitionService } from '../services/transition.service';
 })
 export class HandComponent {
   private _cards: ProjectCard[] = [];
+  private hydratedFromState = false;
   hoveredIndex: number | null = null;
   playingCardIndex: number | null = null;
-  constructor(private router: Router, private slugService: SlugService, private transitionService: TransitionService) {}
+  constructor(private router: Router, private slugService: SlugService, private transitionService: TransitionService, private handState: HandStateService) {}
   cardBasePoint: { x: number, y: number } | null = null;
   @Input() deckOrigin: { x: number; y: number } | null = null;
   @ViewChild('handContainerRef', { static: true }) handContainerRef!: ElementRef<HTMLDivElement>;
@@ -26,13 +28,47 @@ export class HandComponent {
     return this._cards;
   }
 
+  ngOnInit(): void {
+    // If we have saved state, hydrate and skip animations
+    const saved = this.handState.load();
+    if (saved && saved.cards?.length) {
+      this.hydratedFromState = true;
+      this.deckOrigin = saved.deckOrigin ?? this.deckOrigin;
+      this._cards = saved.cards.map(c => ({
+        ...c,
+        animationState: 'inHand', // ensure normal in-hand style
+        offsetX: 0,
+        offsetY: 0,
+      }));
+      this.hoveredIndex = null;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.persistHand();
+  }
+
+  private persistHand(): void {
+    this.handState.save({
+      cards: this._cards.map(c => ({
+        ...c,
+        animationState: 'inHand',
+        offsetX: 0,
+        offsetY: 0,
+      })),
+      deckOrigin: this.deckOrigin ?? null,
+    });
+  }
+
   setHovered(index: number | null): void {
     this.hoveredIndex = index;
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    if (this.sameCards(this._cards, this.cards)) {
+      return;
+    }
     if (!this.deckOrigin || !changes['cards'] || !this.cards?.length){
-      console.log("TUTUTUT");
       return;
     }
     if (changes['cards']) {
@@ -89,6 +125,15 @@ export class HandComponent {
       });
     }
   }
+
+  private sameCards(a: ProjectCard[], b: ProjectCard[]): boolean {
+    if (!a || !b) return false;
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i].id !== b[i].id) return false;
+    }
+    return true;
+  }
   
 
   computeArgument(index: number, total: number): number{
@@ -142,7 +187,8 @@ export class HandComponent {
   }
   
   onCardClicked(card: ProjectCard, index: number) {
-    const slug = this.slugService.getCurrentSlug() ?? 'COMPANY';
+    this.persistHand();
+    const slug = this.slugService.getCurrentSlug() ?? 'shmooz';
     const handContainer = this.handContainerRef.nativeElement;
     const cardEls = handContainer.querySelectorAll('.hand-card');
     const clickedCardEl = cardEls[index] as HTMLElement;

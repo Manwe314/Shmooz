@@ -50,30 +50,21 @@ For Admin panel:
 to-do:
     chose a font and use it.
     text overhaul
-    change "COMPANY" (default search) with actaul default target
-    slug guard based on slug registry in slug resolver
-    check refresh on project pages.
+
+    check refresh on project pages / SSR first call.
     optimise for phone performance
-    optimase for phone layout
+    optimise for phone layout
     OPTIMISE in General (images lag?)
 
     
     Deck:
-        remove hover image bug when none is provided.
-        fix small/thin screen arrow.
-        fix arrow showing up when navigation is impossible only once. 
 
     project card: 
-        preserving hand state after navigation
-        visual update of text and label.
         
     backend:
-        get filters by time (create / edit)
-        add time for all models (created at edited at)
-        add alter endpoint for all models
     
     Pages:
 
 
 for tomorrow:
-    moving on to misc stuff.
+    optimise 

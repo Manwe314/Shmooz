@@ -31,6 +31,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   has_fadedin = false;
   has_animation = false;
   arrowColor = "";
+  needsArrows = false;
   
   constructor(
     private deckService: DeckService,
@@ -214,10 +215,12 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
     if (this.decks.length < this.maxVisibleDecks) {
       totalDeckWidth = this.decks.length * this.deckWidth;
       gaps = this.decks.length + 1;
+      this.needsArrows = false;
     }
     else {
       totalDeckWidth = this.maxVisibleDecks * this.deckWidth;
       gaps = this.maxVisibleDecks + 1;
+      this.needsArrows = true;
     }
     const leftoverSpace = maskWidth - totalDeckWidth;
 

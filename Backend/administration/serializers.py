@@ -4,7 +4,8 @@ from portfolio.models import Deck, ProjectCard, PagesModel, BackgroundData
 from rest_framework.exceptions import ValidationError
 from portfolio.models import SlugEntry
 import re
-
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 
 GRID_TEMPLATE_RE = re.compile(
     r'^(repeat\(\d+,\s*(?:[a-zA-Z0-9().%\s-]+)\)|[a-zA-Z0-9().%\s-]+)+$'
@@ -77,7 +78,7 @@ def validate_link_item(value):
 class SlugEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = SlugEntry
-        fields = ['id', 'slug']
+        fields = ['id', 'slug', 'created_at', 'edited_at']
 
 class ImageUploadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -87,22 +88,22 @@ class ImageUploadSerializer(serializers.ModelSerializer):
 class PageNamesSerializer(serializers.ModelSerializer):
     class Meta: 
         model = BackgroundData
-        fields = ['id', 'page1', 'page2']
+        fields = ['id', 'page1', 'page2', 'created_at', 'edited_at']
 
 class GradientColorsSerializer(serializers.ModelSerializer):
     class Meta:
         model = BackgroundData
-        fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3']
+        fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3', 'created_at', 'edited_at']
 
 class PageDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = BackgroundData
-        fields = ['id', 'navColor', 'arrowColor', 'ellipseWidth', 'ellipseHeight']
+        fields = ['id', 'navColor', 'arrowColor', 'ellipseWidth', 'ellipseHeight', 'created_at', 'edited_at']
 
 class BackgroundDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = BackgroundData
-        fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3', 'page1', 'page2', 'navColor', 'arrowColor', 'ellipseWidth', 'ellipseHeight']
+        fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3', 'page1', 'page2', 'navColor', 'arrowColor', 'ellipseWidth', 'ellipseHeight', 'created_at', 'edited_at']
 
 class DeckSerializer(serializers.ModelSerializer):
     image_id = serializers.IntegerField(write_only=True, required=True)
@@ -119,7 +120,7 @@ class DeckSerializer(serializers.ModelSerializer):
             'hover_img', 'hover_img_id', 'hover_img_url',
             'card_amount', 'x_offsets', 'y_offsets',
             'rotations', 'alphas', 'brightness', 'hover_x_offsets', 'hover_y_offsets',
-            'hover_rotations', 'hover_brightness', 'created_at'
+            'hover_rotations', 'hover_brightness', 'created_at', 'edited_at'
         ]
         read_only_fields = ['id', 'image_url', 'hover_img_url', 'created_at']
 
@@ -192,14 +193,17 @@ class DeckSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+    @extend_schema_field(OpenApiTypes.URI)
     def _get_image_url(self, image_obj):
         if image_obj and image_obj.image:
             return image_obj.image.url
         return None
-
+    
+    @extend_schema_field(OpenApiTypes.URI)
     def get_image_url(self, obj):
         return self._get_image_url(obj.image)
-
+    
+    @extend_schema_field(OpenApiTypes.URI)
     def get_hover_img_url(self, obj):
         return self._get_image_url(obj.hover_img)
     
@@ -234,6 +238,7 @@ class ProjectCardSerializer(serializers.ModelSerializer):
         card = ProjectCard.objects.create(image=image, deck=deck, **validated_data)
         return card
 
+    @extend_schema_field(OpenApiTypes.URI)
     def get_image_url(self, obj):
         if obj.image and obj.image.image:
             return obj.image.image.url

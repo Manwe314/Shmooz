@@ -14,7 +14,7 @@ export class LandingBackgroundResolver implements Resolve<boolean> {
   ) {}
 
   resolve() {
-    const slug = this.slugService.getCurrentSlug() ?? 'COMPANY';
+    const slug = this.slugService.getCurrentSlug() ?? 'shmooz';
 
     return forkJoin({
       gradient: this.backgroundService.getGradientColors(slug),

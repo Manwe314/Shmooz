@@ -36,14 +36,24 @@ class Deck(models.Model):
     hover_rotations = ArrayField(models.FloatField(), blank=True, default=list)
     hover_brightness = ArrayField(models.FloatField(), blank=True, default=list)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    edited_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    edited_at = models.DateTimeField(null=True, blank=True, db_index=True)
+
+
+    class Meta:
+        ordering = ['id']
+        indexes = [
+            models.Index(fields=['-edited_at']),
+            models.Index(fields=['-created_at']),
+        ]
 
     def __str__(self):
         return self.title
     
 class SlugEntry(models.Model):
     slug = models.CharField(max_length=50, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.slug
@@ -66,6 +76,9 @@ class BackgroundData(models.Model):
     arrowColor = models.CharField(max_length=50, default="#FFFFFF")
     ellipseWidth = models.IntegerField(default=0)
     ellipseHeight = models.IntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.owner
@@ -94,8 +107,15 @@ class ProjectCard(models.Model):
         null=True,  # optional: allow nulls if you want a soft transition
         blank=True
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    edited_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    edited_at = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    class Meta:
+        ordering = ['id']  # ✅ default to id
+        indexes = [
+            models.Index(fields=['-edited_at']),
+            models.Index(fields=['-created_at']),
+        ]
 
     def __str__(self):
         return self.title

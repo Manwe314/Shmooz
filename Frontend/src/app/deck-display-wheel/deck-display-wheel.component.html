@@ -11,7 +11,7 @@
       }
   </div>
 </div>
-<div class="deck-controls">
+<div *ngIf="needsArrows" class="deck-controls">
   <button class="nav-button-left" [style.color]="arrowColor" (click)="prevPage()" [disabled]="!canScrollPrev">
     <svg width="132" height="30" viewBox="0 0 132 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
       <line class="line-one" x1="8" y1="15" x2="2" y2="15" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
