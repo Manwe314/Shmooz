@@ -9,6 +9,8 @@ import { ApiService } from '../services/api.service';
 import { Block, PageService } from '../services/page.service';
 import { AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { TransitionService } from '../services/transition.service';
+import { inject } from '@angular/core';
+import { PlatformService } from '../services/platform.service';
 
 @Component({
   selector: 'app-page',
@@ -24,13 +26,19 @@ export class PageComponent {
     private transitionService: TransitionService,
   ) {}
 
+  private platform = inject(PlatformService);
+
   ngAfterViewInit(): void {
     console.log('[PageComponent] ngAfterViewInit called');
+    if (!this.platform.isBrowser()) return;
 
-    const fullscreenCard = document.querySelector('.hand-card-clone.fullscreen') as HTMLElement;
-    const targetEl = document.querySelector('[data-tag="imageTarget"]') as HTMLElement;
-    const borderTarget = document.querySelector('[data-tag="borderTarget"]') as HTMLElement;
-    const gradient = document.querySelector('.background-clone.come-in') as HTMLElement;
+    const doc = this.platform.documentRef!;
+    const win = this.platform.windowRef;
+
+    const fullscreenCard = doc.querySelector('.hand-card-clone.fullscreen') as HTMLElement;
+    const targetEl = doc.querySelector('[data-tag="imageTarget"]') as HTMLElement;
+    const borderTarget = doc.querySelector('[data-tag="borderTarget"]') as HTMLElement;
+    const gradient = doc.querySelector('.background-clone.come-in') as HTMLElement;
 
     if (!fullscreenCard && !gradient){
       return;
@@ -46,15 +54,17 @@ export class PageComponent {
 
     if (!fullscreenCard || !targetEl || !borderTarget) {
       console.warn('[Morph] Required elements not found');
-      fullscreenCard.style.transition = 'opacity 0.8s ease';
-      fullscreenCard.style.opacity = '0';
+      if (fullscreenCard) {
+        fullscreenCard.style.transition = 'opacity 0.8s ease';
+        fullscreenCard.style.opacity = '0';
+      }
       setTimeout(() => {
         this.transitionService.cleanup();
       }, 800);
       return;
     }
 
-    const container = document.getElementById('transition-overlay-container') || document.body;
+    const container = doc.getElementById('transition-overlay-container') || document.body;
 
     // Wait until target has non-zero height
     const waitForTargetDimensions = (attempts = 0) => {
@@ -62,7 +72,7 @@ export class PageComponent {
       if (targetRect.height > 0 || attempts > 10) {
         startMorphAnimation(targetRect);
       } else {
-        requestAnimationFrame(() => waitForTargetDimensions(attempts + 1));
+        win.requestAnimationFrame(() => waitForTargetDimensions(attempts + 1));
         console.log('waiting for dimensions');
       }
     };
@@ -126,7 +136,7 @@ export class PageComponent {
       if (morphClone) {
         morphClone.addEventListener('animationend', () => {
           morphClone.classList.add('fade-out-opacity');
-          pageContent.classList.add('visible');
+          if (pageContent) pageContent.classList.add('visible');
           setTimeout(() => {
             morphClone.remove();
           }, 1000);
@@ -168,7 +178,7 @@ export class PageComponent {
     };
 
     // Start the check
-    requestAnimationFrame(() => waitForTargetDimensions());
+    win.requestAnimationFrame(() => waitForTargetDimensions());
   }
 
   ngOnInit(): void {

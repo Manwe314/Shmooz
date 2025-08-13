@@ -8,6 +8,8 @@ import { ProjectCardsService } from '../services/project-cards.service';
 import { ProjectCard } from '../services/project-cards.service';
 import { filter, switchMap } from 'rxjs';
 import { TransitionService } from '../services/transition.service';
+import { inject } from '@angular/core';
+import { PlatformService } from '../services/platform.service';
 
 
 
@@ -29,9 +31,15 @@ export class LandingPageComponent {
     private transitionService: TransitionService
   ) {}
 
+  private platform = inject(PlatformService);
+
+
   
   ngAfterViewInit(): void {
-    const gradient = document.querySelector('.background-clone.come-in') as HTMLElement;
+    if (!this.platform.isBrowser()) return;
+
+    const doc = this.platform.documentRef!;
+    const gradient = doc.querySelector('.background-clone.come-in') as HTMLElement;
     if (!gradient)
       return;
     gradient.classList.remove('come-in');

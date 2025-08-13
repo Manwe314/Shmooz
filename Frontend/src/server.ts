@@ -1,6 +1,7 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine, isMainModule } from '@angular/ssr/node';
 import express from 'express';
+import compression from 'compression'; // types installed via @types/compression
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import bootstrap from './main.server';
@@ -12,51 +13,196 @@ const indexHtml = join(serverDistFolder, 'index.server.html');
 const app = express();
 const commonEngine = new CommonEngine();
 
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
+// ── Config via env ─────────────────────────────────────────────────────────────
+const ADMIN_CACHE_KEY = process.env['ADMIN_CACHE_KEY'] || '';
+const SSR_CACHE_MAX_ENTRIES = parseInt(process.env['SSR_CACHE_MAX_ENTRIES'] || '500', 10);
+const SSR_CACHE_MAX_BYTES = parseInt(process.env['SSR_CACHE_MAX_BYTES'] || String(50 * 1024 * 1024), 10); // 50MB
 
-/**
- * Serve static files from /browser
- */
+// ── Simple LRU cache for HTML ─────────────────────────────────────────────────
+class LRUCache {
+  private map = new Map<string, { html: string; size: number }>();
+  private totalBytes = 0;
+
+  constructor(private maxEntries: number, private maxBytes: number) {}
+
+  get(key: string) {
+    const v = this.map.get(key);
+    if (!v) return undefined;
+    this.map.delete(key);
+    this.map.set(key, v); // refresh recency
+    return v;
+  }
+
+  set(key: string, html: string) {
+    const size = Buffer.byteLength(html, 'utf8');
+    if (this.map.has(key)) {
+      const old = this.map.get(key)!;
+      this.totalBytes -= old.size;
+      this.map.delete(key);
+    }
+    this.map.set(key, { html, size });
+    this.totalBytes += size;
+    this.evict();
+  }
+
+  delete(key: string) {
+    const v = this.map.get(key);
+    if (!v) return false;
+    this.totalBytes -= v.size;
+    this.map.delete(key);
+    return true;
+  }
+
+  clear() {
+    this.map.clear();
+    this.totalBytes = 0;
+  }
+
+  keys() { return Array.from(this.map.keys()); }
+
+  stats() {
+    return {
+      entries: this.map.size,
+      totalBytes: this.totalBytes,
+      maxEntries: this.maxEntries,
+      maxBytes: this.maxBytes,
+    };
+  }
+
+  private evict() {
+    while (this.map.size > this.maxEntries || this.totalBytes > this.maxBytes) {
+      const firstKey = this.map.keys().next().value as string | undefined;
+      if (!firstKey) break;
+      const old = this.map.get(firstKey)!;
+      this.map.delete(firstKey);
+      this.totalBytes -= old.size;
+    }
+  }
+}
+
+const ssrCache = new LRUCache(SSR_CACHE_MAX_ENTRIES, SSR_CACHE_MAX_BYTES);
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function normPath(p: string) {
+  if (!p) return '/';
+  return p.startsWith('/') ? p : `/${p}`;
+}
+
+// Typed as RequestHandler → must return void (no value)
+const requireAdminKey: express.RequestHandler = (req, res, next) => {
+  if (!ADMIN_CACHE_KEY) {
+    res.status(403).send('ADMIN_CACHE_KEY not set on server');
+    return;
+  }
+  const key = req.header('x-admin-key');
+  if (key !== ADMIN_CACHE_KEY) {
+    res.status(401).send('Unauthorized');
+    return;
+  }
+  next();
+};
+
+// ── Middlewares ───────────────────────────────────────────────────────────────
+app.use(compression());
+app.use(express.json());
+
+// ── Admin endpoints (optional but useful) ─────────────────────────────────────
+
+// Warm (render + cache) specific paths
+app.post('/__admin/ssr-cache/warm', requireAdminKey, async (req, res, next): Promise<void> => {
+  try {
+    const paths: string[] = Array.isArray(req.body?.paths) ? req.body.paths : [];
+    if (!paths.length) {
+      res.status(400).json({ error: 'Provide { "paths": ["/foo", "/bar"] }' });
+      return;
+    }
+
+    const host = req.headers.host!;
+    const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http';
+
+    const results: { path: string; bytes: number }[] = [];
+    for (const p of paths) {
+      const pathOnly = normPath(String(p));
+      const url = `${proto}://${host}${pathOnly}`;
+
+      const html = await commonEngine.render({
+        bootstrap,
+        documentFilePath: indexHtml,
+        url,
+        publicPath: browserDistFolder,
+        providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }],
+      });
+
+      ssrCache.set(pathOnly, html);
+      results.push({ path: pathOnly, bytes: Buffer.byteLength(html, 'utf8') });
+    }
+
+    res.json({ warmed: results, stats: ssrCache.stats() });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Purge one path or all
+app.delete('/__admin/ssr-cache', requireAdminKey, (req, res): void => {
+  const p = req.query['path'];
+  if (typeof p === 'string' && p.length) {
+    const ok = ssrCache.delete(normPath(p));
+    res.json({ deleted: ok, path: normPath(p), stats: ssrCache.stats() });
+    return;
+  }
+  ssrCache.clear();
+  res.json({ cleared: true, stats: ssrCache.stats() });
+});
+
+// Inspect cache
+app.get('/__admin/ssr-cache', requireAdminKey, (_req, res): void => {
+  res.json({ ...ssrCache.stats(), keys: ssrCache.keys() });
+});
+
+// ── Static files from /browser ────────────────────────────────────────────────
 app.get(
   '**',
   express.static(browserDistFolder, {
     maxAge: '1y',
-    index: 'index.html'
+    index: 'index.html',
+    setHeaders(res, filePath) {
+      if (/\.[a-f0-9]{8,}\./.test(filePath)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    },
   }),
 );
 
-/**
- * Handle all other requests by rendering the Angular application.
- */
-app.get('**', (req, res, next) => {
-  const { protocol, originalUrl, baseUrl, headers } = req;
+// ── SSR with cache ────────────────────────────────────────────────────────────
+app.get('**', async (req, res, next): Promise<void> => {
+  try {
+    const key = req.originalUrl; // path + query
+    const cached = ssrCache.get(key);
+    if (cached) {
+      res.set('X-SSR-Cache', 'HIT');
+      res.send(cached.html);
+      return;
+    }
 
-  commonEngine
-    .render({
+    const { protocol, originalUrl, baseUrl, headers } = req;
+    const html = await commonEngine.render({
       bootstrap,
       documentFilePath: indexHtml,
       url: `${protocol}://${headers.host}${originalUrl}`,
       publicPath: browserDistFolder,
       providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
-    })
-    .then((html) => res.send(html))
-    .catch((err) => next(err));
+    });
+
+    ssrCache.set(key, html);
+    res.set('X-SSR-Cache', 'MISS');
+    res.send(html);
+  } catch (err) {
+    next(err);
+  }
 });
 
-/**
- * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
- */
+// ── Boot ──────────────────────────────────────────────────────────────────────
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
   app.listen(port, () => {

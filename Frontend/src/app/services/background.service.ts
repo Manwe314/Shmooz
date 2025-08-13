@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
+import { TransferState, makeStateKey } from '@angular/core';
 
 export interface GradientColors {
   color1: string;
@@ -30,9 +31,20 @@ export interface PageDetails {
 export class BackgroundService {
   private http = inject(HttpClient);
   private api = inject(ApiService);
+  private ts   = inject(TransferState);
   private gradient: GradientColors | null = null;
   private pageNames: PageInfo | null = null;
   private pageDetails: PageDetails | null = null;
+
+  hydrateFromTransferState(slug: string): void {
+    const KEY = makeStateKey<any>(`bg:${slug}`);
+    const payload = this.ts.get(KEY, null as any);
+    if (payload) {
+      this.gradient    = payload.gradient ?? this.gradient;
+      this.pageNames   = payload.pageNames ?? this.pageNames;
+      this.pageDetails = payload.pageDetails ?? this.pageDetails;
+    }
+  }
   
   setResolvedGradient(data: GradientColors) {
     this.gradient = data;

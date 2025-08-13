@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import { SlugService } from '../services/slug.service';
 import { TransitionService } from '../services/transition.service';
 import { HandStateService } from '../services/hand-state.service';
+import { inject } from '@angular/core';
+import { PlatformService } from '../services/platform.service';
 
 @Component({
   selector: 'app-hand',
@@ -23,20 +25,20 @@ export class HandComponent {
   @Input() deckOrigin: { x: number; y: number } | null = null;
   @ViewChild('handContainerRef', { static: true }) handContainerRef!: ElementRef<HTMLDivElement>;
   @Input() cards: ProjectCard[] = [];
+  private platform = inject(PlatformService);
 
   get displayedCards(): ProjectCard[] {
     return this._cards;
   }
 
   ngOnInit(): void {
-    // If we have saved state, hydrate and skip animations
     const saved = this.handState.load();
     if (saved && saved.cards?.length) {
       this.hydratedFromState = true;
       this.deckOrigin = saved.deckOrigin ?? this.deckOrigin;
       this._cards = saved.cards.map(c => ({
         ...c,
-        animationState: 'inHand', // ensure normal in-hand style
+        animationState: 'inHand',
         offsetX: 0,
         offsetY: 0,
       }));
@@ -74,6 +76,16 @@ export class HandComponent {
     if (changes['cards']) {
       console.log('[HandComponent] received cards:', this.cards);
       console.log('🧭 Deck origin received in hand:', this.deckOrigin);
+    }
+
+    if (!this.platform.isBrowser()) {
+      this._cards = this.cards.map(card => ({
+        ...card,
+        animationState: 'inHand',
+        offsetX: 0,
+        offsetY: 0,
+      }));
+      return;
     }
 
     const containerRect = this.handContainerRef.nativeElement.getBoundingClientRect();
@@ -166,10 +178,6 @@ export class HandComponent {
       return `translate(${x}px, ${y}px) scale(0.7) rotate(-90deg)`;
     }
 
-    // if (card.animationState === 'discarding') {
-    //   return `translate(-50%)`;
-    // }
-
     if (this.hoveredIndex === index) {
       return `translateX(-50%) translateX(${xOffset}px) translateY(${yoffset}px) translateY(${-yoffset - 40}px)`;
     }
@@ -189,7 +197,19 @@ export class HandComponent {
   onCardClicked(card: ProjectCard, index: number) {
     this.persistHand();
     const slug = this.slugService.getCurrentSlug() ?? 'shmooz';
-    const handContainer = this.handContainerRef.nativeElement;
+    
+    if (!this.platform.isBrowser()) {
+      this.router.navigate([`/project_page/${card.id}`], { queryParams: { slug } });
+      return;
+    }
+
+    const handContainer = this.handContainerRef?.nativeElement;
+    if (!handContainer) {
+      console.warn('Hand container not found!');
+      this.router.navigate([`/project_page/${card.id}`], { queryParams: { slug } });
+      return;
+    }
+
     const cardEls = handContainer.querySelectorAll('.hand-card');
     const clickedCardEl = cardEls[index] as HTMLElement;
     const clone = this.transitionService.createClone(clickedCardEl);
@@ -206,8 +226,9 @@ export class HandComponent {
     this.router.navigate([`/project_page/${card.id}`], {
       queryParams: { slug }
     });
+     const raf = this.platform.windowRef.requestAnimationFrame.bind(this.platform.windowRef);
     setTimeout(() => {
-      requestAnimationFrame(() => {
+      raf(() => {
         clone.classList.add('fullscreen');
 
         setTimeout(() => {

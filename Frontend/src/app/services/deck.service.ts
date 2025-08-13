@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 import { map } from 'rxjs/operators';
+import { TransferState, makeStateKey } from '@angular/core';
 
 interface PaginatedResponse<T> {
   results: T[];
@@ -34,7 +35,14 @@ export interface Deck {
 export class DeckService {
   private http = inject(HttpClient);
   private api = inject(ApiService);
+  private ts  = inject(TransferState);
   private decks: Deck[] | null = null;
+
+  hydrateFromTransferState(slug: string): void {
+    const KEY = makeStateKey<Deck[]>(`decks:${slug}`);
+    const payload = this.ts.get<Deck[]>(KEY, null as any);
+    if (payload) this.decks = payload;
+  }
 
   setResolvedDecks(data: Deck[]) {
     this.decks = data;

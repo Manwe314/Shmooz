@@ -45,16 +45,19 @@ For Admin panel:
 
     Pages:
         schema in swagger.
+
+    NODE server cache control.
  
 
 to-do:
     chose a font and use it.
     text overhaul
 
-    check refresh on project pages / SSR first call.
-    optimise for phone performance
-    optimise for phone layout
+    check refresh on project pages.
     OPTIMISE in General (images lag?)
+    SEO implementing
+    
+    ? first packet under 14KB - first load animation ?
 
     
     Deck:

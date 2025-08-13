@@ -1,6 +1,8 @@
 import { Component, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Deck } from '../services/deck.service';
+import { inject } from '@angular/core';
+import { PlatformService } from '../services/platform.service';
 
 @Component({
   standalone: true,
@@ -29,6 +31,8 @@ export class DeckComponent {
   @Output() deckSelected = new EventEmitter<{ id: string; origin: { x: number; y: number } }>();
   @ViewChild('deckEl', { static: true }) deckEl!: ElementRef<HTMLDivElement>;
 
+  private platform = inject(PlatformService);
+
   @Input()
   set deck(value: Deck)
   {
@@ -48,7 +52,6 @@ export class DeckComponent {
     this.hover_brightness = this.ensure(value.hover_brightness, [0.95, 0.9, 0.85, 0.8]);
 
     this.cards = Array.from({ length: this.card_amount }, (_, i) => i);
-    console.log('[DeckComponent] hoverImg resolved to:', value.hover_img_url);
   }
 
   ensure(val: number[] | undefined, fallback: number[]): number[] {
@@ -61,28 +64,33 @@ export class DeckComponent {
   hovered = false;
 
   getDeckCardsStyle(card: number): Record<string, string> {
-    if (card >= this.card_amount) card = this.card_amount;
+    const idx = Math.max(0, Math.min(card, Math.max(this.card_amount - 1, 0)));
 
     const isHovered = this.hovered;
 
-    const x_offset = isHovered ? this.hover_x_offsets[card] : this.x_offsets[card];
-    const y_offset = isHovered ? this.hover_y_offsets[card] : this.y_offsets[card];
-    const rotation = isHovered ? this.hover_rotations[card] : this.rotations[card];
-    const brightness = isHovered ? this.hover_brightness[card] : this.brightness[card];
+    const x_offset = (isHovered ? this.hover_x_offsets[idx] : this.x_offsets[idx]) ?? 0;
+    const y_offset = (isHovered ? this.hover_y_offsets[idx] : this.y_offsets[idx]) ?? 0;
+    const rotation = (isHovered ? this.hover_rotations[idx] : this.rotations[idx]) ?? 0;
+    const brightness = (isHovered ? this.hover_brightness[idx] : this.brightness[idx]) ?? 1;
     const blur = isHovered ? 0 : 0.4;
-    const alpha = this.alphas[card];
+    const alpha = this.alphas[idx] ?? 0;
 
-    const index = 40 - (10 * card);
+    const index = 40 - (10 * idx);
 
     return {
       'z-index': `${index}`,
       'background-image': `linear-gradient(rgba(0,0,0,${alpha}), rgba(0,0,0,${alpha})), url('${this.imageUrl}')`,
       'transform': `translateX(${x_offset}px) translateY(${y_offset}px) rotate(${rotation}deg)`,
-      'filter': `brightness(${brightness}), blur(${blur}px)`,
+      'filter': `brightness(${brightness}) blur(${blur}px)`,
     };
   }
 
   handleClick() {
+    if (!this.platform.isBrowser()) return;
+    
+    const host = this.deckEl?.nativeElement;
+    if (!host) return;
+
     const rect = this.deckEl.nativeElement.getBoundingClientRect();
     const origin = {
       x: rect.left + rect.width / 2,

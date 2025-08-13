@@ -9,6 +9,8 @@ import { NgZone } from '@angular/core';
 import { first } from 'rxjs/operators';
 import { PageDetails } from '../services/background.service';
 import { BackgroundService } from '../services/background.service';
+import { inject } from '@angular/core';
+import { PlatformService } from '../services/platform.service';
 
 
 @Component({
@@ -40,6 +42,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
     private backGround: BackgroundService,
   ) {}
   private resizeSub?: Subscription;
+  private platform = inject(PlatformService);
   
   @ViewChild('deckContainer', { static: true }) deckContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('deckMaskRef') deckMaskRef!: ElementRef<HTMLDivElement>;
@@ -50,20 +53,32 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   ellipseYPadding = 0;
   
   ngAfterViewInit() {
+    const current = this.slugService.getCurrentSlug() ?? 'shmooz';
+    this.deckService.hydrateFromTransferState(current);
     const backgroundDetails = this.backGround.getPageDetail();
     this.ellipseXPadding = backgroundDetails!.ellipseWidth;
     this.ellipseRadiusY = backgroundDetails!.ellipseHeight;
     this.arrowColor = backgroundDetails!.arrowColor;
     this.decks = this.deckService.getResolvedDeck();
+
+    if (!this.platform.isBrowser()) {
+      // Optional SSR defaults to keep markup stable
+      this.maxVisibleDecks = Math.max(1, Math.min(this.decks.length || 1, 3));
+      this.actualGap = this.mingap;
+      this.ellipseRadiusX = this.platform.windowRef.innerWidth + this.ellipseXPadding;
+      this.ellipseStepAngle = (this.deckWidth + this.actualGap) / Math.max(this.ellipseRadiusX, 1);
+      return;
+    }
+
     setTimeout(() => {
       this.updateLayout();
       this.zone.onStable.pipe(first()).subscribe(() => {
       this.enableTransitions();
     });
     }, 0);
-    if (typeof window !== 'undefined') {
-      this.resizeSub = fromEvent(window, 'resize').subscribe(() => this.updateLayout());
-    }
+    const win = this.platform.windowRef;
+    this.resizeSub = fromEvent(win as unknown as EventTarget, 'resize').subscribe(() => this.updateLayout());
+
   }
 
   getEllipseDeckStyle(index: number): Record<string, string> {
@@ -73,7 +88,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
 
     const relativeIndex = index - firstVisibleDeck;
 
-    const mid = (visibleCount - 1) / 2;
+    const mid = (visibleCount - 1) / 2 + 2 -2;
 
     let angle: number;
     if (visibleCount % 2 === 1) {
@@ -170,6 +185,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   }
  
   enableTransitions() {
+    if (!this.platform.isBrowser()) return;
     this.deckSlides?.forEach((el: ElementRef<HTMLDivElement>) => {
       el.nativeElement.style.transition = 'opacity 0.8s ease';
       el.nativeElement.style.opacity = '1';
@@ -179,9 +195,11 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
 
   prevPage() {
     if (!this.has_animation) {
-      this.deckSlides?.forEach((el: ElementRef<HTMLDivElement>) => {
-        el.nativeElement.style.transition = 'transform 0.7s cubic-bezier(.42,.19,.5,1.37)';
-      });
+      if (this.platform.isBrowser()) {
+        this.deckSlides?.forEach((el: ElementRef<HTMLDivElement>) => {
+          el.nativeElement.style.transition = 'transform 0.7s cubic-bezier(.42,.19,.5,1.37)';
+        });
+      }
       this.has_animation = true;
     }
     this.currentPage = Math.max(this.currentPage - 1, 0);
@@ -189,9 +207,11 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
 
   nextPage() {
     if (!this.has_animation) {
-      this.deckSlides?.forEach((el: ElementRef<HTMLDivElement>) => {
-        el.nativeElement.style.transition = 'transform 0.7s cubic-bezier(.42,.19,.5,1.37)';
-      });
+      if (this.platform.isBrowser()) {
+        this.deckSlides?.forEach((el: ElementRef<HTMLDivElement>) => {
+          el.nativeElement.style.transition = 'transform 0.7s cubic-bezier(.42,.19,.5,1.37)';
+        });
+      }
       this.has_animation = true;
     }
     const maxPage = this.totalPages - 1;
@@ -204,7 +224,18 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   }
 
   updateLayout(): void {
-    const maskWidth = this.deckMaskRef.nativeElement.offsetWidth;
+    if (!this.platform.isBrowser()) {
+      const viewportW = this.platform.windowRef.innerWidth || 1280;
+      const maskWidth = viewportW - 80; // rough SSR guess to avoid NaN
+      const maxFittable = Math.floor((maskWidth - this.mingap) / (this.deckWidth + this.mingap));
+      this.maxVisibleDecks = Math.max(1, isFinite(maxFittable) ? maxFittable : 1);
+      this.actualGap = this.mingap;
+      this.ellipseRadiusX = viewportW + this.ellipseXPadding;
+      this.ellipseStepAngle = (this.deckWidth + this.actualGap) / Math.max(this.ellipseRadiusX, 1);
+      this.currentPage = 0;
+      return;
+    }
+    const maskWidth = this.deckMaskRef?.nativeElement?.offsetWidth ?? 0;
     let totalDeckWidth: any;
     let gaps: any;
 
@@ -226,8 +257,8 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
 
     this.actualGap = Math.round(leftoverSpace / gaps);
 
-    this.ellipseRadiusX = window.innerWidth + this.ellipseXPadding;
-    this.ellipseRadiusY = (this.deckMaskRef.nativeElement.offsetHeight / 2) + this.ellipseYPadding;
+    this.ellipseRadiusX = this.platform.windowRef.innerWidth + this.ellipseXPadding;
+    this.ellipseRadiusY = (this.deckMaskRef?.nativeElement?.offsetHeight ?? 0) / 2 + this.ellipseYPadding;
     if (this.ellipseRadiusX > 0) {
       this.ellipseStepAngle = (this.deckWidth + this.actualGap) / this.ellipseRadiusX;
     } else {
