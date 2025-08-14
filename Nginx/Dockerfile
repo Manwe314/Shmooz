@@ -10,3 +10,4 @@ RUN openssl req -x509 -nodes -out /etc/nginx/ssl/shmooz.pem -keyout /etc/nginx/s
     -subj "/C=FR/ST=Alpes-Maritimes/L=Nice/O=Ecole\ 42/OU=Ecole/CN=shmooz.fr/emailAddress=lkukahle@student.42nice.fr"
 
 COPY shmooz.conf /etc/nginx/conf.d/default.conf
+COPY robots.txt /usr/share/nginx/html/robots.txt

@@ -51,8 +51,7 @@ export class PageComponent {
         this.transitionService.cleanup();
       }, 1000);
     }
-
-    if (!fullscreenCard || !targetEl || !borderTarget) {
+    else if (!fullscreenCard || !targetEl || !borderTarget) {
       console.warn('[Morph] Required elements not found');
       if (fullscreenCard) {
         fullscreenCard.style.transition = 'opacity 0.8s ease';

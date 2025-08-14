@@ -54,10 +54,14 @@ to-do:
     text overhaul
 
     check refresh on project pages.
-    OPTIMISE in General (images lag?)
-    SEO implementing
     
-    ? first packet under 14KB - first load animation ?
+    OPTIMISE lighthouse last 2 yellow's
+    
+    SEO implementing - add some info to get from database?
+    
+    check deck fade-in back
+
+    ? add "please use desktop - on mobile"
 
     
     Deck:
@@ -70,4 +74,4 @@ to-do:
 
 
 for tomorrow:
-    optimise 
+    text's update

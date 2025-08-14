@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Deck } from '../services/deck.service';
 import { inject } from '@angular/core';
 import { PlatformService } from '../services/platform.service';
@@ -7,7 +7,7 @@ import { PlatformService } from '../services/platform.service';
 @Component({
   standalone: true,
   selector: 'app-deck',
-  imports: [CommonModule],
+  imports: [CommonModule, NgOptimizedImage],
   templateUrl: './deck.component.html',
   styleUrls: ['./deck.component.css'],
 })
@@ -28,6 +28,7 @@ export class DeckComponent {
   hover_brightness: number[] = [];
   cards: number[] = [];
 
+  @Input() isLcp = false;
   @Output() deckSelected = new EventEmitter<{ id: string; origin: { x: number; y: number } }>();
   @ViewChild('deckEl', { static: true }) deckEl!: ElementRef<HTMLDivElement>;
 
@@ -38,7 +39,7 @@ export class DeckComponent {
   {
     this.id = value.id;
     this.displayName = value.displayed_name;
-    this.imageUrl = this.getImageUrl(value.image_url ?? '');
+    this.imageUrl = this.getImageUrl(value.image_url || '');
     this.hoverImg = value.hover_img_url ?  this.getImageUrl(value.hover_img_url) : '';
     this.card_amount = value.card_amount ?? 4;
     this.x_offsets = this.ensure(value.x_offsets, [3, 5, 1, -10]);
@@ -52,6 +53,7 @@ export class DeckComponent {
     this.hover_brightness = this.ensure(value.hover_brightness, [0.95, 0.9, 0.85, 0.8]);
 
     this.cards = Array.from({ length: this.card_amount }, (_, i) => i);
+    console.log(value.image_url);
   }
 
   ensure(val: number[] | undefined, fallback: number[]): number[] {
@@ -103,6 +105,7 @@ export class DeckComponent {
   }
 
   getImageUrl(path: string): string {
+    if (!path) return '';
     //URL
     return `https://127.0.0.1:8080${path}`
   }

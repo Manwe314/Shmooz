@@ -13,6 +13,7 @@ const indexHtml = join(serverDistFolder, 'index.server.html');
 const app = express();
 const commonEngine = new CommonEngine();
 
+
 // ── Config via env ─────────────────────────────────────────────────────────────
 const ADMIN_CACHE_KEY = process.env['ADMIN_CACHE_KEY'] || '';
 const SSR_CACHE_MAX_ENTRIES = parseInt(process.env['SSR_CACHE_MAX_ENTRIES'] || '500', 10);
@@ -82,6 +83,13 @@ class LRUCache {
 
 const ssrCache = new LRUCache(SSR_CACHE_MAX_ENTRIES, SSR_CACHE_MAX_BYTES);
 
+function getOrigin(req: import('express').Request): string {
+  const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http';
+  const host = req.headers.host || 'localhost:4000';
+  return `${proto}://${host}`;
+}
+
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function normPath(p: string) {
   if (!p) return '/';
@@ -117,23 +125,26 @@ app.post('/__admin/ssr-cache/warm', requireAdminKey, async (req, res, next): Pro
       return;
     }
 
-    const host = req.headers.host!;
-    const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http';
-
+    const origin = getOrigin(req);
     const results: { path: string; bytes: number }[] = [];
+
     for (const p of paths) {
       const pathOnly = normPath(String(p));
-      const url = `${proto}://${host}${pathOnly}`;
+      const url = `${origin}${pathOnly}`;
 
       const html = await commonEngine.render({
         bootstrap,
         documentFilePath: indexHtml,
         url,
         publicPath: browserDistFolder,
-        providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }],
+        providers: [
+          { provide: APP_BASE_HREF, useValue: '/' },           // base href your app is served at
+          { provide: 'ORIGIN_URL', useValue: origin },         // used by SeoService
+        ],
       });
 
-      ssrCache.set(pathOnly, html);
+      // if ssrCache.get(key) -> cached.html, then store {html}
+      ssrCache.set(pathOnly, html );
       results.push({ path: pathOnly, bytes: Buffer.byteLength(html, 'utf8') });
     }
 
@@ -177,21 +188,25 @@ app.get(
 // ── SSR with cache ────────────────────────────────────────────────────────────
 app.get('**', async (req, res, next): Promise<void> => {
   try {
-    const key = req.originalUrl; // path + query
+    const origin = getOrigin(req);
+    const key = normPath(req.originalUrl);     // include query; normalized
+
     const cached = ssrCache.get(key);
-    if (cached) {
+    if (cached?.html) {
       res.set('X-SSR-Cache', 'HIT');
       res.send(cached.html);
       return;
     }
 
-    const { protocol, originalUrl, baseUrl, headers } = req;
     const html = await commonEngine.render({
       bootstrap,
       documentFilePath: indexHtml,
-      url: `${protocol}://${headers.host}${originalUrl}`,
+      url: `${origin}${req.originalUrl}`,
       publicPath: browserDistFolder,
-      providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+      providers: [
+        { provide: APP_BASE_HREF, useValue: '/' },            // or req.baseUrl if you mount under a subpath
+        { provide: 'ORIGIN_URL', useValue: origin },
+      ],
     });
 
     ssrCache.set(key, html);

@@ -5,6 +5,7 @@
         <div class="deck-slide" #deckSlideRef [ngStyle]="getEllipseDeckStyle(i)">
           <app-deck
             [deck]="deck"
+            [isLcp]="i === currentPage"
             (deckSelected)="onDeckClicked($event)"
           />
         </div>
