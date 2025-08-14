@@ -3,7 +3,15 @@
     <div class="card" [ngStyle]="getDeckCardsStyle(i)"></div>
   }
   <div class="card card-on-top">
-    <img [src]="imageUrl" alt="Card Image" class="deck-cover"/>
+    <img 
+      [ngSrc]="imageUrl"
+      [width]="269"
+      [height]="192"
+      alt="Card Image" 
+      class="deck-cover"
+      [attr.fetchpriority]="isLcp ? 'high' : 'auto'"
+      [priority]="isLcp"
+    />
     <img *ngIf="hoverImg" class="hover-overlay-img" [src]="hoverImg" alt="Hover Image" />
     <div class="deck-label">{{ displayName }}</div>
   </div>

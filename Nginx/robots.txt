@@ -1,0 +1,8 @@
+# robots.txt for your portfolio
+User-agent: *
+Disallow: /admin/
+Disallow: /__admin/
+Disallow: /__admin/ssr-cache
+Disallow: /api/
+Allow: /
+

@@ -16,10 +16,10 @@ def upload_image(title, filename, slug):
         return img
 
 # Upload replacement images
-new_img = upload_image('new_img', 'top.png', 'kuxi')
+new_img = upload_image('new_img', 'top.webp', 'kuxi')
 
 # Upload hover images
-hover = upload_image('hover', 'deck.png', 'kuxi')
+hover = upload_image('hover', 'deck.webp', 'kuxi')
 
 # === Step 2: Update Decks ===
 

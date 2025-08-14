@@ -45,16 +45,23 @@ For Admin panel:
 
     Pages:
         schema in swagger.
+
+    NODE server cache control.
  
 
 to-do:
     chose a font and use it.
     text overhaul
 
-    check refresh on project pages / SSR first call.
-    optimise for phone performance
-    optimise for phone layout
-    OPTIMISE in General (images lag?)
+    check refresh on project pages.
+    
+    OPTIMISE lighthouse last 2 yellow's
+    
+    SEO implementing - add some info to get from database?
+    
+    check deck fade-in back
+
+    ? add "please use desktop - on mobile"
 
     
     Deck:
@@ -67,4 +74,4 @@ to-do:
 
 
 for tomorrow:
-    optimise 
+    text's update

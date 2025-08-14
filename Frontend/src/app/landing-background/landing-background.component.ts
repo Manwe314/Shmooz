@@ -6,6 +6,8 @@ import { SlugService } from '../services/slug.service';
 import { filter, switchMap } from 'rxjs/operators';
 import { Router, NavigationEnd } from '@angular/router';
 import { TransitionService } from '../services/transition.service';
+import { inject } from '@angular/core';
+import { PlatformService } from '../services/platform.service';
 
 @Component({
   selector: 'app-landing-background',
@@ -19,42 +21,53 @@ export class LandingBackgroundComponent implements OnInit{
   otherPages: { path: 'home' | 'page1' | 'page2'; label: string }[] = [];
   navColor = "#fff"
   isBlocked = true;
-
+  
   @ViewChild('firstBtn') firstBtn!: ElementRef<HTMLButtonElement>;
   @ViewChild('pageSwitcher') pageSwitcher!: ElementRef<HTMLElement>;
   @ViewChild('bgEl', { static: true }) bgEl!: ElementRef<HTMLDivElement>;
-
+  
   constructor(
     private backgroundService: BackgroundService,
     private slugService: SlugService,
     private router: Router,
     private transitionService: TransitionService,
   ) {}
-
+  
+  private platform = inject(PlatformService);
+  
   ngAfterViewInit() {
+    if (!this.platform.isBrowser()) return;
     setTimeout(() => this.centerByGap(), 0);
+    this.platform.windowRef.requestAnimationFrame(() => this.centerByGap());
   }
-
+  
+  gradient! : GradientColors;
   centerByGap() {
+    if (!this.platform.isBrowser()) return;
+    
+    const first = this.firstBtn?.nativeElement;
+    const switcher = this.pageSwitcher?.nativeElement;
+    if (!first || !switcher) return;
+
     const firstWidth = this.firstBtn?.nativeElement?.offsetWidth ?? 0;
     const gap = 24;
     const offset = firstWidth + gap / 2;
 
-    this.pageSwitcher.nativeElement.style.transform = `translateX(-${offset}px)`;
+    switcher.style.transform = `translateX(-${offset}px)`;
   }
 
   ngOnInit() {
-    const gradient = this.backgroundService.getGradient();
-    if (gradient) {
-      const el = this.bgEl.nativeElement;
-      el.style.setProperty('--c1', gradient.color1);
-      el.style.setProperty('--c2', gradient.color2);
-      el.style.setProperty('--c3', gradient.color3);
-      el.style.setProperty('--p1', gradient.position1);
-      el.style.setProperty('--p2', gradient.position2);
-      el.style.setProperty('--p3', gradient.position3);
-      el.style.setProperty('--y', '130%');
+    const current = this.slugService.getCurrentSlug() ?? 'shmooz';
+    this.backgroundService.hydrateFromTransferState(current);
+    this.gradient = this.backgroundService.getGradient() ?? {
+      color1: "#D81B1E",
+      color2: "#330321",
+      color3: "#050319",
+      position1: "11%",
+      position2: "38%",
+      position3: "80%",
     }
+
     const names = this.backgroundService.getPageNames();
     if (names)
       this.pageNames = names;
@@ -100,17 +113,22 @@ export class LandingBackgroundComponent implements OnInit{
     };
     const slug = this.slugService.getCurrentSlug();
     const segments = [pathMap[page], slug].filter(Boolean);
-
-    const el = this.bgEl.nativeElement;
-    const clone = this.transitionService.cloneGradient(el);
-    this.transitionService.blockNavigation();
-    clone.classList.add('come-in');
     
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        clone.style.opacity = '1';
-      });
-    });
+    if (!this.platform.isBrowser()) {
+      this.router.navigate(segments.length ? segments : ['']);
+      return;
+    }
+
+    const el = this.bgEl?.nativeElement;
+    if (el) {
+      const clone = this.transitionService.cloneGradient(el);
+      this.transitionService.blockNavigation();
+      clone.classList.add('come-in');
+
+      const raf = this.platform.windowRef.requestAnimationFrame.bind(this.platform.windowRef);
+      raf(() => { raf(() => { clone.style.opacity = '1'; }); });
+    }
+
     if (segments.length === 0){
       this.router.navigate(['']);
       return;

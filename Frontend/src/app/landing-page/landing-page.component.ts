@@ -8,6 +8,10 @@ import { ProjectCardsService } from '../services/project-cards.service';
 import { ProjectCard } from '../services/project-cards.service';
 import { filter, switchMap } from 'rxjs';
 import { TransitionService } from '../services/transition.service';
+import { inject } from '@angular/core';
+import { PlatformService } from '../services/platform.service';
+import { SeoService } from '../services/seo.service';
+import { BackgroundService } from '../services/background.service';
 
 
 
@@ -26,12 +30,25 @@ export class LandingPageComponent {
   constructor(
     private projectCardService: ProjectCardsService,
     private slugService: SlugService,
-    private transitionService: TransitionService
+    private transitionService: TransitionService,
+    private seo: SeoService,
+    private backgroundService: BackgroundService,
   ) {}
+
+  private platform = inject(PlatformService);
+
 
   
   ngAfterViewInit(): void {
-    const gradient = document.querySelector('.background-clone.come-in') as HTMLElement;
+    if (!this.platform.isBrowser()) return;
+
+    const names = this.backgroundService.getPageNames();
+    const siteTitle = `${this.slugService.getCurrentSlug()} - Portfolio`;
+    const description = `Projects, case Studies and expiriance by ${this.slugService.getCurrentSlug()}`
+    this.seo.setForHome({title: siteTitle, description, });
+
+    const doc = this.platform.documentRef!;
+    const gradient = doc.querySelector('.background-clone.come-in') as HTMLElement;
     if (!gradient)
       return;
     gradient.classList.remove('come-in');

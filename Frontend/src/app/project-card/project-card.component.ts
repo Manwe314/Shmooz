@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter, ElementRef } from '@angular/core';
 import { ProjectCard } from '../services/project-cards.service';
 import { CommonModule } from '@angular/common';
+import { inject } from '@angular/core';
+import { PlatformService } from '../services/platform.service';
 
 @Component({
   selector: 'app-project-card',
@@ -14,11 +16,14 @@ export class ProjectCardComponent {
 
   constructor(private elRef: ElementRef) {}
 
+  private platform = inject(PlatformService);
+
   onCardClick() {
     this.cardClicked.emit(this.card);
   }
 
   onMouseMove(event: MouseEvent): void {
+    if (!this.platform.isBrowser()) return;
     if (this.elRef.nativeElement.classList.contains('hand-card-clone')) return;
     const cardEl = this.elRef.nativeElement.querySelector('.card') as HTMLElement;
     const bgEl = this.elRef.nativeElement.querySelector('.card-bg') as HTMLElement;
@@ -45,6 +50,7 @@ export class ProjectCardComponent {
   }
 
   onMouseLeave(): void {
+    if (!this.platform.isBrowser()) return;
     const bgEl = this.elRef.nativeElement.querySelector('.card-bg') as HTMLElement;
     bgEl.style.transform = `
       perspective(600px)
