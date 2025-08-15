@@ -139,4 +139,28 @@ export class LandingBackgroundComponent implements OnInit{
       this.transitionService.unblockRoute();
     }, 1100);
   }
+
+  brighten(color: string, factor = 0.2, alpha = 0.8): string {
+    const rgb = this.parseRgb(color);
+    if (!rgb) return `rgba(255,255,255,${alpha})`;
+    const mix = (c: number) => Math.min(255, Math.round(c + (255 - c) * factor));
+    const r = mix(rgb.r), g = mix(rgb.g), b = mix(rgb.b);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  private parseRgb(input: string): { r: number; g: number; b: number } | null {
+    if (!input) return null;
+    if (input.startsWith('#')) {
+      const h = input.slice(1);
+      const hex = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return { r, g, b };
+    }
+    const m = input.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*[\d.]+)?\s*\)/i);
+    if (m) return { r: +m[1], g: +m[2], b: +m[3] };
+    return null;
+  }
+
 }

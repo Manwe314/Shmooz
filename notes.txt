@@ -50,19 +50,16 @@ For Admin panel:
  
 
 to-do:
-    chose a font and use it.
-    text overhaul
 
-    check refresh on project pages.
+    check refresh on project pages. (likely no fulscreen card existing issue)
     
-    OPTIMISE lighthouse last 2 yellow's
+    OPTIMISE lighthouse last yellow
     
     SEO implementing - add some info to get from database?
     
-    check deck fade-in back
+
 
     ? add "please use desktop - on mobile"
-
     
     Deck:
 
@@ -74,4 +71,4 @@ to-do:
 
 
 for tomorrow:
-    text's update
+    The Final 3!

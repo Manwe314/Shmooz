@@ -35,6 +35,7 @@ class Deck(models.Model):
     hover_y_offsets = ArrayField(models.FloatField(), blank=True, default=list)
     hover_rotations = ArrayField(models.FloatField(), blank=True, default=list)
     hover_brightness = ArrayField(models.FloatField(), blank=True, default=list)
+    text_color = models.CharField(max_length=50)
 
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     edited_at = models.DateTimeField(null=True, blank=True, db_index=True)

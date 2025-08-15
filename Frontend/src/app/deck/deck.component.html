@@ -1,8 +1,19 @@
-<div class="deck-container" #deckEl (click)="handleClick()" (mouseenter)="hovered = true" (mouseleave)="hovered = false">
+<button 
+  class="deck-container" 
+  type="button" 
+  #deckEl 
+  (click)="handleClick()" 
+  (mouseenter)="hovered = true" 
+  (mouseleave)="hovered = false" 
+  [attr.aria-label]="'Open deck ' + displayName" 
+  [attr.tabindex]="focusable ? 0 : -1"
+  [attr.aria-hidden]="focusable ? null : 'true'"
+  [attr.inert]="focusable ? null : ''"
+  >
   @for (i of cards; track i) {
-    <div class="card" [ngStyle]="getDeckCardsStyle(i)"></div>
+    <div class="card" aria-hidden="true" [ngStyle]="getDeckCardsStyle(i)"></div>
   }
-  <div class="card card-on-top">
+  <div class="card card-on-top" aria-hidden="true">
     <img 
       [ngSrc]="imageUrl"
       [width]="269"
@@ -13,6 +24,6 @@
       [priority]="isLcp"
     />
     <img *ngIf="hoverImg" class="hover-overlay-img" [src]="hoverImg" alt="Hover Image" />
-    <div class="deck-label">{{ displayName }}</div>
+    <div class="deck-label" [style.color]="text_color" aria-hidden="true">{{ displayName }}</div>
   </div>
-</div>
+</button>

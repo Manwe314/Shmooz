@@ -16,27 +16,26 @@ def upload_image(title, filename, slug):
         return img
 
 # Upload replacement images
-new_img = upload_image('new_img', 'top.webp', 'kuxi')
+# new_img = upload_image('new_img', 'top.webp', 'kuxi')
 
-# Upload hover images
-hover = upload_image('hover', 'deck.webp', 'kuxi')
+#  Upload hover images
+# hover = upload_image('hover', 'deck.webp', 'kuxi')
 
 # === Step 2: Update Decks ===
 
-def update_deck(title, new_img, hover_img):
+def update_deck(title, color):
     try:
         deck = Deck.objects.get(title=title)
-        deck.image = new_img
-        deck.hover_img = hover_img
+        deck.text_color = color
         deck.save()
-        print(f"✅ Updated deck '{title}' with new image ID {new_img.id} and hover image ID {hover_img.id}")
+        print(f"✅ Updated deck '{title}' with new color {color}")
     except Deck.DoesNotExist:
         print(f"❌ Deck with title '{title}' not found.")
 
-update_deck("test1 deck", new_img, hover)
-update_deck("test2 deck", new_img, hover)
-update_deck("test3 deck", new_img, hover)
-update_deck("test4 deck", new_img, hover)
-update_deck("boardGames deck", new_img, hover)
+update_deck("test1 deck", '#fff8e7')
+update_deck("test2 deck", '#fff8e7')
+update_deck("test3 deck", '#fff8e7')
+update_deck("test4 deck", '#fff8e7')
+update_deck("boardGames deck", '#B87333')
 
 print("✅ All decks updated with new images and hover images.")

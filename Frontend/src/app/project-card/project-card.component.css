@@ -6,7 +6,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   z-index: 100;
 }
@@ -42,8 +42,8 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  font-weight: 500;
-  font-size: 28px;
+  font-family: "Libre Baskerville", serif;
+  font-size: 1.8rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,9 +53,12 @@
 
 .card-text {
   text-align: center;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 2.5rem;
+  font-family: "Inter", sans-serif;
   z-index: 1;
-  padding: 0 12px;
+  max-width: 193px;
+  text-shadow: 0px 0px 16px rgb(0, 0, 0, 0.85);
+  margin-bottom: 20px;
+  word-break: break-word;
   transition: opacity 0.7s ease-in-out 0.3s;
 }
