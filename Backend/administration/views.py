@@ -10,6 +10,10 @@ from rest_framework import status
 from portfolio.models import Deck, ProjectCard, SlugEntry, PagesModel
 from django.utils import timezone 
 from docs.schema import PageSchema
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.permissions import AllowAny
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
+from django.utils.decorators import method_decorator
 
 from drf_spectacular.utils import (
     extend_schema,
@@ -18,8 +22,57 @@ from drf_spectacular.utils import (
     OpenApiExample,
     OpenApiResponse
 )
-
 # Create your views here.
+
+REFRESH_COOKIE = 'refresh_token'
+COOKIE_KW = dict(
+    httponly=True,
+    secure=True,        # True in production (HTTPS)
+    samesite='Strict',  # 'Lax' or 'None' if you do cross-site; 'None' requires Secure
+    path='/api/token/'  # or '/'
+)
+
+
+@extend_schema(summary="Get CSRF cookie")
+class CSRFCookieView(APIView):
+    permission_classes = [AllowAny]
+
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, request):
+        return Response({'detail': 'CSRF cookie set'})
+
+@extend_schema(
+    summary="Login (sets refresh token cookie, returns access in body)",
+    responses={200: OpenApiResponse(description="OK")}
+)
+class CookieTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)  # has access + refresh
+        data = response.data
+        refresh = data.pop('refresh', None)
+        res = Response(data, status=response.status_code)
+        if refresh:
+            res.set_cookie(REFRESH_COOKIE, refresh, **COOKIE_KW)
+        return res
+
+@extend_schema(
+    summary="Refresh (reads refresh token from HttpOnly cookie and rotates it)",
+    responses={200: OpenApiResponse(description="OK")}
+)
+class CookieTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        request.data['refresh'] = request.COOKIES.get(REFRESH_COOKIE)
+        return super().post(request, *args, **kwargs)
+
+@extend_schema(
+    summary="Logout (blacklist refresh and clear cookie)",
+    responses={204: OpenApiResponse(description="No content")}
+)
+class LogoutView(APIView):
+    def post(self, request):
+        res = Response(status=204)
+        res.delete_cookie(REFRESH_COOKIE, path=COOKIE_KW['path'])
+        return res
 
 @extend_schema(
     summary="Check admin access",

@@ -22,7 +22,7 @@ from rest_framework_simplejwt.views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
-from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView, DeckUpdateDeleteView, ProjectCardUpdateDeleteView, SlugCreateView, PageUploadView, PagesModelUpdateDeleteView, SlugEntryUpdateDeleteView, BackgroundDataUpdateDeleteView
+from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView, DeckUpdateDeleteView, ProjectCardUpdateDeleteView, SlugCreateView, PageUploadView, PagesModelUpdateDeleteView, SlugEntryUpdateDeleteView, BackgroundDataUpdateDeleteView,CookieTokenObtainPairView, CookieTokenRefreshView, LogoutView, CSRFCookieView
 from portfolio.views import GradientColorView, DeckListView, ProjectCardListView, SlugListView, PageNamesView, PageFetchView, ProjectPageFetchView, ImageListView, PageDetailsView
 
 from drf_spectacular.views import (
@@ -35,9 +35,11 @@ from portfolio.sitemaps import SlugRootSitemap, PageOneSitemap, PageTwoSitemap, 
 
 
 urlpatterns = [
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
+    path('api/logout/', LogoutView.as_view(), name='logout'),
     path('api/auth/', AdminApiView.as_view(), name='Admin_actions'),
+    path('api/csrf/', CSRFCookieView.as_view(), name='csrf_cookie'),
 
     path('api/auth/create_deck/<str:slug>', DeckCreateView.as_view(), name='create_deck_slug'),
 

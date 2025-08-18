@@ -4,6 +4,8 @@ import { provideRouter /*, withDebugTracing */ } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
+import { withInterceptors, withXsrfConfiguration } from '@angular/common/http';
+import { authInterceptor } from './admin/auth/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -12,7 +14,9 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     provideHttpClient(
       withFetch(),
-      withInterceptorsFromDi()
+      withInterceptorsFromDi(),
+      withInterceptors([authInterceptor]),
+      withXsrfConfiguration({ cookieName: 'csrftoken', headerName: 'X-CSRFToken' }),
     ),
   ],
 };

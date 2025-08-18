@@ -53,5 +53,8 @@ to-do:
     ? add "please use desktop - on mobile"
     ? last pass optimisations / seo upgrades / security checks
 
+    add /api/csrf call to get the cookie from front
+    dashboard stuff.
+
 for tomorrow:
-    The Final 3!
+    Start working on dashboard

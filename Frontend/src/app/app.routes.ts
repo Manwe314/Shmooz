@@ -9,6 +9,8 @@ import { SlugResolver } from './resolvers/slug.resolver';
 import  { AnimationDelayGuard } from './guards/animation-delay.guard';
 import { LandingAnimationGuard } from './guards/landing-animation.guard';
 import { SlugGuard } from './guards/slug.guard';
+import { DashboardComponent } from './admin/dashboard/dashboard.component';
+import { AuthGuard } from './admin/auth/auth.guard';
 
 export const routes: Routes = [
     {
@@ -21,6 +23,11 @@ export const routes: Routes = [
     {
         path: 'login', 
         component: LoginComponent
+    },
+    {
+      path: 'dashboard',
+      component: DashboardComponent,
+      canActivate: [AuthGuard]
     },
     {
         path: 'page_one', 

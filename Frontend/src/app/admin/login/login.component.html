@@ -3,8 +3,8 @@
     <h2>Login</h2>
 
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Email</mat-label>
-      <input matInput formControlName="email" type="email" />
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="user" />
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="full-width">
@@ -12,8 +12,10 @@
       <input matInput formControlName="password" type="password" />
     </mat-form-field>
 
-    <button  mat-flat-button color="primary" class="full-width" type="submit" [disabled]="!loginForm.valid">
+    <button mat-flat-button color="primary" class="full-width" type="submit" [disabled]="!loginForm.valid">
       Login
     </button>
+
+    <div *ngIf="error" style="color: red; margin-top: 10px">{{ error }}</div>
   </form>
 </mat-card>
