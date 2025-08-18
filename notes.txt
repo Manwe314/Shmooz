@@ -50,25 +50,8 @@ For Admin panel:
  
 
 to-do:
-
-    check refresh on project pages. (likely no fulscreen card existing issue)
-    
-    OPTIMISE lighthouse last yellow
-    
-    SEO implementing - add some info to get from database?
-    
-
-
     ? add "please use desktop - on mobile"
-    
-    Deck:
-
-    project card: 
-        
-    backend:
-    
-    Pages:
-
+    ? last pass optimisations / seo upgrades / security checks
 
 for tomorrow:
     The Final 3!

@@ -23,7 +23,9 @@
       [attr.fetchpriority]="isLcp ? 'high' : 'auto'"
       [priority]="isLcp"
     />
-    <img *ngIf="hoverImg" class="hover-overlay-img" [src]="hoverImg" alt="Hover Image" />
+  <div class="overflow-wraper" *ngIf="hoverImg">
+    <img class="hover-overlay-img" [src]="hoverImg" alt="Hover Image" />
+  </div>
     <div class="deck-label" [style.color]="text_color" aria-hidden="true">{{ displayName }}</div>
   </div>
 </button>

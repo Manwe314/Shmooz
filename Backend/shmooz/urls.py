@@ -30,6 +30,8 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from rest_framework.permissions import AllowAny
+from django.contrib.sitemaps.views import sitemap
+from portfolio.sitemaps import SlugRootSitemap, PageOneSitemap, PageTwoSitemap, ProjectPageSitemap
 
 
 urlpatterns = [
@@ -72,6 +74,8 @@ urlpatterns = [
     path('api/projects/<slug:slug>', ProjectCardListView.as_view(), name='get_projects_sluged'),
 
     path('api/images/', ImageListView.as_view(), name='image_list'),
+
+    path('sitemap.xml', sitemap, {'sitemaps': sitemap}, name='django-sitemap'),
 ]
 
 urlpatterns += [
