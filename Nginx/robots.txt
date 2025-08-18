@@ -1,0 +1,9 @@
+# robots.txt for your portfolio
+User-agent: *
+Disallow: /admin/
+Disallow: /__admin/
+Disallow: /__admin/ssr-cache
+Disallow: /api/
+Allow: /
+
+Sitemap: https://127.0.0.1:8080/sitemap.xml

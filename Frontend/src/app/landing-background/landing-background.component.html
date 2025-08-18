@@ -1,0 +1,35 @@
+<div class="background" #bgEl 
+    [style.--c1]="gradient.color1"
+    [style.--c2]="gradient.color2"
+    [style.--c3]="gradient.color3"
+    [style.--p1]="gradient.position1"
+    [style.--p2]="gradient.position2"
+    [style.--p3]="gradient.position3"
+    [style.--y]="'200%'">
+</div>
+
+<nav class="page-switcher top" aria-label="Sections" [class.nav-disabled]="isBlocked" #pageSwitcher>
+  @for (page of otherPages; let i = $index; track page.path) {
+    <a
+      class="text-button"
+      #firstBtn *ngIf="i === 0"
+      (click)="navigateTo(page.path)"
+      role="link"
+      [attr.aria-label]="'Go to ' + page.label"
+      tabindex="0"
+      [ngStyle]="{'color': navColor, 'border-color': navColor, '--nav-color': navColor}"
+    >
+      {{ page.label }}
+    </a>
+    <a
+      class="text-button" *ngIf="i !== 0"
+      (click)="navigateTo(page.path)"
+      role="link"
+      [attr.aria-label]="'Go to ' + page.label"
+      tabindex="0"
+      [ngStyle]="{'color': navColor, 'border-color': navColor, '--nav-color': navColor}"
+    >
+      {{ page.label }}
+    </a>
+  }
+</nav>

@@ -1,0 +1,40 @@
+.hand-container {
+  position: fixed;
+  height: 50%;
+  width: 100%;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 300; 
+}
+
+.hand-card {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 205px;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  transition: transform 0.8s ease, opacity 0.3s ease; 
+  opacity: 1;
+  z-index: 300;
+}
+
+.hand-card.discarding {
+  position: fixed;
+  animation: discard 250ms cubic-bezier(1,.53,.87,.89) forwards;
+  pointer-events: none;
+}
+
+@keyframes discard {
+  0%{
+    transform: var(--base-transform);
+  }
+  50%{
+    transform:  var(--base-transform) translateX(-27vw)  translateY(-10vh) rotate(-90deg) scale(0.7) ;
+    opacity: 0.79;
+  }
+  100% {
+    transform:  var(--base-transform) translateX(-150vw)  translateY(7vh) rotate(25deg) scale(0.58) ;
+    opacity: 0.69;
+  }
+}

@@ -19,6 +19,8 @@ services:
       - .env
     volumes:
       - ./Backend:/app
+    ports:
+      - "8000:8000"
     expose:
       - "8000"
     networks:
@@ -27,7 +29,7 @@ services:
       - db
 
   db:
-    image: postgres:17
+    image: postgres:17@sha256:aadf2c0696f5ef357aa7a68da995137f0cf17bad0bf6e1f17de06ae5c769b302
     env_file:
       - .env
     volumes:
@@ -41,7 +43,7 @@ services:
     build:
       context: ./Nginx
     ports:
-      - "443:443"
+      - "8080:443"
     depends_on:
       - frontend
       - backend
@@ -59,3 +61,4 @@ volumes:
       type: "none"
       o: "bind"
       device: "./Volume/postgresql"
+

@@ -1,0 +1,272 @@
+.deck-pager {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: 60vh;
+    width: 100%;
+    gap: 20px;
+    box-sizing: border-box;
+    margin-top: 50px;
+    z-index: 500;
+    position: absolute;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.deck-mask {
+  overflow: visible;
+  flex: 1;
+  position: relative;
+  height: 100%;
+  
+}
+
+
+.deck-slide {
+  width: 269px;
+  height: 192px;
+  pointer-events: auto;
+}
+
+.nav-button-left {
+  font-size: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  height: 100%;
+  transform: translateX(11px) scaleX(-1) ;
+}
+
+.nav-button-right {
+  font-size: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  height: 100%;
+  transform: translateX(-11px);
+}
+
+/* ~~~~~ to stagger animating out ~~~~~~ */
+
+.nav-button-right:disabled .line-one{
+  transition: opacity 0.35s ease-in-out;
+  opacity: 0;
+  cursor: auto;
+}
+
+
+.nav-button-right:disabled .line-two{
+  transition: opacity 0.35s ease-in-out 0.15s;
+  opacity: 0;
+  cursor: auto;
+}
+
+
+.nav-button-right:disabled .line-three{
+  transition: opacity 0.35s ease-in-out 0.27s;
+  opacity: 0;
+  cursor: auto;
+}
+
+
+.nav-button-right:disabled .line-four{
+  transition: opacity 0.35s ease-in-out 0.38s;
+  opacity: 0;
+  cursor: auto;
+}
+
+
+.nav-button-right:disabled .line-head{
+  transition: opacity 0.35s ease-in-out 0.5s;
+  opacity: 0;
+  cursor: auto;
+}
+
+.nav-button-left:disabled .line-one{
+  transition: opacity 0.35s ease-in-out;
+  opacity: 0;
+  cursor: auto;
+}
+
+
+.nav-button-left:disabled .line-two{
+  transition: opacity 0.35s ease-in-out 0.15s;
+  opacity: 0;
+  cursor: auto;
+}
+
+
+.nav-button-left:disabled .line-three{
+  transition: opacity 0.35s ease-in-out 0.27s;
+  opacity: 0;
+  cursor: auto;
+}
+
+
+.nav-button-left:disabled .line-four{
+  transition: opacity 0.35s ease-in-out 0.38s;
+  opacity: 0;
+  cursor: auto;
+}
+
+
+.nav-button-left:disabled .line-head{
+  transition: opacity 0.35s ease-in-out 0.5s;
+  opacity: 0;
+  cursor: auto;
+}
+
+
+/* ~~~~~ to stagger animating in ~~~~~~ */
+.nav-button-right .line-one{
+  transition: opacity 0.35s ease-in-out;
+  opacity: 1;
+}
+
+
+.nav-button-right .line-two{
+  transition: opacity 0.35s ease-in-out 0.15s;
+  opacity: 1;
+}
+
+
+.nav-button-right .line-three{
+  transition: opacity 0.35s ease-in-out 0.27s;
+  opacity: 1;
+}
+
+
+.nav-button-right .line-four{
+  transition: opacity 0.35s ease-in-out 0.38s;
+  opacity: 1;
+}
+
+
+.nav-button-right .line-head{
+  transition: opacity 0.35s ease-in-out 0.5s;
+  opacity: 1;
+}
+
+.nav-button-left .line-one{
+  transition: opacity 0.35s ease-in-out;
+  opacity: 1;
+}
+
+
+.nav-button-left .line-two{
+  transition: opacity 0.35s ease-in-out 0.15s;
+  opacity: 1;
+}
+
+
+.nav-button-left .line-three{
+  transition: opacity 0.35s ease-in-out 0.27s;
+  opacity: 1;
+}
+
+
+.nav-button-left .line-four{
+  transition: opacity 0.35s ease-in-out 0.38s;
+  opacity: 1;
+}
+
+
+.nav-button-left .line-head{
+  transition: opacity 0.35s ease-in-out 0.5s;
+  opacity: 1;
+}
+
+/* ~~~~~ to stagger hover ~~~~~~ */
+.nav-button-right:hover .line-one{
+  animation: darken 0.55s ease-in-out forwards;
+  animation-delay: 0.01s;
+  animation-iteration-count: 2;
+}
+
+
+.nav-button-right:hover .line-two{
+  animation: darken 0.55s ease-in-out forwards;
+  animation-delay: 0.16s;
+  animation-iteration-count: 2;
+}
+
+
+.nav-button-right:hover .line-three{
+  animation: darken 0.55s ease-in-out forwards;
+  animation-delay: 0.28s;
+  animation-iteration-count: 2;
+}
+
+
+.nav-button-right:hover .line-four{
+  animation: darken 0.55s ease-in-out forwards;
+  animation-delay: 0.39s;
+  animation-iteration-count: 2;
+}
+
+
+.nav-button-right:hover .line-head{
+  animation: darken 0.55s ease-in-out forwards;
+  animation-delay: 0.5s;
+  animation-iteration-count: 2;
+}
+
+.nav-button-left:hover .line-one{
+  animation: darken 0.55s ease-in-out forwards;
+  animation-delay: 0.01s;
+  animation-iteration-count: 2;
+}
+
+
+.nav-button-left:hover .line-two{
+  animation: darken 0.55s ease-in-out forwards;
+  animation-delay: 0.16s;
+  animation-iteration-count: 2;
+}
+
+
+.nav-button-left:hover .line-three{
+  animation: darken 0.55s ease-in-out forwards;
+  animation-delay: 0.28s;
+  animation-iteration-count: 2;
+}
+
+
+.nav-button-left:hover .line-four{
+  animation: darken 0.55s ease-in-out forwards;
+  animation-delay: 0.39s;
+  animation-iteration-count: 2;
+}
+
+
+.nav-button-left:hover .line-head{
+  animation: darken 0.55s ease-in-out forwards;
+  animation-delay: 0.5s;
+  animation-iteration-count: 2;
+}
+
+@keyframes darken {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(0.75);
+  }
+  100% {
+    filter: brightness(0.9);
+  }
+}
+
+
+.deck-controls {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: inline-flex;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  width: max-content; 
+  overflow: visible;
+}

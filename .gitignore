@@ -2,5 +2,9 @@
 .DS_Store
 __pycache__
 __pycache__/
+Volume/
+DockerDesktopWSL/
+./Backend/media/uploads/
 *.pyc
 dump.rdb
+/Volume

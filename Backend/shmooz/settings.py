@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from pathlib import Path
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,9 +28,33 @@ SECRET_KEY = 'django-insecure-^5q41@v#hu$#a&f8oe0&wfgfb%dun8v#&=o0i)2!xvn1qrf&hl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Shmooz API',
+    'DESCRIPTION': 'API for managing dynamic decks, pages and media content',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': '/api',
+    'ENUM_NAME_OVERRIDES': {
+        'TextAlignEnum': 'TextAlign',
+        'TextAlignEnum_2': 'TextAlign',
+        'TextAlignEnum_3': 'TextAlign',
+    },
+}
 
+ALLOWED_HOSTS = ['*']
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.OrderingFilter',
+    ],
+}
 # Application definition
 
 INSTALLED_APPS = [
@@ -39,6 +64,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
+    'administration',
+    'portfolio',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +79,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}
 
 ROOT_URLCONF = 'shmooz.urls'
 
@@ -124,6 +158,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
