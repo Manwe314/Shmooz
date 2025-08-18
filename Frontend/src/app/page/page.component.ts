@@ -39,8 +39,12 @@ export class PageComponent {
     const targetEl = doc.querySelector('[data-tag="imageTarget"]') as HTMLElement;
     const borderTarget = doc.querySelector('[data-tag="borderTarget"]') as HTMLElement;
     const gradient = doc.querySelector('.background-clone.come-in') as HTMLElement;
+    const page = doc.querySelector('.page-content') as HTMLElement;
 
     if (!fullscreenCard && !gradient){
+      console.log('no transition animation elements found');
+      if (page)
+        page.classList.add('visible');
       return;
     }
 

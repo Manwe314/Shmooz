@@ -6,6 +6,7 @@
           <app-deck
             [deck]="deck"
             [isLcp]="i === currentPage"
+            [focusable]="isDeckInView(i)"
             (deckSelected)="onDeckClicked($event)"
           />
         </div>
@@ -13,8 +14,15 @@
   </div>
 </div>
 <div *ngIf="needsArrows" class="deck-controls">
-  <button class="nav-button-left" [style.color]="arrowColor" (click)="prevPage()" [disabled]="!canScrollPrev">
-    <svg width="132" height="30" viewBox="0 0 132 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <button 
+    class="nav-button-left" 
+    [style.color]="arrowColor" 
+    (click)="prevPage()" 
+    [disabled]="!canScrollPrev" 
+    [attr.aria-disabled]="!canScrollPrev ? 'true' : null"
+    aria-controls="deck-list"
+    aria-label="Previous decks">
+    <svg aria-hidden="true" focusable="false" width="132" height="30" viewBox="0 0 132 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
       <line class="line-one" x1="8" y1="15" x2="2" y2="15" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
       <line class="line-two" x1="32" y1="15" x2="18" y2="15" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
       <line class="line-three" x1="54" y1="15" x2="40" y2="15" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
@@ -23,8 +31,15 @@
     </svg>
   </button>
 
-  <button class="nav-button-right" [style.color]="arrowColor" (click)="nextPage()" [disabled]="!canScrollNext">
-    <svg  width="132" height="30" viewBox="0 0 132 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <button 
+    class="nav-button-right" 
+    [style.color]="arrowColor" 
+    (click)="nextPage()" 
+    [disabled]="!canScrollNext" 
+    [attr.aria-disabled]="!canScrollPrev ? 'true' : null"
+    aria-controls="deck-list"
+    aria-label="Previous decks">
+    <svg  aria-hidden="true" focusable="false" width="132" height="30" viewBox="0 0 132 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
       <line class="line-one" x1="8" y1="15" x2="2" y2="15" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
       <line class="line-two" x1="32" y1="15" x2="18" y2="15" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
       <line class="line-three" x1="54" y1="15" x2="40" y2="15" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
@@ -32,6 +47,7 @@
       <path class="line-head" d="M90 13C88.8954 13 88 13.8954 88 15C88 16.1046 88.8954 17 90 17L90 15L90 13ZM131.414 16.4142C132.195 15.6332 132.195 14.3668 131.414 13.5858L118.686 0.857867C117.905 0.076818 116.639 0.0768179 115.858 0.857867C115.077 1.63892 115.077 2.90525 115.858 3.68629L127.172 15L115.858 26.3137C115.077 27.0948 115.077 28.3611 115.858 29.1421C116.639 29.9232 117.905 29.9232 118.686 29.1421L131.414 16.4142ZM90 15L90 17L130 17L130 15L130 13L90 13L90 15Z" fill="currentColor"/>
     </svg>
   </button>
+  <span class="sr-only" aria-live="polite">{{ ariaStatus }}</span>
 </div>
 
 

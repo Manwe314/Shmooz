@@ -27,8 +27,10 @@ export class DeckComponent {
   hover_rotations: number[] = [];
   hover_brightness: number[] = [];
   cards: number[] = [];
+  text_color: string = '';
 
   @Input() isLcp = false;
+  @Input() focusable = true;
   @Output() deckSelected = new EventEmitter<{ id: string; origin: { x: number; y: number } }>();
   @ViewChild('deckEl', { static: true }) deckEl!: ElementRef<HTMLDivElement>;
 
@@ -51,6 +53,7 @@ export class DeckComponent {
     this.hover_y_offsets = this.ensure(value.hover_y_offsets, [28, 43, -20, 55]);
     this.hover_rotations = this.ensure(value.hover_rotations, [-8, 20, 5, 7]);
     this.hover_brightness = this.ensure(value.hover_brightness, [0.95, 0.9, 0.85, 0.8]);
+    this.text_color = value.text_color ?? "#fff";
 
     this.cards = Array.from({ length: this.card_amount }, (_, i) => i);
     console.log(value.image_url);

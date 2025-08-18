@@ -4,7 +4,6 @@
   <div class="label-circle"[ngStyle]="label">
     {{ card.label_letter }}
   </div>
-  <div class="card-text" [ngStyle]="text">
-    {{ card.text }}
+  <div class="card-text" [ngStyle]="text" [innerHTML]="card.text">
   </div>
 </div>

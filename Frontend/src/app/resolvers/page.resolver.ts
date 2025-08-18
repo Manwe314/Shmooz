@@ -4,12 +4,14 @@ import { Observable, of } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { PageService } from '../services/page.service';
 import { SlugService } from '../services/slug.service';
+import { SeoService } from '../services/seo.service';
 
 @Injectable({ providedIn: 'root' })
 export class PageResolver implements Resolve<boolean> {
   constructor(
     private pageService: PageService,
-    private slugService: SlugService
+    private slugService: SlugService,
+    private seoService: SeoService,
   ) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<boolean> {
@@ -17,7 +19,7 @@ export class PageResolver implements Resolve<boolean> {
     const id = route.paramMap.get('id') ?? undefined;
     const slug = this.slugService.getCurrentSlug() ?? 'shmooz';
 
-
+    this.seoService.setCanonical(path);
     return this.pageService.getPageData(path, slug, id).pipe(
       tap(data => this.pageService.setContent(data)),
       map(() => true), 

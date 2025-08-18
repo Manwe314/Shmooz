@@ -34,6 +34,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   has_animation = false;
   arrowColor = "";
   needsArrows = false;
+  ariaStatus = '';
   
   constructor(
     private deckService: DeckService,
@@ -51,6 +52,10 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
   
   ellipseXPadding = 0;
   ellipseYPadding = 0;
+
+  private updateAriaStatus(): void {
+    this.ariaStatus = `Decks page ${this.currentPage + 1} of ${this.totalPages}`;
+  }
   
   ngAfterViewInit() {
     const current = this.slugService.getCurrentSlug() ?? 'shmooz';
@@ -78,7 +83,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
     }, 0);
     const win = this.platform.windowRef;
     this.resizeSub = fromEvent(win as unknown as EventTarget, 'resize').subscribe(() => this.updateLayout());
-
+    this.updateAriaStatus();
   }
 
   getEllipseDeckStyle(index: number): Record<string, string> {
@@ -203,6 +208,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
       this.has_animation = true;
     }
     this.currentPage = Math.max(this.currentPage - 1, 0);
+    this.updateAriaStatus();
   }
 
   nextPage() {
@@ -216,6 +222,7 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
     }
     const maxPage = this.totalPages - 1;
     this.currentPage = Math.min(this.currentPage + 1, maxPage);
+    this.updateAriaStatus();
   }
  
   getTransform(): string {
@@ -266,6 +273,14 @@ export class DeckDisplayWheelComponent implements AfterViewInit, OnDestroy{
     }
  
     this.currentPage = 0;
+    this.updateAriaStatus();
+  }
+
+  isDeckInView(index: number): boolean {
+    const deckCount = this.decks.length;
+    const visibleCount = Math.min(deckCount, this.maxVisibleDecks);
+    const firstVisible = this.currentPage;
+    return index >= firstVisible && index < firstVisible + visibleCount;
   }
   
   onDeckClicked(deckData: { id: string; origin: { x: number; y: number } }) {
