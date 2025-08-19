@@ -27,6 +27,7 @@ export interface Deck {
   hover_y_offsets?: number[];
   hover_rotations?: number[];
   hover_brightness?: number[];
+  hover_color?: string;
   text_color: string;
 }
 

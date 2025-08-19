@@ -52,9 +52,15 @@
   z-index: 501;
 }
 
+@property --hover-color {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: #e0f804;
+}
+
 /* Show the hover image when parent is hovered */
 .deck-container:hover .card-on-top .hover-overlay-img {
-  filter: drop-shadow(0 0 15px rgb(224, 248, 4));
+  filter: drop-shadow(0 0 15px var(--hover-color));
   opacity: 1;
 }
 

@@ -1,0 +1,14 @@
+.spacer { flex: 1 1 auto; }
+.slug-pill { margin-right: 8px; white-space: nowrap; }
+
+/* Make the whole area under the toolbar scroll */
+.content {
+  margin: 24px 0px;
+  padding: 0 16px;
+  display: grid;
+  gap: 16px;
+  width: 100%;
+
+  height: calc(100vh - 64px - 24px); /* subtract toolbar + top margin */
+  overflow-y: auto;
+}

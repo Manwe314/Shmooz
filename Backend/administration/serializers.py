@@ -88,22 +88,22 @@ class ImageUploadSerializer(serializers.ModelSerializer):
 class PageNamesSerializer(serializers.ModelSerializer):
     class Meta: 
         model = BackgroundData
-        fields = ['id', 'page1', 'page2', 'created_at', 'edited_at']
+        fields = ['id', 'owner' ,'page1', 'page2', 'created_at', 'edited_at']
 
 class GradientColorsSerializer(serializers.ModelSerializer):
     class Meta:
         model = BackgroundData
-        fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3', 'created_at', 'edited_at']
+        fields = ['id', 'owner' ,'color1', 'color2', 'color3', 'position1', 'position2', 'position3', 'created_at', 'edited_at']
 
 class PageDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = BackgroundData
-        fields = ['id', 'navColor', 'arrowColor', 'ellipseWidth', 'ellipseHeight', 'created_at', 'edited_at']
+        fields = ['id', 'owner' ,'navColor', 'arrowColor', 'ellipseWidth', 'ellipseHeight', 'created_at', 'edited_at']
 
 class BackgroundDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = BackgroundData
-        fields = ['id', 'color1', 'color2', 'color3', 'position1', 'position2', 'position3', 'page1', 'page2', 'navColor', 'arrowColor', 'ellipseWidth', 'ellipseHeight', 'created_at', 'edited_at']
+        fields = ['id', 'owner' ,'color1', 'color2', 'color3', 'position1', 'position2', 'position3', 'page1', 'page2', 'navColor', 'arrowColor', 'ellipseWidth', 'ellipseHeight', 'created_at', 'edited_at']
 
 class DeckSerializer(serializers.ModelSerializer):
     image_id = serializers.IntegerField(write_only=True, required=True)
@@ -120,7 +120,7 @@ class DeckSerializer(serializers.ModelSerializer):
             'hover_img', 'hover_img_id', 'hover_img_url',
             'card_amount', 'x_offsets', 'y_offsets',
             'rotations', 'alphas', 'brightness', 'hover_x_offsets', 'hover_y_offsets',
-            'hover_rotations', 'hover_brightness', 'created_at', 'edited_at', 'text_color'
+            'hover_rotations', 'hover_brightness', 'created_at', 'edited_at', 'text_color', 'hover_color'
         ]
         read_only_fields = ['id', 'image_url', 'hover_img_url', 'created_at']
 

@@ -1,0 +1,220 @@
+<mat-card class="deck-card" *ngIf="owner(); else noSlug">
+  <div class="header">
+    <h2>Decks</h2>
+    <span class="owner">Owner: <strong>{{ owner() }}</strong></span>
+    <span class="spacer"></span>
+    <button mat-flat-button color="primary" (click)="newDeck()">New deck</button>
+  </div>
+
+  <div class="layout">
+    <!-- Left: list -->
+    <div class="list">
+      <h3>Existing decks</h3>
+      <mat-nav-list>
+        <a mat-list-item *ngFor="let d of decks()" (click)="loadDeck(d)">
+          <span matListItemTitle>{{ d.displayed_name || d.title }}</span>
+          <span matListItemLine>Edited: {{ d.edited_at || d.created_at | date:'short' }}</span>
+        </a>
+      </mat-nav-list>
+    </div>
+
+    <!-- Right: editor + preview -->
+    <div class="formWrap">
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="grid">
+          <mat-form-field appearance="fill">
+            <mat-label>Title (key)</mat-label>
+            <input matInput formControlName="title" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Displayed name</mat-label>
+            <input matInput formControlName="displayed_name" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Text color</mat-label>
+            <input matInput formControlName="text_color" placeholder="#ffffff or rgba(...)" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Hover color</mat-label>
+            <input matInput formControlName="hover_color" placeholder="#e0f804" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Card amount</mat-label>
+            <input type="number" matInput formControlName="card_amount" />
+          </mat-form-field>
+
+          <!-- Images -->
+          <div class="imageRow">
+            <div class="imgPick">
+              <div class="label">Cover image</div>
+              <div class="thumb" *ngIf="form.controls['image_url'].value as url">
+                <img [src]="toFullUrl(url)" alt="cover" />
+              </div>
+              <div class="btns">
+                <button type="button" mat-stroked-button (click)="pickImage('cover')">Pick</button>
+                <button type="button" mat-stroked-button (click)="clearImage('cover')">Clear</button>
+              </div>
+            </div>
+
+            <div class="imgPick">
+              <div class="label">Hover image</div>
+              <div class="thumb" *ngIf="form.controls['hover_img_url'].value as url">
+                <img [src]="toFullUrl(url)" alt="hover" />
+              </div>
+              <div class="btns">
+                <button type="button" mat-stroked-button (click)="pickImage('hover')">Pick</button>
+                <button type="button" mat-stroked-button (click)="clearImage('hover')">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== Dynamic array editors ===== -->
+          <div class="arraySection">
+            <div class="rowHeader">
+              <h3>Card transforms</h3>
+              <span class="flex"></span>
+              <small>Count: {{ form.controls['card_amount'].value }}</small>
+            </div>
+
+            <div class="arrayRow">
+              <div class="rowLabel">x_offsets</div>
+              <div class="rowInputs">
+                <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
+                  <input matInput type="number"
+                         [value]="getCsvItem('x_offsets', i)"
+                         (input)="setCsvItem('x_offsets', i, $any($event.target).value)" />
+                </mat-form-field>
+              </div>
+              <button mat-stroked-button type="button" (click)="resetDefaults('x_offsets')">Defaults</button>
+            </div>
+
+            <div class="arrayRow">
+              <div class="rowLabel">y_offsets</div>
+              <div class="rowInputs">
+                <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
+                  <input matInput type="number"
+                         [value]="getCsvItem('y_offsets', i)"
+                         (input)="setCsvItem('y_offsets', i, $any($event.target).value)" />
+                </mat-form-field>
+              </div>
+              <button mat-stroked-button type="button" (click)="resetDefaults('y_offsets')">Defaults</button>
+            </div>
+
+            <div class="arrayRow">
+              <div class="rowLabel">rotations</div>
+              <div class="rowInputs">
+                <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
+                  <input matInput type="number"
+                         [value]="getCsvItem('rotations', i)"
+                         (input)="setCsvItem('rotations', i, $any($event.target).value)" />
+                </mat-form-field>
+              </div>
+              <button mat-stroked-button type="button" (click)="resetDefaults('rotations')">Defaults</button>
+            </div>
+
+            <div class="arrayRow">
+              <div class="rowLabel">alphas</div>
+              <div class="rowInputs">
+                <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
+                  <input matInput type="number" step="0.01"
+                         [value]="getCsvItem('alphas', i)"
+                         (input)="setCsvItem('alphas', i, $any($event.target).value)" />
+                </mat-form-field>
+              </div>
+              <button mat-stroked-button type="button" (click)="resetDefaults('alphas')">Defaults</button>
+            </div>
+
+            <div class="arrayRow">
+              <div class="rowLabel">brightness</div>
+              <div class="rowInputs">
+                <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
+                  <input matInput type="number" step="0.01"
+                         [value]="getCsvItem('brightness', i)"
+                         (input)="setCsvItem('brightness', i, $any($event.target).value)" />
+                </mat-form-field>
+              </div>
+              <button mat-stroked-button type="button" (click)="resetDefaults('brightness')">Defaults</button>
+            </div>
+
+            <div class="rowHeader">
+              <h3>Hover transforms</h3>
+            </div>
+
+            <div class="arrayRow">
+              <div class="rowLabel">hover_x_offsets</div>
+              <div class="rowInputs">
+                <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
+                  <input matInput type="number"
+                         [value]="getCsvItem('hover_x_offsets', i)"
+                         (input)="setCsvItem('hover_x_offsets', i, $any($event.target).value)" />
+                </mat-form-field>
+              </div>
+              <button mat-stroked-button type="button" (click)="resetDefaults('hover_x_offsets')">Defaults</button>
+            </div>
+
+            <div class="arrayRow">
+              <div class="rowLabel">hover_y_offsets</div>
+              <div class="rowInputs">
+                <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
+                  <input matInput type="number"
+                         [value]="getCsvItem('hover_y_offsets', i)"
+                         (input)="setCsvItem('hover_y_offsets', i, $any($event.target).value)" />
+                </mat-form-field>
+              </div>
+              <button mat-stroked-button type="button" (click)="resetDefaults('hover_y_offsets')">Defaults</button>
+            </div>
+
+            <div class="arrayRow">
+              <div class="rowLabel">hover_rotations</div>
+              <div class="rowInputs">
+                <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
+                  <input matInput type="number"
+                         [value]="getCsvItem('hover_rotations', i)"
+                         (input)="setCsvItem('hover_rotations', i, $any($event.target).value)" />
+                </mat-form-field>
+              </div>
+              <button mat-stroked-button type="button" (click)="resetDefaults('hover_rotations')">Defaults</button>
+            </div>
+
+            <div class="arrayRow">
+              <div class="rowLabel">hover_brightness</div>
+              <div class="rowInputs">
+                <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
+                  <input matInput type="number" step="0.01"
+                         [value]="getCsvItem('hover_brightness', i)"
+                         (input)="setCsvItem('hover_brightness', i, $any($event.target).value)" />
+                </mat-form-field>
+              </div>
+              <button mat-stroked-button type="button" (click)="resetDefaults('hover_brightness')">Defaults</button>
+            </div>
+          </div>
+          <!-- ===== /Dynamic array editors ===== -->
+        </div>
+
+        <div class="actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || saving()">
+            {{ form.controls['id'].value ? 'Save changes' : 'Create deck' }}
+          </button>
+          <button mat-button type="button" (click)="resetForm()" [disabled]="loading()">Reset</button>
+          <button mat-button color="warn" type="button" (click)="confirmDelete()" [disabled]="!form.controls['id'].value || deleting()">Delete</button>
+        </div>
+      </form>
+
+      <!-- Live preview -->
+      <div class="preview">
+        <h3>Preview</h3>
+        <div class="previewBox">
+          <app-deck [deck]="previewDeck" [focusable]="false"></app-deck>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-card>
+
+<ng-template #noSlug>
+  <mat-card class="deck-card"><p>No slug selected.</p></mat-card>
+</ng-template>

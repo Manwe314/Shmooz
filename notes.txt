@@ -56,5 +56,9 @@ to-do:
     add /api/csrf call to get the cookie from front
     dashboard stuff.
 
+    Login is flashing on refresh
+
+    make card transform and hover traget a drop down menu.
+
 for tomorrow:
-    Start working on dashboard
+    Start working on project card and page

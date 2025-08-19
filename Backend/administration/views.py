@@ -7,7 +7,7 @@ from .serializers import ImageUploadSerializer, DeckSerializer, ProjectCardSeria
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.generics import get_object_or_404
 from rest_framework import status
-from portfolio.models import Deck, ProjectCard, SlugEntry, PagesModel
+from portfolio.models import Deck, ProjectCard, SlugEntry, PagesModel, BackgroundData
 from django.utils import timezone 
 from docs.schema import PageSchema
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -31,6 +31,58 @@ COOKIE_KW = dict(
     samesite='Strict',  # 'Lax' or 'None' if you do cross-site; 'None' requires Secure
     path='/api/token/'  # or '/'
 )
+
+def _check_pages_conflicts(old_slug: str, new_slug: str):
+    if old_slug == new_slug:
+        return
+
+    old_cats = set(
+        PagesModel.objects.filter(owner=old_slug).values_list('category', flat=True)
+    )
+    if not old_cats:
+        return
+
+    # categories already present for the new owner
+    new_cats = set(
+        PagesModel.objects.filter(owner=new_slug).values_list('category', flat=True)
+    )
+
+    conflicts = sorted(old_cats.intersection(new_cats))
+    if conflicts:
+        cats_txt = ", ".join(conflicts)
+        raise ValidationError(
+            {
+                "owner": (
+                    f"Cannot rename slug '{old_slug}' to '{new_slug}' because "
+                    f"PagesModel entries for categories [{cats_txt}] already exist for '{new_slug}'. "
+                    "Resolve/merge these pages first."
+                )
+            }
+        )
+
+
+def _propagate_owner_change(old_slug: str, new_slug: str) -> dict:
+    now = timezone.now()
+    results = {}
+
+    results["BackgroundData"] = BackgroundData.objects.filter(owner=old_slug).update(
+        owner=new_slug,
+        edited_at=now,
+    )
+    results["Deck"] = Deck.objects.filter(owner=old_slug).update(
+        owner=new_slug,
+        edited_at=now,
+    )
+    results["ProjectCard"] = ProjectCard.objects.filter(owner=old_slug).update(
+        owner=new_slug,
+        edited_at=now,
+    )
+    results["PagesModel"] = PagesModel.objects.filter(owner=old_slug).update(
+        owner=new_slug,
+        edited_at=now,
+    )
+
+    return results
 
 
 @extend_schema(summary="Get CSRF cookie")
@@ -83,7 +135,7 @@ class LogoutView(APIView):
     }
 )
 class AdminApiView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         if not request.user.is_staff:
@@ -106,7 +158,7 @@ class AdminApiView(APIView):
 )
 class ImageUploadView(APIView):
     parser_classes = [MultiPartParser, FormParser]
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, slug=None):
         serializer = ImageUploadSerializer(data=request.data)
@@ -132,7 +184,7 @@ class ImageUploadView(APIView):
     }
 )
 class BackgroundDataUploadView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, slug=None):
         serializer = BackgroundDataSerializer(data=request.data)
@@ -166,7 +218,7 @@ class BackgroundDataUploadView(APIView):
     ]
 )
 class DeckCreateView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, slug=None):
         
@@ -206,7 +258,7 @@ class DeckCreateView(APIView):
     ]
 )
 class ProjectCardCreateView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, slug=None):
         
@@ -226,7 +278,7 @@ class ProjectCardCreateView(APIView):
     }
 )
 class PageUploadView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = PagesModelSerializer(data=request.data)
@@ -245,7 +297,7 @@ class PageUploadView(APIView):
     }
 )
 class SlugCreateView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = SlugEntrySerializer(data=request.data)
@@ -269,7 +321,7 @@ class SlugCreateView(APIView):
     }
 )
 class DeckUpdateDeleteView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         deck = get_object_or_404(Deck, pk=pk)
@@ -301,7 +353,7 @@ class DeckUpdateDeleteView(APIView):
     }
 )
 class ProjectCardUpdateDeleteView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         card = get_object_or_404(ProjectCard, pk=pk)
@@ -333,7 +385,7 @@ class ProjectCardUpdateDeleteView(APIView):
     }
 )
 class PagesModelUpdateDeleteView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         page = get_object_or_404(PagesModel, pk=pk)
@@ -365,17 +417,35 @@ class PagesModelUpdateDeleteView(APIView):
     }
 )
 class SlugEntryUpdateDeleteView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         slug_entry = get_object_or_404(SlugEntry, pk=pk)
-        serializer = SlugEntrySerializer(slug_entry, data=request.data, partial=True, context={'request': request})
-        if serializer.is_valid():
-            updated = serializer.save()
-            updated.edited_at = timezone.now()
-            updated.save()
-            return Response(SlugEntrySerializer(updated).data)
-        return Response(serializer.errors, status=400)
+        old_slug = slug_entry.slug
+
+        serializer = SlugEntrySerializer(
+            slug_entry, data=request.data, partial=True, context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        new_slug = serializer.validated_data.get('slug', old_slug)
+
+        _check_pages_conflicts(old_slug, new_slug)
+
+        with transaction.atomic():
+            updated_entry = serializer.save()
+            updated_entry.edited_at = timezone.now()
+            updated_entry.save(update_fields=["edited_at"])
+
+            cascade_result = {}
+            if old_slug != new_slug:
+                cascade_result = _propagate_owner_change(old_slug, new_slug)
+
+        response_payload = {
+            "slug_entry": SlugEntrySerializer(updated_entry).data,
+            "cascade": cascade_result,
+        }
+        return Response(response_payload)
 
     def delete(self, request, pk):
         slug_entry = get_object_or_404(SlugEntry, pk=pk)
@@ -398,7 +468,7 @@ class SlugEntryUpdateDeleteView(APIView):
     }
 )
 class BackgroundDataUpdateDeleteView(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         background = get_object_or_404(BackgroundData, pk=pk)
