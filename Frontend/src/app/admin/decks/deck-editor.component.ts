@@ -17,6 +17,7 @@ import { SlugService } from '../slugs/slug.service';
 import { DeckService, DeckDto } from './deck.service';
 import { ConfirmDialogComponent } from '../widgets/confirm-dialog.component';
 import { ImagePickerDialogComponent, ImagePickResult } from '../images/image-picker-dialog.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 // live preview
 import { DeckComponent } from '../../../app/deck/deck.component'; // <-- adjust path to your DeckComponent
@@ -63,6 +64,7 @@ type ArrayKey =
     MatDialogModule,
     MatSnackBarModule,
     DeckComponent,
+    MatExpansionModule,
   ],
   templateUrl: './deck-editor.component.html',
   styleUrl: './deck-editor.component.css'

@@ -19,6 +19,25 @@ const ADMIN_CACHE_KEY = process.env['ADMIN_CACHE_KEY'] || '';
 const SSR_CACHE_MAX_ENTRIES = parseInt(process.env['SSR_CACHE_MAX_ENTRIES'] || '500', 10);
 const SSR_CACHE_MAX_BYTES = parseInt(process.env['SSR_CACHE_MAX_BYTES'] || String(50 * 1024 * 1024), 10); // 50MB
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const units = ['KB', 'MB', 'GB', 'TB'];
+  let i = -1;
+  do {
+    bytes = bytes / 1024;
+    i++;
+  } while (bytes >= 1024 && i < units.length - 1);
+  return `${bytes.toFixed(2)} ${units[i]}`;
+}
+
+function logCacheStats(tag: string) {
+  const s = ssrCache.stats();
+  console.log(
+    `[SSR cache] ${tag} :: entries=${s.entries}, total=${s.totalBytes}B (${formatBytes(s.totalBytes)}),` +
+    ` limits: entries<=${s.maxEntries}, bytes<=${formatBytes(s.maxBytes)}`
+  );
+}
+
 // ── Simple LRU cache for HTML ─────────────────────────────────────────────────
 class LRUCache {
   private map = new Map<string, { html: string; size: number }>();
@@ -194,6 +213,7 @@ app.get('**', async (req, res, next): Promise<void> => {
     const cached = ssrCache.get(key);
     if (cached?.html) {
       res.set('X-SSR-Cache', 'HIT');
+      logCacheStats(`HIT ${key}`);
       res.send(cached.html);
       return;
     }
@@ -211,6 +231,7 @@ app.get('**', async (req, res, next): Promise<void> => {
 
     ssrCache.set(key, html);
     res.set('X-SSR-Cache', 'MISS');
+    logCacheStats(`MISS ${key}`);
     res.send(html);
   } catch (err) {
     next(err);

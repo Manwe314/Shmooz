@@ -12,6 +12,9 @@ import { ConfirmDialogComponent } from '../widgets/confirm-dialog.component';
 import { EditSlugDialogComponent } from '../widgets/edit-slug-dialog.component';
 import { BackgroundEditorComponent } from '../background/background-editor.component';
 import { DeckEditorComponent } from '../decks/deck-editor.component';
+import { ProjectCardEditorComponent } from '../project-cards/project-card-editor.component';
+import { PageEditorComponent } from '../pages/page-editor.component';
+
 
 @Component({
   selector: 'app-admin-workspace',
@@ -26,6 +29,8 @@ import { DeckEditorComponent } from '../decks/deck-editor.component';
     MatSnackBarModule,
     BackgroundEditorComponent,
     DeckEditorComponent,
+    ProjectCardEditorComponent,
+    PageEditorComponent,
   ],
   templateUrl: './admin-workspace.component.html',
   styleUrls: ['./admin-workspace.component.css'],

@@ -3,6 +3,7 @@ import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
 import { ApplicationRef } from '@angular/core';
 import { filter, take } from 'rxjs/operators';
+import { routes } from './app/app.routes';
 
 bootstrapApplication(AppComponent, appConfig).then(ref => {
   const appRef = ref.injector.get(ApplicationRef);

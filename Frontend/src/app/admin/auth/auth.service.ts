@@ -1,10 +1,12 @@
+// src/app/admin/auth/auth.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { TokenService } from './token.service';
+import { Observable, of } from 'rxjs';
+import { catchError, finalize, map, shareReplay, switchMap, tap, timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
-import { Observable, ReplaySubject, of } from 'rxjs';
-import { tap, map, catchError, finalize, shareReplay } from 'rxjs/operators';
+import { TokenService } from './token.service';
+import { CsrfService } from './csrf.service';
 
 interface TokenPair { access: string; refresh?: string; }
 interface AccessOnly { access: string; }
@@ -15,13 +17,19 @@ export class AuthService {
   private router = inject(Router);
   private tokens = inject(TokenService);
   private api = inject(ApiService);
+  private csrf = inject(CsrfService);
 
-  private refreshing = false;
-  private refresh$ = new ReplaySubject<string | null>(1);
+  private refreshing$?: Observable<string | null>;
 
   login(username: string, password: string): Observable<boolean> {
-    // Backend sets HttpOnly refresh cookie; we just read access from body
-    return this.http.post<TokenPair>(this.api.buildUrl('token/'), { username, password }, { withCredentials: true }).pipe(
+    return this.csrf.ensureCsrfCookie().pipe(
+      switchMap(() =>
+        this.http.post<TokenPair>(
+          this.api.buildUrl('token/'),
+          { username, password },
+          { withCredentials: true }
+        )
+      ),
       tap(res => this.tokens.setAccessToken(res.access)),
       map(() => true),
       catchError(err => {
@@ -33,36 +41,46 @@ export class AuthService {
   }
 
   refreshAccess(): Observable<string | null> {
-    if (this.refreshing) return this.refresh$.asObservable();
+    if (this.refreshing$) return this.refreshing$;
 
-    this.refreshing = true;
-    const req$ = this.http.post<AccessOnly>(this.api.buildUrl('token/refresh/'), {}, { withCredentials: true }).pipe(
-      tap(res => this.tokens.setAccessToken(res.access)),
-      tap(res => this.refresh$.next(res.access)),
-      map(res => res.access),
+    this.refreshing$ = this.csrf.ensureCsrfCookie().pipe(
+      switchMap(() =>
+        this.http.post<AccessOnly>(
+          this.api.buildUrl('token/refresh/'),
+          {},
+          { withCredentials: true }
+        ).pipe(timeout(5000)) // ⏱ avoid hangs on initial navigation
+      ),
+      tap(resp => this.tokens.setAccessToken(resp.access)),
+      map(resp => resp.access),
       catchError(err => {
         console.warn('Refresh failed', err);
         this.tokens.clear();
-        this.refresh$.next(null);
-        this.router.navigate(['/login']);
         return of(null);
       }),
-      finalize(() => this.refreshing = false),
+      finalize(() => { this.refreshing$ = undefined; }),
       shareReplay(1)
     );
 
-    return req$;
+    return this.refreshing$;
   }
 
-  logout() {
-    // (Optional) Tell backend to delete cookie
-    this.http.post(this.api.buildUrl('logout/'), {}, { withCredentials: true }).subscribe({
-      next: () => {},
-      error: () => {}
-    });
+  ensureSession(): Observable<boolean> {
+    if (this.tokens.hasAccessToken() && !this.tokens.isExpiringSoon(20)) {
+      return of(true);
+    }
+    return this.refreshAccess().pipe(map(tok => !!tok));
+  }
+
+  isLoggedIn(): boolean {
+    return this.tokens.hasAccessToken() && !this.tokens.isExpired(10);
+  }
+
+  logout(): void {
+    // best-effort inform server to clear cookie
+    this.http.post(this.api.buildUrl('logout/'), {}, { withCredentials: true })
+      .subscribe({ next: () => {}, error: () => {} });
     this.tokens.clear();
     this.router.navigate(['/login']);
   }
-
-  isLoggedIn() { return !this.tokens.isExpired(); }
 }

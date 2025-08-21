@@ -1,0 +1,8 @@
+.scroll-container { max-height: 70vh; overflow: auto; }
+
+
+.preview-host { position: relative; }
+.page-content { padding: 1rem; box-sizing: border-box; width: 100%; }
+.block-wrapper { padding: 1rem; margin-bottom: 2rem; border-radius: 12px; }
+.grid-host { position: relative; }
+.grid-container { width: 100%; display: grid; gap: 1rem; }

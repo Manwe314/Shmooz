@@ -53,12 +53,12 @@ to-do:
     ? add "please use desktop - on mobile"
     ? last pass optimisations / seo upgrades / security checks
 
-    add /api/csrf call to get the cookie from front
-    dashboard stuff.
+    Node cache refresh
 
-    Login is flashing on refresh
+    clean code
 
-    make card transform and hover traget a drop down menu.
+
+
 
 for tomorrow:
     Start working on project card and page

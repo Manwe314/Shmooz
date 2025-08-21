@@ -1,49 +1,70 @@
-import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+// src/app/admin/auth/auth.interceptor.ts
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
 import { TokenService } from './token.service';
-import { catchError, switchMap, throwError, of } from 'rxjs';
+import { catchError, filter, finalize, switchMap, take, throwError } from 'rxjs';
+import { Subject } from 'rxjs';
 
-function isAuthUrl(req: HttpRequest<unknown>): boolean {
-  const url = req.url;
-  return url.endsWith('/api/token/') || url.endsWith('/api/token/refresh/') || url.endsWith('/api/logout/');
+const refreshGate = {
+  inFlight: false,
+  subject: new Subject<string | null>(),
+};
+
+function isAuthEndpoint(url: string): boolean {
+  // Make sure these match your ApiService.buildUrl outputs
+  // and cover token + csrf endpoints.
+  return url.includes('/token/') || url.includes('/auth/csrf');
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const auth = inject(AuthService);
   const tokens = inject(TokenService);
+  const auth = inject(AuthService);
 
-  // Always include cookies (for refresh cookie + CSRF)
-  let request = req.clone({ withCredentials: true });
+  const skip = isAuthEndpoint(req.url);
 
-  const attach = (r: HttpRequest<unknown>, token: string | null) =>
-    token ? r.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : r;
+  // Attach Authorization if we have a token and request is not auth-related
+  const access = tokens.getAccessToken();
+  const authedReq = access && !skip
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${access}` } })
+    : req;
 
-  const handle = (r: HttpRequest<unknown>) =>
-    next(r).pipe(
-      catchError((err: HttpErrorResponse) => {
-        if (err.status === 401 && !isAuthUrl(r)) {
-          return auth.refreshAccess().pipe(
-            switchMap(newToken => {
-              if (!newToken) return throwError(() => err);
-              return next(attach(r, newToken));
+  return next(authedReq).pipe(
+    catchError((err) => {
+      const httpErr = err as HttpErrorResponse;
+
+      // Only try refresh for 401s on non-auth endpoints
+      if (httpErr.status === 401 && !skip) {
+        // If a refresh is already in flight, wait for it
+        if (refreshGate.inFlight) {
+          return refreshGate.subject.pipe(
+            filter(v => v !== undefined),
+            take(1),
+            switchMap((token) => {
+              if (!token) return throwError(() => httpErr);
+              const retry = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+              return next(retry);
             })
           );
         }
-        return throwError(() => err);
-      })
-    );
 
-  if (!isAuthUrl(request)) {
-    // Proactive refresh if token missing/expiring
-    const token = tokens.getAccessToken();
-    if (!token || tokens.isExpiringSoon(20)) {
-      return auth.refreshAccess().pipe(
-        switchMap(newToken => handle(attach(request, newToken)))
-      );
-    }
-    request = attach(request, token);
-  }
+        // Start a single refresh
+        refreshGate.inFlight = true;
+        return auth.refreshAccess().pipe(
+          take(1),
+          switchMap((token) => {
+            refreshGate.subject.next(token);
+            if (!token) return throwError(() => httpErr);
+            const retry = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+            return next(retry);
+          }),
+          finalize(() => {
+            refreshGate.inFlight = false;
+          })
+        );
+      }
 
-  return handle(request);
+      return throwError(() => httpErr);
+    })
+  );
 };

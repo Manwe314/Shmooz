@@ -88,7 +88,7 @@
 
 .previewBox { 
     width: 360px; 
-    height: 260px; 
+    height: 360px; 
     border: 1px solid #333; 
     border-radius: 8px; 
     overflow: hidden; 
@@ -121,8 +121,10 @@
   grid-template-columns: 140px 1fr auto;
   gap: 8px;
   align-items: center;
-  border: gray solid;
+  border: 1px gray solid;
   padding: 3px;
+  border-radius: 8px;
+  margin-bottom: 2px;
 }
 
 .rowLabel {

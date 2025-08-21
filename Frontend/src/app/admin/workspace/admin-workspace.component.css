@@ -12,3 +12,8 @@
   height: calc(100vh - 64px - 24px); /* subtract toolbar + top margin */
   overflow-y: auto;
 }
+
+.padd {
+  height: 150px;
+  width: 100vw;
+}
