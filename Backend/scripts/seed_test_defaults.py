@@ -6,17 +6,73 @@ Creates:
 - 2 decks with placeholder data
 - 2 project cards for each deck (4 total)
 - Project pages for each project card with text content and swagger link
+
+HOW TO ADD IMAGES:
+1. Place your image files in the Backend/media/ directory (or subdirectories)
+2. Uncomment the relevant TODO lines in this script
+3. Replace the placeholder paths with your actual image file paths (relative to Backend/)
+4. Re-run the script to upload and assign images automatically
+
+The script includes TODO comments for:
+- Deck images and hover images (with automatic upload)
+- Project card images (with automatic upload)
+- Project page images (as image blocks in content using uploaded images)
 """
 
 import os
+import sys
 import django
 
+# Add the parent directory to Python path so Django can find the shmooz module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 # --- Setup Django environment ---
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "shmooz.settings")
 django.setup()
 
 from django.utils import timezone
+from django.core.files import File
 from portfolio.models import SlugEntry, Deck, ProjectCard, PagesModel, BackgroundData
+from administration.models import ImageUpload
+import os
+
+
+def upload_image_from_path(title, file_path, slug="test"):
+    """
+    Upload an image from a file path.
+
+    Args:
+        title (str): Title for the image
+        file_path (str): Relative path to the image file from Backend/ directory
+        slug (str): Slug for organizing uploads (default: "test")
+
+    Returns:
+        ImageUpload: The created image object, or None if file doesn't exist
+    """
+    # Convert relative path to absolute path
+    if not os.path.isabs(file_path):
+        # Get the Backend directory (parent of scripts directory)
+        backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        full_path = os.path.join(backend_dir, file_path)
+    else:
+        full_path = file_path
+
+    if not os.path.exists(full_path):
+        print(f"❌ Image file not found: {full_path}")
+        return None
+
+    try:
+        with open(full_path, "rb") as f:
+            # Get just the filename for the upload
+            filename = os.path.basename(full_path)
+            img = ImageUpload(title=title, image=File(f, name=filename))
+            img.upload_slug = slug
+            img.save()
+            print(f"✅ Uploaded image: {filename} as '{title}' (ID: {img.id})")
+            return img
+    except Exception as e:
+        print(f"❌ Failed to upload image {file_path}: {str(e)}")
+        return None
 
 
 def create_slug_entry():
@@ -57,6 +113,13 @@ def create_background_data():
 
 def create_decks():
     """Create 2 decks for test."""
+    # TODO: Uncomment and modify these lines to add images to decks
+    # Replace the paths with your actual image file paths (relative to Backend/ directory)
+    # web_deck_image = upload_image_from_path("Web Deck Image", "media/your-web-deck-image.jpg")
+    # mobile_deck_image = upload_image_from_path("Mobile Deck Image", "media/your-mobile-deck-image.jpg")
+    # web_hover_image = upload_image_from_path("Web Deck Hover", "media/your-web-hover-image.jpg")
+    # mobile_hover_image = upload_image_from_path("Mobile Deck Hover", "media/your-mobile-hover-image.jpg")
+
     decks_data = [
         {
             "title": "web_projects_deck",
@@ -64,6 +127,8 @@ def create_decks():
             "text_color": "#FFFFFF",
             "hover_color": "#4A90E2",
             "card_amount": 2,
+            # "image": web_deck_image,  # TODO: Uncomment to add deck image
+            # "hover_img": web_hover_image,  # TODO: Uncomment to add hover image
             "x_offsets": [0.0, 10.0],
             "y_offsets": [0.0, 5.0],
             "rotations": [0.0, -2.5],
@@ -80,6 +145,8 @@ def create_decks():
             "text_color": "#F8F9FA",
             "hover_color": "#28A745",
             "card_amount": 2,
+            # "image": mobile_deck_image,  # TODO: Uncomment to add deck image
+            # "hover_img": mobile_hover_image,  # TODO: Uncomment to add hover image
             "x_offsets": [0.0, -8.0],
             "y_offsets": [0.0, 3.0],
             "rotations": [0.0, 1.8],
@@ -110,6 +177,13 @@ def create_decks():
 
 def create_project_cards(decks):
     """Create 2 project cards for each deck."""
+    # TODO: Uncomment and modify these lines to add images to project cards
+    # Replace the paths with your actual image file paths (relative to Backend/ directory)
+    # ecommerce_image = upload_image_from_path("E-Commerce Image", "media/ecommerce-project.jpg")
+    # portfolio_image = upload_image_from_path("Portfolio Image", "media/portfolio-project.jpg")
+    # taskmanager_image = upload_image_from_path("Task Manager Image", "media/taskmanager-project.jpg")
+    # weather_image = upload_image_from_path("Weather App Image", "media/weather-project.jpg")
+
     cards_data = [
         # Web Projects Deck Cards
         {
@@ -117,12 +191,14 @@ def create_project_cards(decks):
             "text": "Modern shopping experience",
             "label_letter": "E",
             "deck": decks[0],  # web_projects_deck
+            # "image": ecommerce_image,  # TODO: Uncomment to add project card image
         },
         {
             "title": "Portfolio Website",
             "text": "Creative showcase platform",
             "label_letter": "P",
             "deck": decks[0],  # web_projects_deck
+            # "image": portfolio_image,  # TODO: Uncomment to add project card image
         },
         # Mobile Apps Deck Cards
         {
@@ -130,12 +206,14 @@ def create_project_cards(decks):
             "text": "Productivity on the go",
             "label_letter": "T",
             "deck": decks[1],  # mobile_apps_deck
+            # "image": taskmanager_image,  # TODO: Uncomment to add project card image
         },
         {
             "title": "Weather Forecast",
             "text": "Real-time weather updates",
             "label_letter": "W",
             "deck": decks[1],  # mobile_apps_deck
+            # "image": weather_image,  # TODO: Uncomment to add project card image
         },
     ]
     
@@ -151,6 +229,7 @@ def create_project_cards(decks):
                 "label_letter": card_data["label_letter"],
                 "label_color": "#2C3E50",
                 "inline_color": "#4A90E2",
+                # "image": card_data.get("image"),  # TODO: Uncomment to add project card image
             }
         )
         if created:
@@ -164,6 +243,26 @@ def create_project_cards(decks):
 
 def create_project_pages(project_cards):
     """Create project pages for each project card."""
+    # TODO: Uncomment and modify these lines to add images to project pages
+    # Upload images for use in page content (replace paths with your actual image files)
+    # page_image_1 = upload_image_from_path("E-Commerce Page Image", "media/ecommerce-page.jpg")
+    # page_image_2 = upload_image_from_path("Portfolio Page Image", "media/portfolio-page.jpg")
+    # page_image_3 = upload_image_from_path("Task Manager Page Image", "media/taskmanager-page.jpg")
+    # page_image_4 = upload_image_from_path("Weather Page Image", "media/weather-page.jpg")
+
+    # Example image block you can add to any page content (after uncommenting image uploads above):
+    # {
+    #     "id": "img-001",
+    #     "type": "image",
+    #     "url": page_image_1.image.url if page_image_1 else "/media/placeholder.jpg",
+    #     "alt": "Project Image",
+    #     "rowStart": 1,
+    #     "colStart": 2,
+    #     "borderRadius": "8px",
+    #     "object-fit": "cover",
+    #     "height": "200px",
+    # },
+
     pages_content_templates = [
         # E-Commerce Platform page
         [
@@ -445,3 +544,44 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+"""
+EXAMPLE: How to add images to this script
+
+1. Place your image files in Backend/media/ (or any subdirectory)
+   Example structure:
+   Backend/
+   ├── media/
+   │   ├── deck-web.jpg
+   │   ├── deck-mobile.jpg
+   │   ├── project-ecommerce.jpg
+   │   └── project-portfolio.jpg
+
+2. Uncomment and modify the image upload lines in the functions above:
+
+   In create_decks():
+   web_deck_image = upload_image_from_path("Web Deck Image", "media/deck-web.jpg")
+   mobile_deck_image = upload_image_from_path("Mobile Deck Image", "media/deck-mobile.jpg")
+
+   And uncomment the image assignments in the deck data:
+   "image": web_deck_image,
+   "hover_img": web_hover_image,
+
+   In create_project_cards():
+   ecommerce_image = upload_image_from_path("E-Commerce Image", "media/project-ecommerce.jpg")
+
+   And uncomment in the card data:
+   "image": ecommerce_image,
+
+3. Re-run the script and images will be automatically uploaded and assigned!
+
+The upload_image_from_path() function will:
+- Check if the file exists
+- Upload it to the database with the specified title
+- Set the upload_slug to "test" for organization
+- Return the ImageUpload object for use in your models
+- Print success/error messages
+
+Image paths are relative to the Backend/ directory.
+"""
