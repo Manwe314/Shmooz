@@ -8,13 +8,8 @@ For Production:
     upgrade LRU cache invalidation to django
 
 to-do:
-    ? add "please use desktop - on mobile"
-    ? last pass optimisations / seo upgrades / security checks
+    move to production
 
-    clean code
+    this application is not yet fully optimised for mobile layout
+    
 
-
-
-
-for tomorrow:
-    Start working on project card and page

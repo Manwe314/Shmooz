@@ -28,7 +28,6 @@
 
 ![Architecture Diagram](./Dev%20mode@2k.jpg)
 
-Shmooz is built with a **microservices architecture** optimized for development efficiency and production scalability:
 
 ### 🔄 **Request Flow**
 1. **Nginx Reverse Proxy** → Routes requests and handles SSL termination
@@ -367,7 +366,7 @@ The admin panel provides powerful tools for managing your portfolio:
 
 ### 🔗 **Interactive API Explorer**
 
-Access the full API documentation at: **http://localhost:8000/api/docs/**
+Access the full API documentation after starting the network at: **http://localhost:8000/api/docs/**
 
 **Features:**
 - **OpenAPI 3.0 Specification**: Industry-standard API documentation
@@ -414,6 +413,7 @@ DELETE /api/auth/alter_page/{id}       # Delete page       # Clear SSR cache
 2. **Docker Issues**: Try `make fclean` and `make re` for clean rebuild
 3. **Database Connection**: Check `.env` file configuration
 4. **Permission Issues**: Ensure Docker has proper file permissions
+5. **presisting Volume**: If the data is presisting after `make fclean`, delete the `Volume` folder manually
 
 **Getting Help:**
 - Check the [Issues](link-to-issues) page for known problems
