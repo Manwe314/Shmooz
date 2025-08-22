@@ -1,0 +1,21 @@
+<mat-toolbar color="primary">
+  <span>Admin</span>
+  <span class="spacer"></span>
+  <ng-container *ngIf="current as s">
+    <span class="slug-pill">Slug: <strong>{{ s.slug }}</strong></span>
+    <button mat-icon-button aria-label="Edit slug" (click)="editSlug(s)">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button mat-icon-button color="warn" aria-label="Delete slug" (click)="deleteSlug(s)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </ng-container>
+  <button mat-button (click)="backToPicker()">Change</button>
+</mat-toolbar>
+<div class="content">
+  <app-background-editor></app-background-editor>
+  <app-deck-editor></app-deck-editor>
+  <app-project-card-editor></app-project-card-editor>
+  <app-page-editor></app-page-editor>
+  <div class="padd"></div>
+</div>

@@ -75,7 +75,7 @@ export class ProjectCardComponent {
       return {};
     }
     const inline_color = this.card ? `${this.card.inline_color}` : '';
-    return  {'border-color': `#${inline_color}`};
+    return  {'border-color': `${inline_color}`};
   }
 
   get label(): Record<string, string> {
@@ -85,7 +85,7 @@ export class ProjectCardComponent {
     }
     const label_color = this.card ? `${this.card.label_color}` : '';
     const text_color = this.card ? `${this.card.text_color}` : '';
-    return {'background-color': `#${label_color}`, 'color': `#${text_color}`};
+    return {'background-color': `${label_color}`, 'color': `${text_color}`};
   }
 
   get text(): Record<string, string> {
@@ -94,7 +94,7 @@ export class ProjectCardComponent {
       return {};
     }
     const color = this.card ? `${this.card.text_color}` : '';
-    return {'color': `#${color}`};
+    return {'color': `${color}`};
   }
 
 

@@ -1,0 +1,27 @@
+<mat-card class="slug-card">
+    <h2>Pick a slug</h2>
+
+    <div class="chip-wrap">
+      <mat-chip-set aria-label="Available slugs">
+        <mat-chip *ngFor="let s of slugsService.slugsSnapshot"
+                  (click)="pick(s)" clickable>
+          {{ s.slug }}
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="create()" class="create-form">
+      <mat-form-field appearance="fill" class="full">
+        <mat-label>New slug</mat-label>
+        <input matInput formControlName="slug" placeholder="my_slug-123" />
+        <mat-hint>Max 50 chars, letters/numbers/_/- only</mat-hint>
+        <mat-error *ngIf="form.controls.slug.hasError('required')">Slug is required</mat-error>
+        <mat-error *ngIf="form.controls.slug.hasError('maxlength')">Too long (max 50)</mat-error>
+        <mat-error *ngIf="form.controls.slug.hasError('pattern')">Invalid characters or spaces</mat-error>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || creating()">
+        {{ creating() ? 'Creating…' : 'Create slug' }}
+      </button>
+    </form>
+  </mat-card>
