@@ -24,7 +24,7 @@
       [priority]="isLcp"
     />
   <div class="overflow-wraper" *ngIf="hoverImg">
-    <img class="hover-overlay-img" [src]="hoverImg" alt="Hover Image" />
+    <img class="hover-overlay-img" [style.--hover-color]="hover_color" [src]="hoverImg" alt="Hover Image" />
   </div>
     <div class="deck-label" [style.color]="text_color" aria-hidden="true">{{ displayName }}</div>
   </div>

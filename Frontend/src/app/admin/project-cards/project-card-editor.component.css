@@ -1,0 +1,56 @@
+.pcard-card { max-width: 1200px; margin: 16px auto; padding: 16px; }
+.header { display:flex; align-items:center; gap: 12px; flex-wrap: wrap; }
+.owner { margin-left: auto; }
+.spacer { flex: 1 1 auto; }
+.deckSelect { min-width: 220px; }
+
+.layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+
+.list {
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+  border-right: 1px solid #2b2b2b;
+  padding-right: 8px;
+}
+
+.formWrap { 
+  display: grid; 
+  grid-template-columns: 1fr 300px; 
+  gap: 16px; 
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+  padding-right: 8px;
+}
+.formWrap.disabled { opacity: 0.5; pointer-events: none; }
+
+.grid { display: grid; grid-template-columns: repeat(2, minmax(220px,1fr)); gap: 12px; }
+
+.imageRow { grid-column: span 2; display: grid; grid-template-columns: 1fr; gap: 12px; }
+.imgPick .label { font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
+.thumb { width: 100%; height: 160px; border: 1px dashed #666; border-radius: 8px; overflow: hidden; background: #111;
+  display:flex; align-items:center; justify-content:center; }
+.thumb img { width: 100%; height: 100%; object-fit: contain; }
+
+.actions { display: flex; gap: 8px; margin-top: 10px; }
+
+.btns {
+    margin-top: 5px;
+}
+
+
+.previewBox { 
+    width: 240px; 
+    height: 300px; 
+    border: 1px solid #333; 
+    border-radius: 8px; 
+    overflow: hidden; 
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.debug { font-size: 11px; max-height: 180px; overflow: auto; background:#111; color:#9f9; padding:8px; }
+
+
+/* The public ProjectCardComponent CSS is fine; no override needed */

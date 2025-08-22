@@ -28,6 +28,7 @@ export class DeckComponent {
   hover_brightness: number[] = [];
   cards: number[] = [];
   text_color: string = '';
+  hover_color: string = '';
 
   @Input() isLcp = false;
   @Input() focusable = true;
@@ -54,6 +55,7 @@ export class DeckComponent {
     this.hover_rotations = this.ensure(value.hover_rotations, [-8, 20, 5, 7]);
     this.hover_brightness = this.ensure(value.hover_brightness, [0.95, 0.9, 0.85, 0.8]);
     this.text_color = value.text_color ?? "#fff";
+    this.hover_color = value.hover_color ? value.hover_color : this.toRgba('#e0f804', 1);
 
     this.cards = Array.from({ length: this.card_amount }, (_, i) => i);
     console.log(value.image_url);
@@ -63,6 +65,33 @@ export class DeckComponent {
     return Array.isArray(val) && val.length > 0 && this.card_amount != 0
       ? val
       : fallback;
+  }
+
+  toRgba(input: string, alpha: number): string {
+    const hex = input.trim();
+
+    if (hex.startsWith('rgba')) {
+      return hex.replace(/rgba\(([^)]+)\)/, (_, inner) => {
+        const parts = inner.split(',').map((s: string) => s.trim());
+        return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})`;
+      });
+    }
+    if (hex.startsWith('rgb(')) {
+      return hex.replace(/rgb\(([^)]+)\)/, (_, inner) => `rgba(${inner}, ${alpha})`);
+    }
+
+    const clean = hex.replace('#', '');
+    let r: number, g: number, b: number;
+    if (clean.length === 3) {
+      r = parseInt(clean[0] + clean[0], 16);
+      g = parseInt(clean[1] + clean[1], 16);
+      b = parseInt(clean[2] + clean[2], 16);
+    } else {
+      r = parseInt(clean.slice(0, 2), 16);
+      g = parseInt(clean.slice(2, 4), 16);
+      b = parseInt(clean.slice(4, 6), 16);
+    }
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
 

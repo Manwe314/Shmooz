@@ -9,6 +9,10 @@ import { SlugResolver } from './resolvers/slug.resolver';
 import  { AnimationDelayGuard } from './guards/animation-delay.guard';
 import { LandingAnimationGuard } from './guards/landing-animation.guard';
 import { SlugGuard } from './guards/slug.guard';
+import { AuthGuard } from './admin/auth/auth.guard';
+import { AdminWorkspaceComponent } from './admin/workspace/admin-workspace.component';
+import { SlugSelectComponent } from './admin/slugs/slug-select.component';
+import { SelectedSlugGuard } from './admin/slugs/selected-slug.guard';
 
 export const routes: Routes = [
     {
@@ -22,6 +26,15 @@ export const routes: Routes = [
         path: 'login', 
         component: LoginComponent
     },
+    {
+        path: 'dashboard',
+        component: SlugSelectComponent,
+        canActivate: [AuthGuard]
+    },
+    { 
+        path: 'admin', 
+        component: AdminWorkspaceComponent, 
+        canActivate: [AuthGuard, SelectedSlugGuard] },
     {
         path: 'page_one', 
         component: PageComponent, 

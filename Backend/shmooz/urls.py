@@ -22,7 +22,7 @@ from rest_framework_simplejwt.views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
-from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView, DeckUpdateDeleteView, ProjectCardUpdateDeleteView, SlugCreateView, PageUploadView, PagesModelUpdateDeleteView, SlugEntryUpdateDeleteView, BackgroundDataUpdateDeleteView
+from administration.views import AdminApiView, ImageUploadView, DeckCreateView, ProjectCardCreateView, DeckUpdateDeleteView, ProjectCardUpdateDeleteView, SlugCreateView, PageUploadView, PagesModelUpdateDeleteView, SlugEntryUpdateDeleteView, BackgroundDataUpdateDeleteView,CookieTokenObtainPairView, CookieTokenRefreshView, LogoutView, CSRFCookieView, BackgroundDataUploadView
 from portfolio.views import GradientColorView, DeckListView, ProjectCardListView, SlugListView, PageNamesView, PageFetchView, ProjectPageFetchView, ImageListView, PageDetailsView
 
 from drf_spectacular.views import (
@@ -35,9 +35,11 @@ from portfolio.sitemaps import SlugRootSitemap, PageOneSitemap, PageTwoSitemap, 
 
 
 urlpatterns = [
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/logout/', LogoutView.as_view(), name='logout'),
     path('api/auth/', AdminApiView.as_view(), name='Admin_actions'),
+    path('api/auth/csrf/', CSRFCookieView.as_view(), name='csrf_cookie'),
 
     path('api/auth/create_deck/<str:slug>', DeckCreateView.as_view(), name='create_deck_slug'),
 
@@ -48,13 +50,14 @@ urlpatterns = [
     path('api/auth/alter_page/<int:pk>', PagesModelUpdateDeleteView.as_view(), name='page_update_delete'),
     path('api/auth/alter_slug/<int:pk>', SlugEntryUpdateDeleteView.as_view(), name='slug_update_delete'),
     path('api/auth/alter_background/<int:pk>', BackgroundDataUpdateDeleteView.as_view(), name='background_update_delete'),
+    path('api/auth/create_background/', BackgroundDataUploadView.as_view(), name='background_data_upload'),
 
     path('api/auth/create_slug/', SlugCreateView.as_view(), name='slug_create'),
 
     path('api/auth/upload_page/', PageUploadView.as_view(), name='upload_page'),
 
-    path('upload-image/<str:slug>', ImageUploadView.as_view()),
-    path('upload-image/', ImageUploadView.as_view()),
+    path('api/upload-image/<str:slug>', ImageUploadView.as_view()),
+    path('api/upload-image/', ImageUploadView.as_view()),
 
     path('api/slugs/', SlugListView.as_view(), name='slug_list'),
 

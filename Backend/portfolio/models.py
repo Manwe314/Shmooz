@@ -36,6 +36,7 @@ class Deck(models.Model):
     hover_rotations = ArrayField(models.FloatField(), blank=True, default=list)
     hover_brightness = ArrayField(models.FloatField(), blank=True, default=list)
     text_color = models.CharField(max_length=50)
+    hover_color = models.CharField(max_length=50)
 
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     edited_at = models.DateTimeField(null=True, blank=True, db_index=True)
@@ -105,7 +106,7 @@ class ProjectCard(models.Model):
         Deck,
         on_delete=models.CASCADE,
         related_name='project_cards',
-        null=True,  # optional: allow nulls if you want a soft transition
+        null=True,
         blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
