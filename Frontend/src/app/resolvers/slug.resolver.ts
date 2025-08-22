@@ -1,6 +1,7 @@
-import { Injectable, inject } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { inject,Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot,Resolve } from '@angular/router';
 import { Observable, of } from 'rxjs';
+
 import { SlugService } from '../services/slug.service';
 
 const DEFAULT_SLUG = 'shmooz';
@@ -10,10 +11,7 @@ export class SlugResolver implements Resolve<boolean> {
   private slugService = inject(SlugService);
 
   resolve(route: ActivatedRouteSnapshot): Observable<boolean> {
-    const slug =
-      route.paramMap.get('slug') ??
-      route.queryParamMap.get('slug') ??
-      DEFAULT_SLUG;
+    const slug = route.paramMap.get('slug') ?? route.queryParamMap.get('slug') ?? DEFAULT_SLUG;
 
     this.slugService.setSlug(slug);
     return of(true);

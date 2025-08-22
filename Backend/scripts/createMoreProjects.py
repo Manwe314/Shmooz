@@ -1,19 +1,19 @@
 # seed_project_cards_extra.py
 
 from django.core.files import File
+
 from administration.models import ImageUpload
-from portfolio.models import ProjectCard, Deck
+from portfolio.models import Deck, ProjectCard
+
 
 def upload_image(title, filename, slug):
-    with open(f'/app/media/{filename}', 'rb') as f:
-        img = ImageUpload(
-            title=title,
-            image=File(f, name=filename)
-        )
+    with open(f"/app/media/{filename}", "rb") as f:
+        img = ImageUpload(title=title, image=File(f, name=filename))
         img.upload_slug = slug
         img.save()
         print(f"✅ Uploaded image '{filename}' with ID {img.id}")
         return img
+
 
 # === Upload image once ===
 image1 = upload_image("Project Extra Image", "1.png", "kuxi")
@@ -56,7 +56,7 @@ for deck_name, count in cards_to_create.items():
             inline_color="FEF1DF",
             owner="kuxi",
             image=image1,
-            deck=deck
+            deck=deck,
         )
         print(f"✅ Created ProjectCard {i} in deck '{deck_name}'")
 

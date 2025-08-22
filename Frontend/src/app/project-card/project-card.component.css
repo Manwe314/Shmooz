@@ -13,8 +13,10 @@
 
 .card-bg {
   position: absolute;
-  top: -10px; left: -10px;
-  right: -10px; bottom: -10px;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
   background-size: cover;
   background-position: center;
   transition: transform 0.15s ease;
@@ -42,7 +44,7 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  font-family: "Libre Baskerville", serif;
+  font-family: 'Libre Baskerville', serif;
   font-size: 1.8rem;
   display: flex;
   align-items: center;
@@ -54,7 +56,7 @@
 .card-text {
   text-align: center;
   font-size: 2.5rem;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   z-index: 1;
   max-width: 193px;
   text-shadow: 0px 0px 16px rgb(0, 0, 0, 0.85);

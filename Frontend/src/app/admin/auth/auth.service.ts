@@ -1,15 +1,20 @@
-// src/app/admin/auth/auth.service.ts
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { inject,Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, map, shareReplay, switchMap, tap, timeout } from 'rxjs/operators';
-import { ApiService } from '../../services/api.service';
-import { TokenService } from './token.service';
-import { CsrfService } from './csrf.service';
 
-interface TokenPair { access: string; refresh?: string; }
-interface AccessOnly { access: string; }
+import { ApiService } from '../../services/api.service';
+import { CsrfService } from './csrf.service';
+import { TokenService } from './token.service';
+
+interface TokenPair {
+  access: string;
+  refresh?: string;
+}
+interface AccessOnly {
+  access: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -27,16 +32,16 @@ export class AuthService {
         this.http.post<TokenPair>(
           this.api.buildUrl('token/'),
           { username, password },
-          { withCredentials: true }
-        )
+          { withCredentials: true },
+        ),
       ),
-      tap(res => this.tokens.setAccessToken(res.access)),
+      tap((res) => this.tokens.setAccessToken(res.access)),
       map(() => true),
-      catchError(err => {
+      catchError((err) => {
         console.error('Login failed', err);
         this.tokens.clear();
         return of(false);
-      })
+      }),
     );
   }
 
@@ -44,22 +49,23 @@ export class AuthService {
     if (this.refreshing$) return this.refreshing$;
 
     this.refreshing$ = this.csrf.ensureCsrfCookie().pipe(
-      switchMap(() =>
-        this.http.post<AccessOnly>(
-          this.api.buildUrl('token/refresh/'),
-          {},
-          { withCredentials: true }
-        ).pipe(timeout(5000)) // ⏱ avoid hangs on initial navigation
+      switchMap(
+        () =>
+          this.http
+            .post<AccessOnly>(this.api.buildUrl('token/refresh/'), {}, { withCredentials: true })
+            .pipe(timeout(5000)),
       ),
-      tap(resp => this.tokens.setAccessToken(resp.access)),
-      map(resp => resp.access),
-      catchError(err => {
+      tap((resp) => this.tokens.setAccessToken(resp.access)),
+      map((resp) => resp.access),
+      catchError((err) => {
         console.warn('Refresh failed', err);
         this.tokens.clear();
         return of(null);
       }),
-      finalize(() => { this.refreshing$ = undefined; }),
-      shareReplay(1)
+      finalize(() => {
+        this.refreshing$ = undefined;
+      }),
+      shareReplay(1),
     );
 
     return this.refreshing$;
@@ -69,7 +75,7 @@ export class AuthService {
     if (this.tokens.hasAccessToken() && !this.tokens.isExpiringSoon(20)) {
       return of(true);
     }
-    return this.refreshAccess().pipe(map(tok => !!tok));
+    return this.refreshAccess().pipe(map((tok) => !!tok));
   }
 
   isLoggedIn(): boolean {
@@ -77,8 +83,8 @@ export class AuthService {
   }
 
   logout(): void {
-    // best-effort inform server to clear cookie
-    this.http.post(this.api.buildUrl('logout/'), {}, { withCredentials: true })
+    this.http
+      .post(this.api.buildUrl('logout/'), {}, { withCredentials: true })
       .subscribe({ next: () => {}, error: () => {} });
     this.tokens.clear();
     this.router.navigate(['/login']);

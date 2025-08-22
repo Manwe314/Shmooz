@@ -1,101 +1,101 @@
-.deck-card { 
-    max-width: 1200px; 
-    margin: 16px auto; 
-    padding: 16px; 
+.deck-card {
+  max-width: 1200px;
+  margin: 16px auto;
+  padding: 16px;
 }
 
-.header { 
-    display:flex; 
-    align-items:center; 
-    gap: 16px; 
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.owner { 
-    margin-left: auto; 
+.owner {
+  margin-left: auto;
 }
 
-.layout { 
-    display: grid; 
-    grid-template-columns: 320px 1fr; 
-    gap: 16px; 
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
 }
 
-.list { 
-    max-height: 540px; 
-    overflow: auto; 
-    border-right: 1px solid #2b2b2b; 
-    padding-right: 8px; 
+.list {
+  max-height: 540px;
+  overflow: auto;
+  border-right: 1px solid #2b2b2b;
+  padding-right: 8px;
 }
 
-.formWrap { 
-    display: grid; 
-    grid-template-columns: 1fr 360px; 
-    gap: 16px; 
+.formWrap {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 16px;
 }
 
-.grid { 
-    display: grid; 
-    grid-template-columns: repeat(2, minmax(200px,1fr)); 
-    gap: 12px; 
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  gap: 12px;
 }
 
-.wide { 
-    grid-column: span 2; 
+.wide {
+  grid-column: span 2;
 }
 
-.actions { 
-    display: flex; 
-    gap: 8px; 
-    margin-top: 12px; 
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
 }
 
-.imageRow { 
-    grid-column: span 2; 
-    display: grid; 
-    grid-template-columns: repeat(2,1fr); 
-    gap: 12px; 
+.imageRow {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
-.imgPick .label { 
-    font-size: 12px; 
-    opacity: 0.8; 
-    margin-bottom: 4px; 
+.imgPick .label {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-bottom: 4px;
 }
 
-.thumb { 
-    width: 100%; 
-    height: 150px; 
-    border: 1px dashed #666; 
-    border-radius: 8px; 
-    display:flex; 
-    align-items:center; 
-    justify-content:center; 
-    overflow:hidden; 
-    background:#111; 
+.thumb {
+  width: 100%;
+  height: 150px;
+  border: 1px dashed #666;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #111;
 }
 
-.thumb img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: contain; 
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.btns { 
-    display:flex; 
-    gap: 8px; 
-    margin-top: 6px; 
+.btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
 }
 
-.previewBox { 
-    width: 360px; 
-    height: 360px; 
-    border: 1px solid #333; 
-    border-radius: 8px; 
-    overflow: hidden; 
-    position: relative; 
-    justify-content: center; 
-    align-items: center; 
-    display: flex;
+.previewBox {
+  width: 360px;
+  height: 360px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 
 :host ::ng-deep .deck-container {

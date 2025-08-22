@@ -11,7 +11,7 @@ export class SeoService {
     private title: Title,
     rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private doc: Document,
-    @Optional() @Inject('ORIGIN_URL') private originFromSsr: string | null
+    @Optional() @Inject('ORIGIN_URL') private originFromSsr: string | null,
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
@@ -19,7 +19,6 @@ export class SeoService {
   private getOrigin(): string {
     if (this.originFromSsr) return this.originFromSsr;
     if (typeof window !== 'undefined' && window.location) return window.location.origin;
-    // fallback if neither present (adjust to your domain if you want)
     return 'https://your-domain.example';
   }
 
@@ -48,25 +47,42 @@ export class SeoService {
     this.setLink('link', 'canonical', href);
   }
 
-  setOpenGraph(opts: { title?: string; description?: string; url?: string; image?: string; type?: string; siteName?: string }) {
-    if (opts.title)       this.meta.updateTag({ property: 'og:title', content: opts.title });
-    if (opts.description) this.meta.updateTag({ property: 'og:description', content: opts.description });
-    if (opts.type)        this.meta.updateTag({ property: 'og:type', content: opts.type });
-    this.meta.updateTag({ property: 'og:url', content: opts.url || this.getOrigin() + this.currentPath() });
-    if (opts.image)       this.meta.updateTag({ property: 'og:image', content: opts.image });
-    if (opts.siteName)    this.meta.updateTag({ property: 'og:site_name', content: opts.siteName });
+  setOpenGraph(opts: {
+    title?: string;
+    description?: string;
+    url?: string;
+    image?: string;
+    type?: string;
+    siteName?: string;
+  }) {
+    if (opts.title) this.meta.updateTag({ property: 'og:title', content: opts.title });
+    if (opts.description)
+      this.meta.updateTag({ property: 'og:description', content: opts.description });
+    if (opts.type) this.meta.updateTag({ property: 'og:type', content: opts.type });
+    this.meta.updateTag({
+      property: 'og:url',
+      content: opts.url || this.getOrigin() + this.currentPath(),
+    });
+    if (opts.image) this.meta.updateTag({ property: 'og:image', content: opts.image });
+    if (opts.siteName) this.meta.updateTag({ property: 'og:site_name', content: opts.siteName });
   }
 
-  setTwitterCard(opts: { title?: string; description?: string; image?: string; site?: string; card?: 'summary'|'summary_large_image' }) {
+  setTwitterCard(opts: {
+    title?: string;
+    description?: string;
+    image?: string;
+    site?: string;
+    card?: 'summary' | 'summary_large_image';
+  }) {
     this.meta.updateTag({ name: 'twitter:card', content: opts.card || 'summary_large_image' });
-    if (opts.title)       this.meta.updateTag({ name: 'twitter:title', content: opts.title });
-    if (opts.description) this.meta.updateTag({ name: 'twitter:description', content: opts.description });
-    if (opts.image)       this.meta.updateTag({ name: 'twitter:image', content: opts.image });
-    if (opts.site)        this.meta.updateTag({ name: 'twitter:site', content: opts.site });
+    if (opts.title) this.meta.updateTag({ name: 'twitter:title', content: opts.title });
+    if (opts.description)
+      this.meta.updateTag({ name: 'twitter:description', content: opts.description });
+    if (opts.image) this.meta.updateTag({ name: 'twitter:image', content: opts.image });
+    if (opts.site) this.meta.updateTag({ name: 'twitter:site', content: opts.site });
   }
 
   setJsonLd(schema: object) {
-    // Remove existing JSON-LD if any
     const prev = this.doc.head.querySelector('script[type="application/ld+json"]');
     if (prev) prev.remove();
     const script = this.renderer.createElement('script');
@@ -85,15 +101,37 @@ export class SeoService {
   setForHome(opts: { title: string; description: string; image?: string }) {
     this.setTitleAndDescription(opts.title, opts.description);
     this.setCanonical('/');
-    this.setOpenGraph({ title: opts.title, description: opts.description, image: opts.image, type: 'website', siteName: opts.title });
-    this.setTwitterCard({ title: opts.title, description: opts.description, image: opts.image, card: 'summary_large_image' });
+    this.setOpenGraph({
+      title: opts.title,
+      description: opts.description,
+      image: opts.image,
+      type: 'website',
+      siteName: opts.title,
+    });
+    this.setTwitterCard({
+      title: opts.title,
+      description: opts.description,
+      image: opts.image,
+      card: 'summary_large_image',
+    });
   }
 
   setForPage(opts: { title: string; description: string; path: string; image?: string }) {
     this.setTitleAndDescription(opts.title, opts.description);
     this.setCanonical(opts.path);
     const url = this.getOrigin() + (opts.path.startsWith('/') ? opts.path : `/${opts.path}`);
-    this.setOpenGraph({ title: opts.title, description: opts.description, image: opts.image, type: 'article', url });
-    this.setTwitterCard({ title: opts.title, description: opts.description, image: opts.image, card: 'summary_large_image' });
+    this.setOpenGraph({
+      title: opts.title,
+      description: opts.description,
+      image: opts.image,
+      type: 'article',
+      url,
+    });
+    this.setTwitterCard({
+      title: opts.title,
+      description: opts.description,
+      image: opts.image,
+      card: 'summary_large_image',
+    });
   }
 }

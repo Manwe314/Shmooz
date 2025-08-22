@@ -1,7 +1,8 @@
 # seed_one_page.py
 
-from portfolio.models import PagesModel
 from django.utils import timezone
+
+from portfolio.models import PagesModel
 
 # Define your content schema (same format used in frontend)
 page_content = [
@@ -20,7 +21,7 @@ page_content = [
                 "colStart": 2,
                 "tag": "h1",
                 "textAlign": "center",
-                "color": "#333"
+                "color": "#333",
             },
             {
                 "id": "img-001",
@@ -30,7 +31,7 @@ page_content = [
                 "rowStart": 1,
                 "colStart": 1,
                 "rowSpan": 2,
-                "borderRadius": "8px"
+                "borderRadius": "8px",
             },
             {
                 "id": "link-001",
@@ -38,18 +39,17 @@ page_content = [
                 "rowStart": 2,
                 "colStart": 2,
                 "text": "visit our swagger",
-                "url": "http://localhost:8000/api/docs/"
-            }
-        ]
+                "url": "http://localhost:8000/api/docs/",
+            },
+        ],
     }
 ]
 
 # Save it to the DB
 page = PagesModel.objects.create(
-    owner="kuxi",
-    category="page_one",
-    content=page_content,
-    created_at=timezone.now()
+    owner="kuxi", category="page_one", content=page_content, created_at=timezone.now()
 )
 
-print(f"✅ Seeded PagesModel with ID {page.id}, owner='{page.owner}', category='{page.category}'")
+print(
+    f"✅ Seeded PagesModel with ID {page.id}, owner='{page.owner}', category='{page.category}'"
+)

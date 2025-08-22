@@ -1,5 +1,6 @@
-from portfolio.models import PagesModel, ProjectCard
 from django.utils import timezone
+
+from portfolio.models import PagesModel, ProjectCard
 
 PROJECT_CARD_ID = 2
 
@@ -33,7 +34,7 @@ page_content = [
                 "padding": "10px",
                 "fontFamily": "'Open sans', sans-serif",
                 "fontSize": "2rem",
-                "fontWeight": "600"
+                "fontWeight": "600",
             },
             {
                 "id": "img-001",
@@ -62,16 +63,18 @@ page_content = [
                 "horizontalAlign": "center",
                 "iconPosition": "right",
                 "fontFamily": "'Times New Roman', Times, serif",
-                "fontWeight": "500"
+                "fontWeight": "500",
             },
-        ]
+        ],
     }
 ]
 
 # Delete existing page if it exists
 existing_page = PagesModel.objects.filter(project_card=project_card).first()
 if existing_page:
-    print(f"🗑️ Deleting existing page (ID: {existing_page.id}) for ProjectCard ID {PROJECT_CARD_ID}")
+    print(
+        f"🗑️ Deleting existing page (ID: {existing_page.id}) for ProjectCard ID {PROJECT_CARD_ID}"
+    )
     existing_page.delete()
 
 # Create new page
@@ -80,7 +83,9 @@ page = PagesModel.objects.create(
     content=page_content,
     category=f"project_{PROJECT_CARD_ID}",
     project_card=project_card,
-    created_at=timezone.now()
+    created_at=timezone.now(),
 )
 
-print(f"✅ Created PagesModel with ID {page.id} linked to ProjectCard ID {PROJECT_CARD_ID}.")
+print(
+    f"✅ Created PagesModel with ID {page.id} linked to ProjectCard ID {PROJECT_CARD_ID}."
+)

@@ -1,19 +1,19 @@
 # seed_project_cards_updated.py
 
 from django.core.files import File
+
 from administration.models import ImageUpload
-from portfolio.models import ProjectCard, Deck
+from portfolio.models import Deck, ProjectCard
+
 
 def upload_image(title, filename, slug):
-    with open(f'/app/media/{filename}', 'rb') as f:
-        img = ImageUpload(
-            title=title,
-            image=File(f, name=filename)
-        )
+    with open(f"/app/media/{filename}", "rb") as f:
+        img = ImageUpload(title=title, image=File(f, name=filename))
         img.upload_slug = slug
         img.save()
         print(f"✅ Uploaded image '{filename}' with ID {img.id}")
         return img
+
 
 # === Upload image once ===
 image1 = upload_image("Project 1 Image", "1.png", "kuxi")
@@ -30,43 +30,43 @@ cards = [
         "title": "Project two",
         "text": "Shmooz To Reality",
         "label_letter": "S",
-        "deck_name": "boardGames deck"
+        "deck_name": "boardGames deck",
     },
     {
         "title": "Project three",
         "text": "trolizmi",
         "label_letter": "T",
-        "deck_name": "test1 deck"
+        "deck_name": "test1 deck",
     },
     {
         "title": "Project four",
         "text": "MC Fire",
         "label_letter": "Sh",
-        "deck_name": "boardGames deck"
+        "deck_name": "boardGames deck",
     },
     {
         "title": "Project five",
         "text": "ADAM?",
         "label_letter": "A",
-        "deck_name": "test1 deck"
+        "deck_name": "test1 deck",
     },
     {
         "title": "Project six",
         "text": "kodak",
         "label_letter": "KK",
-        "deck_name": "boardGames deck"
+        "deck_name": "boardGames deck",
     },
     {
         "title": "Project seven",
         "text": "toomuch?",
         "label_letter": "L",
-        "deck_name": "boardGames deck"
+        "deck_name": "boardGames deck",
     },
     {
         "title": "Project eight",
         "text": "WAP",
         "label_letter": "W",
-        "deck_name": "boardGames deck"
+        "deck_name": "boardGames deck",
     },
 ]
 

@@ -1,14 +1,15 @@
-import { Component, Input, Output, EventEmitter, ElementRef } from '@angular/core';
-import { ProjectCard } from '../services/project-cards.service';
 import { CommonModule } from '@angular/common';
+import { Component, ElementRef,EventEmitter, Input, Output } from '@angular/core';
 import { inject } from '@angular/core';
+
 import { PlatformService } from '../services/platform.service';
+import { ProjectCard } from '../services/project-cards.service';
 
 @Component({
   selector: 'app-project-card',
   imports: [CommonModule],
   templateUrl: './project-card.component.html',
-  styleUrl: './project-card.component.css'
+  styleUrl: './project-card.component.css',
 })
 export class ProjectCardComponent {
   @Input() card!: ProjectCard;
@@ -32,14 +33,14 @@ export class ProjectCardComponent {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    const percentX = (x / rect.width) - 0.5; // -0.5 to +0.5
-    const percentY = (y / rect.height) - 0.5;
+    const percentX = x / rect.width - 0.5;
+    const percentY = y / rect.height - 0.5;
 
-    const moveX = percentX * 20; // translate px
+    const moveX = percentX * 20;
     const moveY = percentY * 20;
 
-    const rotateY = percentX * 12; // rotate left/right
-    const rotateX = -percentY * 12; // rotate up/down
+    const rotateY = percentX * 12;
+    const rotateX = -percentY * 12;
 
     bgEl.style.transform = `
       perspective(600px)
@@ -61,46 +62,44 @@ export class ProjectCardComponent {
   }
 
   get backgroundImage(): Record<string, string> {
-    if (!this.card){
+    if (!this.card) {
       console.warn('the card is not initialized');
       return {};
     }
     const url = this.card ? `url(${this.getImageUrl(this.card.image_url)})` : '';
-    return {'background-image': `${url}`};
+    return { 'background-image': `${url}` };
   }
 
   get insetBorder(): Record<string, string> {
-    if (!this.card){
+    if (!this.card) {
       console.warn('the card is not initialized');
       return {};
     }
     const inline_color = this.card ? `${this.card.inline_color}` : '';
-    return  {'border-color': `${inline_color}`};
+    return { 'border-color': `${inline_color}` };
   }
 
   get label(): Record<string, string> {
-    if (!this.card){
+    if (!this.card) {
       console.warn('the card is not initialized');
       return {};
     }
     const label_color = this.card ? `${this.card.label_color}` : '';
     const text_color = this.card ? `${this.card.text_color}` : '';
-    return {'background-color': `${label_color}`, 'color': `${text_color}`};
+    return { 'background-color': `${label_color}`, color: `${text_color}` };
   }
 
   get text(): Record<string, string> {
-    if (!this.card){
+    if (!this.card) {
       console.warn('the card is not initialized');
       return {};
     }
     const color = this.card ? `${this.card.text_color}` : '';
-    return {'color': `${color}`};
+    return { color: `${color}` };
   }
-
 
   getImageUrl(path: string): string {
     //URL
-    return `https://127.0.0.1:8080${path}`
+    return `https://127.0.0.1:8080${path}`;
   }
-
 }

@@ -1,28 +1,32 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import {
-  ReactiveFormsModule, FormBuilder, Validators,
-  FormGroup, FormControl
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
-import { MatListModule } from '@angular/material/list';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { SlugService } from '../slugs/slug.service';
-import { DeckService, DeckDto } from './deck.service';
-import { ConfirmDialogComponent } from '../widgets/confirm-dialog.component';
-import { ImagePickerDialogComponent, ImagePickResult } from '../images/image-picker-dialog.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
+import { DeckComponent } from '../../../app/deck/deck.component';
+import {
+  ImagePickerDialogComponent,
+  ImagePickResult,
+} from '../images/image-picker-dialog.component';
 import { SsrCacheService } from '../services/ssr-cache.service';
-
-
-// live preview
-import { DeckComponent } from '../../../app/deck/deck.component'; // <-- adjust path to your DeckComponent
+import { SlugService } from '../slugs/slug.service';
+import { ConfirmDialogComponent } from '../widgets/confirm-dialog.component';
+import { DeckDto,DeckService } from './deck.service';
 
 type DeckForm = FormGroup<{
   id: FormControl<number | null>;
@@ -33,7 +37,7 @@ type DeckForm = FormGroup<{
   image_id: FormControl<number | null>;
   hover_img_id: FormControl<number | null>;
   card_amount: FormControl<number>;
-  x_offsets: FormControl<string>;           // CSV in the form
+  x_offsets: FormControl<string>;
   y_offsets: FormControl<string>;
   rotations: FormControl<string>;
   alphas: FormControl<string>;
@@ -42,13 +46,20 @@ type DeckForm = FormGroup<{
   hover_y_offsets: FormControl<string>;
   hover_rotations: FormControl<string>;
   hover_brightness: FormControl<string>;
-  image_url: FormControl<string | null>;    // for preview
+  image_url: FormControl<string | null>;
   hover_img_url: FormControl<string | null>;
 }>;
 
 type ArrayKey =
-  | 'x_offsets' | 'y_offsets' | 'rotations' | 'alphas' | 'brightness'
-  | 'hover_x_offsets' | 'hover_y_offsets' | 'hover_rotations' | 'hover_brightness';
+  | 'x_offsets'
+  | 'y_offsets'
+  | 'rotations'
+  | 'alphas'
+  | 'brightness'
+  | 'hover_x_offsets'
+  | 'hover_y_offsets'
+  | 'hover_rotations'
+  | 'hover_brightness';
 
 @Component({
   selector: 'app-deck-editor',
@@ -69,7 +80,7 @@ type ArrayKey =
     MatExpansionModule,
   ],
   templateUrl: './deck-editor.component.html',
-  styleUrl: './deck-editor.component.css'
+  styleUrl: './deck-editor.component.css',
 })
 export class DeckEditorComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -79,13 +90,11 @@ export class DeckEditorComponent implements OnInit {
   private snack = inject(MatSnackBar);
   private ssr = inject(SsrCacheService);
 
-
   owner = signal<string | null>(null);
   decks = signal<DeckDto[]>([]);
   loading = signal(false);
   saving = signal(false);
   deleting = signal(false);
-
 
   private invalidateLandingCache() {
     const slug = this.owner();
@@ -96,7 +105,6 @@ export class DeckEditorComponent implements OnInit {
     });
   }
 
-  // Default arrays for auto-fill/padding
   private defaults: Record<ArrayKey, number[]> = {
     x_offsets: [3, 5, 1, -10],
     y_offsets: [1, 0, 4, 1],
@@ -112,7 +120,10 @@ export class DeckEditorComponent implements OnInit {
   form: DeckForm = this.fb.nonNullable.group({
     id: this.fb.control<number | null>(null),
     title: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
-    displayed_name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
+    displayed_name: this.fb.nonNullable.control('', [
+      Validators.required,
+      Validators.maxLength(50),
+    ]),
     text_color: this.fb.nonNullable.control('#ffffff', [Validators.maxLength(50)]),
     hover_color: this.fb.nonNullable.control('#e0f804', [Validators.maxLength(50)]),
     image_id: this.fb.control<number | null>(null),
@@ -134,7 +145,6 @@ export class DeckEditorComponent implements OnInit {
     hover_img_url: this.fb.control<string | null>(null),
   });
 
-  // preview object shaped for DeckComponent input
   get previewDeck() {
     const f = this.form.getRawValue();
     return {
@@ -159,7 +169,7 @@ export class DeckEditorComponent implements OnInit {
 
   ngOnInit() {
     this.owner.set(this.slugService.selectedSlugSnapshot?.slug ?? null);
-    this.slugService.selectedSlug$.subscribe(s => {
+    this.slugService.selectedSlug$.subscribe((s) => {
       const next = s?.slug ?? null;
       if (next !== this.owner()) {
         this.owner.set(next);
@@ -168,7 +178,6 @@ export class DeckEditorComponent implements OnInit {
       }
     });
 
-    // When card amount changes, resize all CSV controls accordingly
     this.form.controls.card_amount.valueChanges.subscribe(() => {
       this.resizeAllCsv();
     });
@@ -177,13 +186,11 @@ export class DeckEditorComponent implements OnInit {
     this.newDeck();
   }
 
-  /** indices 0..card_amount-1 */
   get indexArray(): number[] {
     const n = this.form.controls.card_amount.value ?? 0;
     return Array.from({ length: Math.max(0, n) }, (_, i) => i);
   }
 
-  /** Read a numeric value at idx from a CSV control; padded with defaults or 0 */
   getCsvItem(key: ArrayKey, idx: number): number {
     const arr = parseCsvNums(this.form.controls[key].value || '');
     if (idx < arr.length) return arr[idx] ?? 0;
@@ -193,33 +200,37 @@ export class DeckEditorComponent implements OnInit {
     return padded[idx] ?? 0;
   }
 
-  /** Write a numeric value at idx back into the CSV control, respecting card_amount length */
   setCsvItem(key: ArrayKey, idx: number, value: string | number) {
     const n = this.form.controls.card_amount.value ?? 0;
     const parsed = Number(value);
     const val = Number.isFinite(parsed) ? parsed : 0;
 
     let arr = parseCsvNums(this.form.controls[key].value || '');
-    // Resize to exactly n
     arr = ensureLength(arr, n, this.defaults[key]);
-    // Set the index
     if (idx >= 0 && idx < n) arr[idx] = val;
     this.form.controls[key].setValue(arr.join(','));
   }
 
-  /** Reset a whole row to defaults (trim/pad to card_amount) */
   resetDefaults(key: ArrayKey) {
     const n = this.form.controls.card_amount.value ?? 0;
     const base = ensureLength([], n, this.defaults[key]);
     this.form.controls[key].setValue(base.join(','));
   }
 
-  /** Make all CSV arrays align to card_amount using defaults */
   private resizeAllCsv() {
-    ([
-      'x_offsets','y_offsets','rotations','alphas','brightness',
-      'hover_x_offsets','hover_y_offsets','hover_rotations','hover_brightness'
-    ] as ArrayKey[]).forEach(k => {
+    (
+      [
+        'x_offsets',
+        'y_offsets',
+        'rotations',
+        'alphas',
+        'brightness',
+        'hover_x_offsets',
+        'hover_y_offsets',
+        'hover_rotations',
+        'hover_brightness',
+      ] as ArrayKey[]
+    ).forEach((k) => {
       const n = this.form.controls.card_amount.value ?? 0;
       const arr = parseCsvNums(this.form.controls[k].value || '');
       const resized = ensureLength(arr, n, this.defaults[k]);
@@ -241,7 +252,7 @@ export class DeckEditorComponent implements OnInit {
       return this.getImageUrl(input);
     } catch {
       const i = input.indexOf(MEDIA);
-      if (i !== -1) return  this.getImageUrl(input.slice(i));
+      if (i !== -1) return this.getImageUrl(input.slice(i));
       if (input.startsWith('media')) return this.getImageUrl('/' + input);
       return this.getImageUrl(input);
     }
@@ -253,9 +264,10 @@ export class DeckEditorComponent implements OnInit {
   }
 
   loadDecks() {
-    const o = this.owner(); if (!o) return;
+    const o = this.owner();
+    if (!o) return;
     this.loading.set(true);
-    this.decksApi.listByOwner(o, 100).subscribe(list => {
+    this.decksApi.listByOwner(o, 100).subscribe((list) => {
       this.decks.set(list);
       this.loading.set(false);
     });
@@ -315,13 +327,14 @@ export class DeckEditorComponent implements OnInit {
   }
 
   pickImage(kind: 'cover' | 'hover') {
-    const o = this.owner(); if (!o) return;
+    const o = this.owner();
+    if (!o) return;
     const ref = this.dialog.open(ImagePickerDialogComponent, {
       data: { ownerSlug: o },
-      width: '900px',          
-      maxWidth: '90vw',        
-      minWidth: '400px',       
-      panelClass: 'image-picker-dialog' 
+      width: '900px',
+      maxWidth: '90vw',
+      minWidth: '400px',
+      panelClass: 'image-picker-dialog',
     });
     ref.afterClosed().subscribe((res: ImagePickResult | null) => {
       if (!res) return;
@@ -348,7 +361,7 @@ export class DeckEditorComponent implements OnInit {
   resetForm() {
     if (this.form.controls['id'].value) {
       const id = this.form.controls['id'].value!;
-      const d = this.decks().find(x => x.id === id);
+      const d = this.decks().find((x) => x.id === id);
       if (d) this.loadDeck(d);
     } else {
       this.newDeck();
@@ -356,7 +369,8 @@ export class DeckEditorComponent implements OnInit {
   }
 
   save() {
-    const o = this.owner(); if (!o || this.form.invalid) return;
+    const o = this.owner();
+    if (!o || this.form.invalid) return;
     this.saving.set(true);
     const f = this.form.getRawValue();
 
@@ -383,7 +397,7 @@ export class DeckEditorComponent implements OnInit {
     };
 
     if (!f.id) {
-      this.decksApi.createDeck(o, { owner: o, ...payloadCommon }).subscribe(rec => {
+      this.decksApi.createDeck(o, { owner: o, ...payloadCommon }).subscribe((rec) => {
         this.saving.set(false);
         if (rec) {
           this.snack.open('Deck created', 'OK', { duration: 1500 });
@@ -395,11 +409,11 @@ export class DeckEditorComponent implements OnInit {
         }
       });
     } else {
-      this.decksApi.updateDeck(f.id, o, payloadCommon as any).subscribe(rec => {
+      this.decksApi.updateDeck(f.id, o, payloadCommon as any).subscribe((rec) => {
         this.saving.set(false);
         if (rec) {
           this.snack.open('Saved', 'OK', { duration: 1200 });
-          const list = this.decks().map(d => d.id === rec.id ? rec : d);
+          const list = this.decks().map((d) => (d.id === rec.id ? rec : d));
           this.decks.set(list);
           this.loadDeck(rec);
           this.invalidateLandingCache();
@@ -419,16 +433,16 @@ export class DeckEditorComponent implements OnInit {
         message: `Delete this deck? This cannot be undone.`,
         confirmText: 'Delete',
         cancelText: 'Cancel',
-      }
+      },
     });
-    ref.afterClosed().subscribe(ok => {
+    ref.afterClosed().subscribe((ok) => {
       if (!ok) return;
       this.deleting.set(true);
-      this.decksApi.deleteDeck(id).subscribe(success => {
+      this.decksApi.deleteDeck(id).subscribe((success) => {
         this.deleting.set(false);
         if (success) {
           this.snack.open('Deck deleted', 'OK', { duration: 1500 });
-          this.decks.set(this.decks().filter(d => d.id !== id));
+          this.decks.set(this.decks().filter((d) => d.id !== id));
           this.newDeck();
           this.invalidateLandingCache();
         } else {
@@ -439,14 +453,13 @@ export class DeckEditorComponent implements OnInit {
   }
 }
 
-/* helpers */
 function parseCsvNums(s: string): number[] {
   return (s || '')
     .split(',')
-    .map(x => x.trim())
-    .filter(x => x.length > 0)
-    .map(x => Number(x))
-    .filter(x => !Number.isNaN(x));
+    .map((x) => x.trim())
+    .filter((x) => x.length > 0)
+    .map((x) => Number(x))
+    .filter((x) => !Number.isNaN(x));
 }
 function joinCsv(arr?: number[]): string {
   return Array.isArray(arr) ? arr.join(',') : '';

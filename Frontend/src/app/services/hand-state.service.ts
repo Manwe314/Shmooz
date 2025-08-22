@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import { ProjectCard } from './project-cards.service';
 
 export type AnimationState = 'entering' | 'inHand' | 'discarding';
@@ -14,7 +15,7 @@ export class HandStateService {
 
   save(state: HandState): void {
     this.state = {
-      cards: state.cards.map(c => ({ ...c })),
+      cards: state.cards.map((c) => ({ ...c })),
       deckOrigin: state.deckOrigin ? { ...state.deckOrigin } : null,
     };
   }
@@ -22,7 +23,7 @@ export class HandStateService {
   load(): HandState | null {
     return this.state
       ? {
-          cards: this.state.cards.map(c => ({ ...c })),
+          cards: this.state.cards.map((c) => ({ ...c })),
           deckOrigin: this.state.deckOrigin ? { ...this.state.deckOrigin } : null,
         }
       : null;

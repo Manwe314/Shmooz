@@ -4,8 +4,8 @@ import { ResolveFn } from '@angular/router';
 import { landingBackgroundResolver } from './landing-background.resolver';
 
 describe('landingBackgroundResolver', () => {
-  const executeResolver: ResolveFn<boolean> = (...resolverParameters) => 
-      TestBed.runInInjectionContext(() => landingBackgroundResolver(...resolverParameters));
+  const executeResolver: ResolveFn<boolean> = (...resolverParameters) =>
+    TestBed.runInInjectionContext(() => landingBackgroundResolver(...resolverParameters));
 
   beforeEach(() => {
     TestBed.configureTestingModule({});

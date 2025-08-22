@@ -3,7 +3,6 @@
     <h2>Pages</h2>
     <span class="spacer"></span>
 
-    <!-- Target selector -->
     <mat-form-field appearance="fill" class="w180">
       <mat-label>Target</mat-label>
       <mat-select [(value)]="targetType">
@@ -36,10 +35,7 @@
         <mat-label>Project card</mat-label>
         <mat-select [(value)]="selectedProjectCardId" [disabled]="!selectedDeckId">
           <mat-option [value]="null">— Select card —</mat-option>
-          <!-- ✅ coerce to number with unary + -->
-          <mat-option *ngFor="let c of projectCards" [value]="+c.id">
-            {{ c.title }} (id: {{ c.id }})
-          </mat-option>
+          <mat-option *ngFor="let c of projectCards" [value]="+c.id"> {{ c.title }} (id: {{ c.id }}) </mat-option>
         </mat-select>
       </mat-form-field>
     </ng-template>
@@ -50,7 +46,6 @@
   </div>
 
   <div class="layout">
-    <!-- Left: Blocks builder -->
     <div class="editor">
       <div class="editor-actions">
         <button mat-flat-button color="primary" (click)="addBlock()">Add Block</button>
@@ -82,9 +77,7 @@
               <input matInput [formControl]="b.controls.gridTemplateRows" placeholder="auto auto" />
             </mat-form-field>
             <div class="checkbox-wrap">
-              <mat-checkbox
-                [checked]="!!b.value.tag"
-                (change)="toggleBlockTag(b, $event.checked)">
+              <mat-checkbox [checked]="!!b.value.tag" (change)="toggleBlockTag(b, $event.checked)">
                 Use as borderTarget (for morph)
               </mat-checkbox>
             </div>
@@ -98,227 +91,241 @@
             <button mat-button color="warn" (click)="removeBlock(bi)">Remove block</button>
           </div>
 
-            <div class="content-list">
-              <mat-accordion multi="true">
-                <mat-expansion-panel *ngFor="let c of (b.controls.content.controls); let ci = index" [expanded]="ci === 0">
-                  <mat-expansion-panel-header>
-                    <div class="content-header">
-                      <strong>{{ c.value.type | titlecase }}</strong>
-                      <span class="muted">• row {{ c.value.rowStart || 1 }}, col {{ c.value.colStart || 1 }}</span>
-                      <span class="spacer"></span>
-                      <button mat-icon-button color="warn" (click)="removeContent(bi, ci)" aria-label="Remove">
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                    </div>
-                  </mat-expansion-panel-header>
-              
-                  <!-- common placement -->
+          <div class="content-list">
+            <mat-accordion multi="true">
+              <mat-expansion-panel *ngFor="let c of b.controls.content.controls; let ci = index" [expanded]="ci === 0">
+                <mat-expansion-panel-header>
+                  <div class="content-header">
+                    <strong>{{ c.value.type | titlecase }}</strong>
+                    <span class="muted">• row {{ c.value.rowStart || 1 }}, col {{ c.value.colStart || 1 }}</span>
+                    <span class="spacer"></span>
+                    <button mat-icon-button color="warn" (click)="removeContent(bi, ci)" aria-label="Remove">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </mat-expansion-panel-header>
+
+                <div class="row">
+                  <mat-form-field appearance="fill">
+                    <mat-label>Row start</mat-label>
+                    <input matInput type="number" [formControl]="$any(c.controls['rowStart'])" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill">
+                    <mat-label>Col start</mat-label>
+                    <input matInput type="number" [formControl]="$any(c.controls['colStart'])" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill">
+                    <mat-label>Row span</mat-label>
+                    <input matInput type="number" [formControl]="$any(c.controls['rowSpan'])" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill">
+                    <mat-label>Col span</mat-label>
+                    <input matInput type="number" [formControl]="$any(c.controls['colSpan'])" />
+                  </mat-form-field>
+                </div>
+                <div class="row">
+                  <mat-form-field appearance="fill">
+                    <mat-label>Margin</mat-label>
+                    <input matInput [formControl]="$any(c.controls['margin'])" />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill">
+                    <mat-label>Padding</mat-label>
+                    <input matInput [formControl]="$any(c.controls['padding'])" />
+                  </mat-form-field>
+                </div>
+
+                <ng-container *ngIf="c.value.type === 'image'">
+                  <div class="row">
+                    <mat-form-field appearance="fill" class="grow">
+                      <mat-label>Image URL</mat-label>
+                      <input matInput [formControl]="$any(c.controls['url'])" />
+                    </mat-form-field>
+                    <button mat-stroked-button type="button" (click)="pickImageForContent(bi, ci)">Pick</button>
+                  </div>
                   <div class="row">
                     <mat-form-field appearance="fill">
-                      <mat-label>Row start</mat-label>
-                      <input matInput type="number" [formControl]="$any(c.controls['rowStart'])">
+                      <mat-label>Alt</mat-label>
+                      <input matInput [formControl]="$any(c.controls['alt'])" />
                     </mat-form-field>
                     <mat-form-field appearance="fill">
-                      <mat-label>Col start</mat-label>
-                      <input matInput type="number" [formControl]="$any(c.controls['colStart'])">
-                    </mat-form-field>
-                    <mat-form-field appearance="fill">
-                      <mat-label>Row span</mat-label>
-                      <input matInput type="number" [formControl]="$any(c.controls['rowSpan'])">
-                    </mat-form-field>
-                    <mat-form-field appearance="fill">
-                      <mat-label>Col span</mat-label>
-                      <input matInput type="number" [formControl]="$any(c.controls['colSpan'])">
+                      <mat-label>Border radius</mat-label>
+                      <input matInput [formControl]="$any(c.controls['borderRadius'])" />
                     </mat-form-field>
                   </div>
                   <div class="row">
                     <mat-form-field appearance="fill">
-                      <mat-label>Margin</mat-label>
-                      <input matInput [formControl]="$any(c.controls['margin'])">
+                      <mat-label>Object fit</mat-label>
+                      <input
+                        matInput
+                        [formControl]="$any(c.controls['objectFit'])"
+                        placeholder="cover/contain/fill/none/scale-down"
+                      />
                     </mat-form-field>
                     <mat-form-field appearance="fill">
-                      <mat-label>Padding</mat-label>
-                      <input matInput [formControl]="$any(c.controls['padding'])">
+                      <mat-label>Object position</mat-label>
+                      <input matInput [formControl]="$any(c.controls['objectPosition'])" placeholder="center" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Overflow</mat-label>
+                      <input
+                        matInput
+                        [formControl]="$any(c.controls['overflow'])"
+                        placeholder="hidden/visible/scroll"
+                      />
                     </mat-form-field>
                   </div>
-              
-                  <!-- Image -->
-                  <ng-container *ngIf="c.value.type === 'image'">
-                    <div class="row">
-                      <mat-form-field appearance="fill" class="grow">
-                        <mat-label>Image URL</mat-label>
-                        <input matInput [formControl]="$any(c.controls['url'])">
-                      </mat-form-field>
-                      <button mat-stroked-button type="button" (click)="pickImageForContent(bi, ci)">Pick</button>
+                  <div class="row">
+                    <mat-form-field appearance="fill">
+                      <mat-label>Width</mat-label>
+                      <input matInput [formControl]="$any(c.controls['width'])" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Height</mat-label>
+                      <input matInput [formControl]="$any(c.controls['height'])" />
+                    </mat-form-field>
+                    <div class="checkbox-wrap" style="align-self: center">
+                      <mat-checkbox
+                        [checked]="c.value.tag === 'imageTarget'"
+                        (change)="toggleImageTag(c, $event.checked)"
+                      >
+                        Use as imageTarget (for morph)
+                      </mat-checkbox>
                     </div>
-                    <div class="row">
-                      <mat-form-field appearance="fill">
-                        <mat-label>Alt</mat-label>
-                        <input matInput [formControl]="$any(c.controls['alt'])">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Border radius</mat-label>
-                        <input matInput [formControl]="$any(c.controls['borderRadius'])">
-                      </mat-form-field>
-                    </div>
-                    <div class="row">
-                      <mat-form-field appearance="fill">
-                        <mat-label>Object fit</mat-label>
-                        <input matInput [formControl]="$any(c.controls['objectFit'])" placeholder="cover/contain/fill/none/scale-down">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Object position</mat-label>
-                        <input matInput [formControl]="$any(c.controls['objectPosition'])" placeholder="center">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Overflow</mat-label>
-                        <input matInput [formControl]="$any(c.controls['overflow'])" placeholder="hidden/visible/scroll">
-                      </mat-form-field>
-                    </div>
-                    <div class="row">
-                      <mat-form-field appearance="fill">
-                        <mat-label>Width</mat-label>
-                        <input matInput [formControl]="$any(c.controls['width'])">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Height</mat-label>
-                        <input matInput [formControl]="$any(c.controls['height'])">
-                      </mat-form-field>
-                      <div class="checkbox-wrap" style="align-self:center;">
-                          <mat-checkbox
-                            [checked]="c.value.tag === 'imageTarget'"
-                            (change)="toggleImageTag(c, $event.checked)">
-                            Use as imageTarget (for morph)
-                          </mat-checkbox>
-                        </div>
-                    </div>
-                  </ng-container>
-              
-                  <!-- Text -->
-                  <ng-container *ngIf="c.value.type === 'text'">
-                    <div class="row">
-                      <mat-form-field appearance="fill" class="grow">
-                        <mat-label>Text</mat-label>
-                        <input matInput [formControl]="$any(c.controls['text'])">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Color</mat-label>
-                        <input matInput [formControl]="$any(c.controls['color'])" placeholder="#ffffff">
-                      </mat-form-field>
-                    </div>
-                    <div class="row">
-                      <mat-form-field appearance="fill">
-                        <mat-label>Tag</mat-label>
-                        <input matInput [formControl]="$any(c.controls['tag'])" placeholder="p/h1/h2/span/div">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Horizontal</mat-label>
-                        <input matInput [formControl]="$any(c.controls['horizontalAlign'])" placeholder="left/center/right">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Vertical</mat-label>
-                        <input matInput [formControl]="$any(c.controls['verticalAlign'])" placeholder="top/center/bottom">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Text align</mat-label>
-                        <input matInput [formControl]="$any(c.controls['textAlign'])" placeholder="left/center/right">
-                      </mat-form-field>
-                    </div>
-                    <div class="row">
-                      <mat-form-field appearance="fill">
-                        <mat-label>Font size</mat-label>
-                        <input matInput [formControl]="$any(c.controls['fontSize'])">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Font weight</mat-label>
-                        <input matInput [formControl]="$any(c.controls['fontWeight'])">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Font family</mat-label>
-                        <input matInput [formControl]="$any(c.controls['fontFamily'])">
-                      </mat-form-field>
-                    </div>
-                  </ng-container>
-              
-                  <!-- Link -->
-                  <ng-container *ngIf="c.value.type === 'link'">
-                    <div class="row">
-                      <mat-form-field appearance="fill" class="grow">
-                        <mat-label>URL</mat-label>
-                        <input matInput [formControl]="$any(c.controls['url'])">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill" class="grow">
-                        <mat-label>Text</mat-label>
-                        <input matInput [formControl]="$any(c.controls['text'])">
-                      </mat-form-field>
-                    </div>
-                    <div class="row">
-                      <mat-form-field appearance="fill">
-                        <mat-label>Color</mat-label>
-                        <input matInput [formControl]="$any(c.controls['color'])" placeholder="#ffffff">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Icon URL</mat-label>
-                        <input matInput [formControl]="$any(c.controls['iconUrl'])">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Icon pos</mat-label>
-                        <input matInput [formControl]="$any(c.controls['iconPosition'])" placeholder="left/right">
-                      </mat-form-field>
-                    </div>
-                    <div class="row">
-                      <mat-form-field appearance="fill">
-                        <mat-label>Horizontal</mat-label>
-                        <input matInput [formControl]="$any(c.controls['horizontalAlign'])" placeholder="left/center/right">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Vertical</mat-label>
-                        <input matInput [formControl]="$any(c.controls['verticalAlign'])" placeholder="top/center/bottom">
-                      </mat-form-field>
-                    </div>
-                    <div class="row">
-                      <mat-form-field appearance="fill">
-                        <mat-label>Font size</mat-label>
-                        <input matInput [formControl]="$any(c.controls['fontSize'])">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Font weight</mat-label>
-                        <input matInput [formControl]="$any(c.controls['fontWeight'])">
-                      </mat-form-field>
-                      <mat-form-field appearance="fill">
-                        <mat-label>Font family</mat-label>
-                        <input matInput [formControl]="$any(c.controls['fontFamily'])">
-                      </mat-form-field>
-                    </div>
-                    <div class="row">
-                      <button mat-stroked-button type="button" (click)="pickImageForContent(bi, ci)">Pick icon</button>
-                    </div>
-                  </ng-container>
-                </mat-expansion-panel>
-              </mat-accordion>
-            </div>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="c.value.type === 'text'">
+                  <div class="row">
+                    <mat-form-field appearance="fill" class="grow">
+                      <mat-label>Text</mat-label>
+                      <input matInput [formControl]="$any(c.controls['text'])" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Color</mat-label>
+                      <input matInput [formControl]="$any(c.controls['color'])" placeholder="#ffffff" />
+                    </mat-form-field>
+                  </div>
+                  <div class="row">
+                    <mat-form-field appearance="fill">
+                      <mat-label>Tag</mat-label>
+                      <input matInput [formControl]="$any(c.controls['tag'])" placeholder="p/h1/h2/span/div" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Horizontal</mat-label>
+                      <input
+                        matInput
+                        [formControl]="$any(c.controls['horizontalAlign'])"
+                        placeholder="left/center/right"
+                      />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Vertical</mat-label>
+                      <input
+                        matInput
+                        [formControl]="$any(c.controls['verticalAlign'])"
+                        placeholder="top/center/bottom"
+                      />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Text align</mat-label>
+                      <input matInput [formControl]="$any(c.controls['textAlign'])" placeholder="left/center/right" />
+                    </mat-form-field>
+                  </div>
+                  <div class="row">
+                    <mat-form-field appearance="fill">
+                      <mat-label>Font size</mat-label>
+                      <input matInput [formControl]="$any(c.controls['fontSize'])" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Font weight</mat-label>
+                      <input matInput [formControl]="$any(c.controls['fontWeight'])" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Font family</mat-label>
+                      <input matInput [formControl]="$any(c.controls['fontFamily'])" />
+                    </mat-form-field>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="c.value.type === 'link'">
+                  <div class="row">
+                    <mat-form-field appearance="fill" class="grow">
+                      <mat-label>URL</mat-label>
+                      <input matInput [formControl]="$any(c.controls['url'])" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill" class="grow">
+                      <mat-label>Text</mat-label>
+                      <input matInput [formControl]="$any(c.controls['text'])" />
+                    </mat-form-field>
+                  </div>
+                  <div class="row">
+                    <mat-form-field appearance="fill">
+                      <mat-label>Color</mat-label>
+                      <input matInput [formControl]="$any(c.controls['color'])" placeholder="#ffffff" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Icon URL</mat-label>
+                      <input matInput [formControl]="$any(c.controls['iconUrl'])" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Icon pos</mat-label>
+                      <input matInput [formControl]="$any(c.controls['iconPosition'])" placeholder="left/right" />
+                    </mat-form-field>
+                  </div>
+                  <div class="row">
+                    <mat-form-field appearance="fill">
+                      <mat-label>Horizontal</mat-label>
+                      <input
+                        matInput
+                        [formControl]="$any(c.controls['horizontalAlign'])"
+                        placeholder="left/center/right"
+                      />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Vertical</mat-label>
+                      <input
+                        matInput
+                        [formControl]="$any(c.controls['verticalAlign'])"
+                        placeholder="top/center/bottom"
+                      />
+                    </mat-form-field>
+                  </div>
+                  <div class="row">
+                    <mat-form-field appearance="fill">
+                      <mat-label>Font size</mat-label>
+                      <input matInput [formControl]="$any(c.controls['fontSize'])" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Font weight</mat-label>
+                      <input matInput [formControl]="$any(c.controls['fontWeight'])" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                      <mat-label>Font family</mat-label>
+                      <input matInput [formControl]="$any(c.controls['fontFamily'])" />
+                    </mat-form-field>
+                  </div>
+                  <div class="row">
+                    <button mat-stroked-button type="button" (click)="pickImageForContent(bi, ci)">Pick icon</button>
+                  </div>
+                </ng-container>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
         </mat-expansion-panel>
       </mat-accordion>
     </div>
 
-    <!-- Right: Preview -->
     <div class="preview">
       <div class="previewHeader">
         <h3>Preview</h3>
         <span class="spacer"></span>
-        <mat-slide-toggle
-          color="primary"
-          [checked]="showGridOverlay"
-          (change)="showGridOverlay = $event.checked">
+        <mat-slide-toggle color="primary" [checked]="showGridOverlay" (change)="showGridOverlay = $event.checked">
           Grid
         </mat-slide-toggle>
       </div>
 
       <div class="previewBox">
-        <app-page-preview
-          [blocks]="$any(blocks.value)"
-          [showGrid]="showGridOverlay">
-        </app-page-preview>
+        <app-page-preview [blocks]="$any(blocks.value)" [showGrid]="showGridOverlay"> </app-page-preview>
       </div>
     </div>
   </div>
