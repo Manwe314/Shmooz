@@ -24,6 +24,8 @@ import { PagePreviewComponent } from './page-preview.component';
 import { ImagePickerDialogComponent, ImagePickResult } from '../images/image-picker-dialog.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorDialogComponent } from '../widgets/error-dialog.component';
+import { SsrCacheService } from '../services/ssr-cache.service';
+
 
 
 type TargetType = 'nav' | 'project';
@@ -69,6 +71,8 @@ export class PageEditorComponent implements OnInit {
   private pagesApi = inject(AdminPageApiService);
   private snack = inject(MatSnackBar);
   private dialog = inject(MatDialog);
+  private ssr = inject(SsrCacheService);
+
 
   ownerSlug: string | null = null;
   targetType: TargetType = 'nav';
@@ -85,6 +89,28 @@ export class PageEditorComponent implements OnInit {
 
   // Blocks form array
   blocks = this.fb.array<BlockForm>([]);
+
+  private invalidatePageCache(kind: 'created' | 'updated' | 'deleted' = 'updated') {
+    const slug = this.ownerSlug;
+    if (!slug) return;
+
+    if (this.targetType === 'nav') {
+      // /page_one/:slug or /page_two/:slug
+      this.ssr.invalidatePage(this.navCategory, slug).subscribe({
+        next: () => this.snack.open(`Cache cleared for ${this.navCategory}`, 'OK', { duration: 1200 }),
+        error: (e) => console.warn('SSR invalidate (nav page) failed', e),
+      });
+    } else {
+      // project page → /project_page/:id
+      const id = this.selectedProjectCardId;
+      if (!id) return;
+      this.ssr.invalidateProjectPage(id, slug).subscribe({
+        next: () => this.snack.open(`Cache cleared for project page #${id}`, 'OK', { duration: 1200 }),
+        error: (e) => console.warn('SSR invalidate (project page) failed', e),
+      });
+    }
+  }
+
 
   ngOnInit() {
     this.ownerSlug = this.slugs.selectedSlugSnapshot?.slug ?? null;
@@ -383,19 +409,16 @@ export class PageEditorComponent implements OnInit {
 
       if (this.currentPageId) {
         this.pagesApi.updatePage(this.currentPageId, body).subscribe({
-          next: () => { this.saving = false; this.snack.open('Page updated', 'OK', { duration: 1500 }); },
+          next: () => { this.saving = false; this.snack.open('Page updated', 'OK', { duration: 1500 }); this.invalidatePageCache('updated'); },
           error: err => { this.saving = false; this.showSaveError(err); }
         });
       } else {
         this.pagesApi.uploadPage(this.ownerSlug, category, content, projectCardId).subscribe({
-          next: rec => { this.saving = false; this.currentPageId = rec.id; this.snack.open('Page created', 'OK', { duration: 1500 }); },
+          next: rec => { this.saving = false; this.currentPageId = rec.id; this.snack.open('Page created', 'OK', { duration: 1500 }); this.invalidatePageCache('updated'); },
           error: err => { this.saving = false; this.showSaveError(err); }
         });
       }
     }
-
-
-
 
     confirmDelete() {
       if (!this.currentPageId) return;
@@ -406,6 +429,7 @@ export class PageEditorComponent implements OnInit {
             this.snack.open('Page deleted', 'OK', { duration: 1500 });
             this.currentPageId = null;
             this.clearAll();
+            this.invalidatePageCache('updated');
           },
           error: (err) => {
             const details = this.formatHttpError(err);

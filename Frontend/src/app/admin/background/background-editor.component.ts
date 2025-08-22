@@ -16,6 +16,7 @@ import { SlugService } from '../slugs/slug.service';
 import { BackgroundService, BackgroundData, BackgroundCreate, BackgroundUpdate } from './background.service';
 import { ConfirmDialogComponent } from '../widgets/confirm-dialog.component';
 import { Subject, takeUntil } from 'rxjs';
+import { SsrCacheService } from '../services/ssr-cache.service';
 
 type BgForm = FormGroup<{
   color1: FormControl<string>;
@@ -159,6 +160,7 @@ export class BackgroundEditorComponent implements OnInit, OnDestroy {
     private snack = inject(MatSnackBar);
     private dialog = inject(MatDialog); 
     private destroy$ = new Subject<void>(); 
+    private ssr = inject(SsrCacheService);
     owner: string | null = null;
     record: BackgroundData | null = null;   
     loading = false;
@@ -199,6 +201,13 @@ export class BackgroundEditorComponent implements OnInit, OnDestroy {
       this.destroy$.next();
       this.destroy$.complete();
     }   
+
+    private invalidateForOwner(slug: string) {
+      this.ssr.invalidateBackground(slug).subscribe({
+        next: () => this.snack.open('SSR cache purged (background)', 'OK', { duration: 1400 }),
+        error: () => this.snack.open('SSR cache purge failed (dev)', 'Dismiss', { duration: 2500 })
+      });
+    }
 
     private loadFromServer() {
       if (!this.owner) return;
@@ -241,14 +250,27 @@ export class BackgroundEditorComponent implements OnInit, OnDestroy {
       if (!this.record) {
         this.service.createBackground(this.owner, values).subscribe(rec => {
           this.saving = false;
-          if (rec) { this.record = rec; this.form.patchValue(rec as any); this.snack.open('Background created', 'OK', { duration: 1500 }); }
-          else { this.snack.open('Failed to create background', 'Dismiss', { duration: 2500 }); }
+          if (rec) { 
+            this.record = rec; this.form.patchValue(rec as any); 
+            this.snack.open('Background created', 'OK', { duration: 1500 });
+            this.invalidateForOwner(this.owner!);
+          }
+          else { 
+            this.snack.open('Failed to create background', 'Dismiss', { duration: 2500 }); 
+          }
         });
       } else {
         this.service.updateBackground(this.record.id, this.owner, values).subscribe(rec => {
           this.saving = false;
-          if (rec) { this.record = rec; this.form.patchValue(rec as any); this.snack.open('Saved', 'OK', { duration: 1200 }); }
-          else { this.snack.open('Failed to save changes', 'Dismiss', { duration: 2500 }); }
+          if (rec) { 
+            this.record = rec; 
+            this.form.patchValue(rec as any); 
+            this.snack.open('Saved', 'OK', { duration: 1200 });
+            this.invalidateForOwner(this.owner!); 
+          }
+          else { 
+            this.snack.open('Failed to save changes', 'Dismiss', { duration: 2500 }); 
+          }
         });
       }
     }
@@ -285,6 +307,7 @@ export class BackgroundEditorComponent implements OnInit, OnDestroy {
             ellipseHeight: 0,
           });
           this.snack.open('Background deleted', 'OK', { duration: 1500 });
+          this.invalidateForOwner(this.owner!);
         } else {
           this.snack.open('Failed to delete', 'Dismiss', { duration: 2500 });
         }

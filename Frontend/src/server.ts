@@ -38,6 +38,19 @@ function logCacheStats(tag: string) {
   );
 }
 
+function deleteKeys(keys: string[]): string[] {
+  const gone: string[] = [];
+  for (const k of keys) {
+    if (ssrCache.delete(k)) gone.push(k);
+  }
+  return gone;
+}
+
+function includesSlugQuery(key: string, slug: string): boolean {
+  const enc = encodeURIComponent(slug);
+  return key.includes(`?slug=${enc}`) || key.includes(`&slug=${enc}`);
+}
+
 // ── Simple LRU cache for HTML ─────────────────────────────────────────────────
 class LRUCache {
   private map = new Map<string, { html: string; size: number }>();
@@ -117,11 +130,29 @@ function normPath(p: string) {
 
 // Typed as RequestHandler → must return void (no value)
 const requireAdminKey: express.RequestHandler = (req, res, next) => {
+  const key = req.header('x-admin-key');
+  const serverHasKey = Boolean(ADMIN_CACHE_KEY);
+  const gotHeader = typeof key === 'string' && key.length > 0;
+  if (!serverHasKey) {
+    console.warn('[SSR-ADMIN] No ADMIN_CACHE_KEY on server');
+    res.status(403).send('ADMIN_CACHE_KEY not set on server');
+    return;
+  }
+  if (!gotHeader) {
+    console.warn('[SSR-ADMIN] Missing x-admin-key header');
+    res.status(401).send('Unauthorized');
+    return;
+  }
+  if (key !== ADMIN_CACHE_KEY) {
+    console.warn('[SSR-ADMIN] x-admin-key mismatch');
+    res.status(401).send('Unauthorized');
+    return;
+  }
   if (!ADMIN_CACHE_KEY) {
     res.status(403).send('ADMIN_CACHE_KEY not set on server');
     return;
   }
-  const key = req.header('x-admin-key');
+  // const key = req.header('x-admin-key');
   if (key !== ADMIN_CACHE_KEY) {
     res.status(401).send('Unauthorized');
     return;
@@ -134,7 +165,94 @@ app.use(compression());
 app.use(express.json());
 
 // ── Admin endpoints (optional but useful) ─────────────────────────────────────
+app.post('/__admin/ssr-cache/invalidate', requireAdminKey, (req, res): void => {
+  const { kind, slug, category, id } = req.body || {};
 
+  // Make badReq return void so "return badReq(...)" is type-safe
+  const badReq = (msg: string): void => {
+    res.status(400).json({ error: msg });
+  };
+
+  type Kind = 'deck' | 'page' | 'project_page' | 'background';
+  const k = String(kind) as Kind;
+
+  if (!k) return badReq('Provide { kind }');
+
+  if (k === 'deck' || k === 'background') {
+    if (!slug) return badReq('Provide { slug } for kind=deck/background');
+  }
+
+  if (k === 'page') {
+    if (!slug || !category) return badReq('Provide { slug, category } for kind=page');
+    if (category !== 'page_one' && category !== 'page_two') {
+      return badReq('category must be "page_one" or "page_two"');
+    }
+  }
+
+  if (k === 'project_page') {
+    const isNumLike = typeof id === 'number' || (typeof id === 'string' && /^\d+$/.test(id));
+    if (!isNumLike) return badReq('Provide numeric { id } for kind=project_page');
+  }
+
+  let toDelete: string[] = [];
+
+  if (k === 'deck') {
+    // Decks render on /:slug
+    toDelete = [`/${slug}`];
+  }
+
+  if (k === 'page') {
+    // /page_one/:slug OR /page_two/:slug + possible ?slug=
+    toDelete = [
+      `/${category}/${slug}`,
+      `/${category}?slug=${encodeURIComponent(slug)}`
+    ];
+  }
+
+  if (k === 'project_page') {
+    const base = `/project_page/${id}`;
+    if (slug) {
+      toDelete = [base, `${base}?slug=${encodeURIComponent(slug)}`];
+    } else {
+      toDelete = [base];
+    }
+  }
+
+  if (k === 'background') {
+    const keys = ssrCache.keys();
+    toDelete = keys.filter(key =>
+      key === `/${slug}` ||
+      key.startsWith(`/page_one/${slug}`) ||
+      key.startsWith(`/page_two/${slug}`) ||
+      includesSlugQuery(key, slug!)
+    );
+
+    // Also include common forms in case cached that way
+    toDelete.push(
+      `/page_one/${slug}`,
+      `/page_two/${slug}`,
+      `/page_one?slug=${encodeURIComponent(slug!)}`,
+      `/page_two?slug=${encodeURIComponent(slug!)}`
+    );
+
+    // Dedupe
+    toDelete = Array.from(new Set(toDelete));
+  }
+
+  const deleted = deleteKeys(toDelete);
+  const stats = ssrCache.stats();
+  logCacheStats(`invalidate ${k} ${slug ?? id ?? ''}`);
+
+  res.json({
+    ok: true,
+    kind: k,
+    slug: slug ?? null,
+    category: category ?? null,
+    id: id ?? null,
+    deleted,
+    stats
+  });
+});
 // Warm (render + cache) specific paths
 app.post('/__admin/ssr-cache/warm', requireAdminKey, async (req, res, next): Promise<void> => {
   try {

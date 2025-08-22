@@ -18,6 +18,8 @@ import { DeckService, DeckDto } from './deck.service';
 import { ConfirmDialogComponent } from '../widgets/confirm-dialog.component';
 import { ImagePickerDialogComponent, ImagePickResult } from '../images/image-picker-dialog.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { SsrCacheService } from '../services/ssr-cache.service';
+
 
 // live preview
 import { DeckComponent } from '../../../app/deck/deck.component'; // <-- adjust path to your DeckComponent
@@ -75,12 +77,24 @@ export class DeckEditorComponent implements OnInit {
   private decksApi = inject(DeckService);
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
+  private ssr = inject(SsrCacheService);
+
 
   owner = signal<string | null>(null);
   decks = signal<DeckDto[]>([]);
   loading = signal(false);
   saving = signal(false);
   deleting = signal(false);
+
+
+  private invalidateLandingCache() {
+    const slug = this.owner();
+    if (!slug) return;
+    this.ssr.invalidateDeck(slug).subscribe({
+      next: () => this.snack.open('Landing cache refreshed', 'OK', { duration: 1200 }),
+      error: (e) => console.warn('SSR invalidate (deck) failed', e),
+    });
+  }
 
   // Default arrays for auto-fill/padding
   private defaults: Record<ArrayKey, number[]> = {
@@ -375,6 +389,7 @@ export class DeckEditorComponent implements OnInit {
           this.snack.open('Deck created', 'OK', { duration: 1500 });
           this.loadDecks();
           this.loadDeck(rec);
+          this.invalidateLandingCache();
         } else {
           this.snack.open('Failed to create deck', 'Dismiss', { duration: 2500 });
         }
@@ -387,6 +402,7 @@ export class DeckEditorComponent implements OnInit {
           const list = this.decks().map(d => d.id === rec.id ? rec : d);
           this.decks.set(list);
           this.loadDeck(rec);
+          this.invalidateLandingCache();
         } else {
           this.snack.open('Failed to save changes', 'Dismiss', { duration: 2500 });
         }
@@ -414,6 +430,7 @@ export class DeckEditorComponent implements OnInit {
           this.snack.open('Deck deleted', 'OK', { duration: 1500 });
           this.decks.set(this.decks().filter(d => d.id !== id));
           this.newDeck();
+          this.invalidateLandingCache();
         } else {
           this.snack.open('Failed to delete deck', 'Dismiss', { duration: 2500 });
         }

@@ -1,59 +1,15 @@
-To operate in school:
-    upadte yaml file to 8080:443
-    search //URL and update to 127.0.0.1:8080
-    go to api service and update it to 127.0.0.1:8080
-
 For Production:
     serve media files with nginx.
-    deck-display-wheel.ts uses any twice. (dont know how not to use)
-    switch client side "127.0.0.1" api calls and server side "backend:8000" calls to
-    an env variable. OR just update api service.
-    add back jwt is authenticated!
-    chnage DockerFiles to copy files
+    deck-display-wheel.ts uses any twice, and many other "any" uses.
+    update the Api service 
+    change DockerFiles to copy files
+    put both django and angular in production
     ctrl + f "URL"
-
-
-For Admin panel:
-    
-    Background data:
-        3 Colors  hex code
-        3 Positions 0-100
-        2 page names strings
-        owner string(slug)
-    
-    images:
-        image .png / .jpg
-        optional upload slug string.
-    
-    Deck component:
-        title text  
-        display_text text
-        owner slug_text
-        image id of the image uploaded
-        ?cards, layout, width, height, text color, text font?
-    
-    ProjectCard component:
-        title text
-        project name text
-        project name color text (hex without #)
-        label letter text (1-2 letters)
-        label color text (hex without #)
-        innner line color text (hex without #)
-        owner slug_text
-        deck id text (id of the deck that owns this card) 
-        image id of the image uploaded
-
-    Pages:
-        schema in swagger.
-
-    NODE server cache control.
- 
+    upgrade LRU cache invalidation to django
 
 to-do:
     ? add "please use desktop - on mobile"
     ? last pass optimisations / seo upgrades / security checks
-
-    Node cache refresh
 
     clean code
 
