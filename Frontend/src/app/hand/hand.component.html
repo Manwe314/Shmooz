@@ -1,15 +1,14 @@
 <div class="hand-container" #handContainerRef>
-  @for (card of displayedCards; track $index; let i = $index; let total = $count)
-  {
-    <app-project-card 
-      class="hand-card" 
-      [card]="card" 
-      (cardClicked)="onCardClicked(card, i)" 
-      (mouseenter)="setHovered(i)" 
-      (mouseleave)="setHovered(null)" 
+  @for (card of displayedCards; track $index; let i = $index; let total = $count) {
+    <app-project-card
+      class="hand-card"
+      [card]="card"
+      (cardClicked)="onCardClicked(card, i)"
+      (mouseenter)="setHovered(i)"
+      (mouseleave)="setHovered(null)"
       [class.discarding]="card.animationState === 'discarding'"
       [style.transform]="getCardTransform(i, total, card)"
       [style.--base-transform]="getCardTransform(i, total, card)"
-      ></app-project-card>
+    ></app-project-card>
   }
 </div>

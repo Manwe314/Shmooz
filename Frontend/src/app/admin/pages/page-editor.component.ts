@@ -1,32 +1,45 @@
-import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  ReactiveFormsModule, FormBuilder, Validators,
-  FormGroup, FormControl, FormArray, AbstractControl
-} from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-
-import { SlugService } from '../slugs/slug.service';
-import { DeckService, DeckDto } from '../decks/deck.service';
-import { ProjectCardsService as PublicCardsService, ProjectCard as PublicProjectCard } from '../../../app/services/project-cards.service';
-import { AdminPageApiService, Block, BlockContent, PageData, PageCategory } from './page-api.service';
-import { PagePreviewComponent } from './page-preview.component';
-import { ImagePickerDialogComponent, ImagePickResult } from '../images/image-picker-dialog.component';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ErrorDialogComponent } from '../widgets/error-dialog.component';
+import { Component, inject,OnInit } from '@angular/core';
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
+import {
+  ProjectCard as PublicProjectCard,
+  ProjectCardsService as PublicCardsService,
+} from '../../../app/services/project-cards.service';
+import { DeckDto,DeckService } from '../decks/deck.service';
+import {
+  ImagePickerDialogComponent,
+  ImagePickResult,
+} from '../images/image-picker-dialog.component';
 import { SsrCacheService } from '../services/ssr-cache.service';
-
-
+import { SlugService } from '../slugs/slug.service';
+import { ErrorDialogComponent } from '../widgets/error-dialog.component';
+import {
+  AdminPageApiService,
+  Block,
+  BlockContent,
+  PageData,
+} from './page-api.service';
+import { PagePreviewComponent } from './page-preview.component';
 
 type TargetType = 'nav' | 'project';
 
@@ -39,7 +52,7 @@ type BlockForm = FormGroup<{
   tag: FormControl<string | null>;
   content: FormArray<ContentForm>;
 }>;
-type ContentForm = FormGroup<any>; // specific per type
+type ContentForm = FormGroup<any>;
 
 @Component({
   selector: 'app-page-editor',
@@ -61,18 +74,17 @@ type ContentForm = FormGroup<any>; // specific per type
     PagePreviewComponent,
   ],
   templateUrl: './page-editor.component.html',
-  styleUrl: './page-editor.component.css'
+  styleUrl: './page-editor.component.css',
 })
 export class PageEditorComponent implements OnInit {
   private fb = inject(FormBuilder);
   private slugs = inject(SlugService);
   private decksApi = inject(DeckService);
-  private publicCardsApi = inject(PublicCardsService); // to list project cards for a deck
+  private publicCardsApi = inject(PublicCardsService);
   private pagesApi = inject(AdminPageApiService);
   private snack = inject(MatSnackBar);
   private dialog = inject(MatDialog);
   private ssr = inject(SsrCacheService);
-
 
   ownerSlug: string | null = null;
   targetType: TargetType = 'nav';
@@ -82,39 +94,38 @@ export class PageEditorComponent implements OnInit {
   selectedDeckId: number | null = null;
   selectedProjectCardId: number | null = null;
 
-  currentPageId: number | null = null; // if loaded existing
+  currentPageId: number | null = null;
 
   saving = false;
   showGridOverlay = false;
 
-  // Blocks form array
+  
   blocks = this.fb.array<BlockForm>([]);
 
-  private invalidatePageCache(kind: 'created' | 'updated' | 'deleted' = 'updated') {
+  private invalidatePageCache(_kind: 'created' | 'updated' | 'deleted' = 'updated') {
     const slug = this.ownerSlug;
     if (!slug) return;
 
     if (this.targetType === 'nav') {
-      // /page_one/:slug or /page_two/:slug
       this.ssr.invalidatePage(this.navCategory, slug).subscribe({
-        next: () => this.snack.open(`Cache cleared for ${this.navCategory}`, 'OK', { duration: 1200 }),
+        next: () =>
+          this.snack.open(`Cache cleared for ${this.navCategory}`, 'OK', { duration: 1200 }),
         error: (e) => console.warn('SSR invalidate (nav page) failed', e),
       });
     } else {
-      // project page → /project_page/:id
       const id = this.selectedProjectCardId;
       if (!id) return;
       this.ssr.invalidateProjectPage(id, slug).subscribe({
-        next: () => this.snack.open(`Cache cleared for project page #${id}`, 'OK', { duration: 1200 }),
+        next: () =>
+          this.snack.open(`Cache cleared for project page #${id}`, 'OK', { duration: 1200 }),
         error: (e) => console.warn('SSR invalidate (project page) failed', e),
       });
     }
   }
 
-
   ngOnInit() {
     this.ownerSlug = this.slugs.selectedSlugSnapshot?.slug ?? null;
-    this.slugs.selectedSlug$.subscribe(s => {
+    this.slugs.selectedSlug$.subscribe((s) => {
       this.ownerSlug = s?.slug ?? null;
       this.clearAll();
       this.loadDecks();
@@ -122,12 +133,9 @@ export class PageEditorComponent implements OnInit {
     this.loadDecks();
   }
 
-  
-
-  /* ----------------- Target selection ----------------- */
   loadDecks() {
     if (!this.ownerSlug) return;
-    this.decksApi.listByOwner(this.ownerSlug, 100).subscribe(list => {
+    this.decksApi.listByOwner(this.ownerSlug, 100).subscribe((list) => {
       this.decks = list;
     });
   }
@@ -137,50 +145,48 @@ export class PageEditorComponent implements OnInit {
     this.selectedProjectCardId = null;
     this.projectCards = [];
     if (!deckId || !this.ownerSlug) return;
-    // Reuse public service to list project cards:
-    this.publicCardsApi
-      .getCardsForDeck(this.ownerSlug, String(deckId))
-      .subscribe(cards => { this.projectCards = cards; });
+    this.publicCardsApi.getCardsForDeck(this.ownerSlug, String(deckId)).subscribe((cards) => {
+      this.projectCards = cards;
+    });
   }
 
-    async loadExisting() {
-      if (!this.ownerSlug) return;
-      const owner = this.ownerSlug;
+  async loadExisting() {
+    if (!this.ownerSlug) return;
+    const owner = this.ownerSlug;
 
-      let rec$;
-      if (this.targetType === 'nav') {
-        rec$ = this.pagesApi.getNavPage(owner, this.navCategory);
-      } else {
-        if (!this.selectedProjectCardId) {
-          this.snack.open('Choose a project card', 'OK', { duration: 1500 });
-          return;
-        }
-        rec$ = this.pagesApi.getProjectPage(this.selectedProjectCardId);
+    let rec$;
+    if (this.targetType === 'nav') {
+      rec$ = this.pagesApi.getNavPage(owner, this.navCategory);
+    } else {
+      if (!this.selectedProjectCardId) {
+        this.snack.open('Choose a project card', 'OK', { duration: 1500 });
+        return;
       }
-
-      rec$.subscribe(rec => {
-        if (!rec) {
-          this.snack.open('No page found. You can create a new one.', 'OK', { duration: 2000 });
-          this.currentPageId = null;
-          this.blocks.clear();
-          return;
-        }
-        this.currentPageId = rec.id;
-
-        try {
-          const raw = typeof rec.content === 'string' ? JSON.parse(rec.content) : (rec.content as any);
-          // ✅ accept both shapes: array OR { content: [...] }
-          const blocks = Array.isArray(raw) ? raw : (raw?.content ?? []);
-          this.loadBlocks(blocks);
-          this.snack.open('Page loaded', 'OK', { duration: 1200 });
-        } catch (e) {
-          console.error('Failed to parse page content', e);
-          this.snack.open('Invalid page content JSON', 'Dismiss', { duration: 2500 });
-        }
-      });
+      rec$ = this.pagesApi.getProjectPage(this.selectedProjectCardId);
     }
 
-  /* ----------------- Form builders ----------------- */
+    rec$.subscribe((rec) => {
+      if (!rec) {
+        this.snack.open('No page found. You can create a new one.', 'OK', { duration: 2000 });
+        this.currentPageId = null;
+        this.blocks.clear();
+        return;
+      }
+      this.currentPageId = rec.id;
+
+      try {
+        const raw =
+          typeof rec.content === 'string' ? JSON.parse(rec.content) : (rec.content as any);
+        const blocks = Array.isArray(raw) ? raw : (raw?.content ?? []);
+        this.loadBlocks(blocks);
+        this.snack.open('Page loaded', 'OK', { duration: 1200 });
+      } catch (e) {
+        console.error('Failed to parse page content', e);
+        this.snack.open('Invalid page content JSON', 'Dismiss', { duration: 2500 });
+      }
+    });
+  }
+
   private gid(prefix: string) {
     return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
   }
@@ -217,9 +223,9 @@ export class PageEditorComponent implements OnInit {
       url: this.fb.nonNullable.control('', Validators.required),
       alt: this.fb.control<string | null>(null),
       borderRadius: this.fb.control<string | null>('8px'),
-      objectFit: this.fb.control<'cover'|'contain'|'fill'|'none'|'scale-down'>('cover'),
+      objectFit: this.fb.control<'cover' | 'contain' | 'fill' | 'none' | 'scale-down'>('cover'),
       objectPosition: this.fb.control<string | null>('center'),
-      overflow: this.fb.control<'visible'|'hidden'|'scroll'>('hidden'),
+      overflow: this.fb.control<'visible' | 'hidden' | 'scroll'>('hidden'),
       width: this.fb.control<string | null>('100%'),
       height: this.fb.control<string | null>('auto'),
     });
@@ -231,10 +237,10 @@ export class PageEditorComponent implements OnInit {
       ...this.baseContentControls(),
       text: this.fb.nonNullable.control('', Validators.required),
       color: this.fb.control<string | null>('#ffffff'),
-      tag: this.fb.control<'p'|'h1'|'h2'|'span'|'div' | null>('p'),
-      horizontalAlign: this.fb.control<'left'|'center'|'right' | null>('center'),
-      verticalAlign: this.fb.control<'top'|'center'|'bottom' | null>('center'),
-      textAlign: this.fb.control<'left'|'center'|'right' | null>('center'),
+      tag: this.fb.control<'p' | 'h1' | 'h2' | 'span' | 'div' | null>('p'),
+      horizontalAlign: this.fb.control<'left' | 'center' | 'right' | null>('center'),
+      verticalAlign: this.fb.control<'top' | 'center' | 'bottom' | null>('center'),
+      textAlign: this.fb.control<'left' | 'center' | 'right' | null>('center'),
       fontSize: this.fb.control<string | null>(null),
       fontWeight: this.fb.control<string | number | null>(null),
       fontFamily: this.fb.control<string | null>(null),
@@ -249,22 +255,30 @@ export class PageEditorComponent implements OnInit {
       text: this.fb.nonNullable.control('', Validators.required),
       iconUrl: this.fb.control<string | null>(null),
       color: this.fb.control<string | null>('#ffffff'),
-      horizontalAlign: this.fb.control<'left'|'center'|'right' | null>('center'),
-      verticalAlign: this.fb.control<'top'|'center'|'bottom' | null>('center'),
+      horizontalAlign: this.fb.control<'left' | 'center' | 'right' | null>('center'),
+      verticalAlign: this.fb.control<'top' | 'center' | 'bottom' | null>('center'),
       fontSize: this.fb.control<string | null>(null),
       fontWeight: this.fb.control<string | number | null>(null),
       fontFamily: this.fb.control<string | null>(null),
-      iconPosition: this.fb.control<'left'|'right' | null>('left'),
+      iconPosition: this.fb.control<'left' | 'right' | null>('left'),
     });
   }
 
-  /* ----------------- Block / Content ops ----------------- */
-  addBlock() { this.blocks.push(this.newBlockForm()); }
-  removeBlock(i: number) { this.blocks.removeAt(i); }
+  addBlock() {
+    this.blocks.push(this.newBlockForm());
+  }
+  removeBlock(i: number) {
+    this.blocks.removeAt(i);
+  }
 
-  addContent(i: number, type: 'image'|'text'|'link') {
+  addContent(i: number, type: 'image' | 'text' | 'link') {
     const arr = this.blocks.at(i).controls.content as FormArray<ContentForm>;
-    const form = type === 'image' ? this.imageContentForm() : type === 'text' ? this.textContentForm() : this.linkContentForm();
+    const form =
+      type === 'image'
+        ? this.imageContentForm()
+        : type === 'text'
+          ? this.textContentForm()
+          : this.linkContentForm();
     arr.push(form);
   }
   removeContent(blockIndex: number, contentIndex: number) {
@@ -276,45 +290,41 @@ export class PageEditorComponent implements OnInit {
     if (!this.ownerSlug) return;
     const ref = this.dialog.open(ImagePickerDialogComponent, {
       data: { ownerSlug: this.ownerSlug },
-      width: '900px',          
-      maxWidth: '90vw',        
-      minWidth: '400px',       
-      panelClass: 'image-picker-dialog' 
+      width: '900px',
+      maxWidth: '90vw',
+      minWidth: '400px',
+      panelClass: 'image-picker-dialog',
     });
     ref.afterClosed().subscribe((res: ImagePickResult | null) => {
       if (!res) return;
       const arr = this.blocks.at(blockIndex).controls.content as FormArray<ContentForm>;
       const ctrl = arr.at(contentIndex);
       if (ctrl?.value?.type === 'image') {
-        ctrl.patchValue({ url: res.path }); // normalized /media/...
+        ctrl.patchValue({ url: res.path });
       } else if (ctrl?.value?.type === 'link') {
-        // if they wanted an icon
         ctrl.patchValue({ iconUrl: res.path });
       }
     });
   }
 
-    toggleBlockTag(b: FormGroup, checked: boolean) {
-      const tagCtrl = b.get('tag') as FormControl<string | null> | null;
-      if (tagCtrl) {
-        tagCtrl.setValue(checked ? 'borderTarget' : null);
-      } else {
-        // In case 'tag' control wasn't created (defensive)
-        b.addControl('tag', new FormControl<string | null>(checked ? 'borderTarget' : null));
-      }
+  toggleBlockTag(b: FormGroup, checked: boolean) {
+    const tagCtrl = b.get('tag') as FormControl<string | null> | null;
+    if (tagCtrl) {
+      tagCtrl.setValue(checked ? 'borderTarget' : null);
+    } else {
+      b.addControl('tag', new FormControl<string | null>(checked ? 'borderTarget' : null));
     }
+  }
 
-    // Toggle image tag (sets/clears 'imageTarget' on the Content form group)
-    toggleImageTag(c: FormGroup, checked: boolean) {
-      let tagCtrl = c.get('tag') as FormControl<string | null> | null;
-      if (!tagCtrl) {
-        tagCtrl = new FormControl<string | null>(null);
-        c.addControl('tag', tagCtrl);
-      }
-      tagCtrl.setValue(checked ? 'imageTarget' : null);
+  toggleImageTag(c: FormGroup, checked: boolean) {
+    let tagCtrl = c.get('tag') as FormControl<string | null> | null;
+    if (!tagCtrl) {
+      tagCtrl = new FormControl<string | null>(null);
+      c.addControl('tag', tagCtrl);
     }
+    tagCtrl.setValue(checked ? 'imageTarget' : null);
+  }
 
-  /* ----------------- Build/Load content ----------------- */
   private loadBlocks(blocks: Block[]) {
     this.blocks.clear();
     for (const b of blocks) {
@@ -348,12 +358,13 @@ export class PageEditorComponent implements OnInit {
   }
 
   private buildPageData(): PageData {
-    const blocks: Block[] = this.blocks.controls.map(bf => {
+    const blocks: Block[] = this.blocks.controls.map((bf) => {
       const v = bf.getRawValue();
-      const content: BlockContent[] = (bf.controls.content.controls).map(cf => {
+      const content: BlockContent[] = bf.controls.content.controls.map((cf) => {
         const cv = cf.getRawValue();
-        // Cast fields to correct optionality; drop nulls
-        const clean = Object.fromEntries(Object.entries(cv).filter(([,val]) => val !== null && val !== undefined));
+        const clean = Object.fromEntries(
+          Object.entries(cv).filter(([, val]) => val !== null && val !== undefined),
+        );
         return clean as any;
       });
       return {
@@ -363,188 +374,199 @@ export class PageEditorComponent implements OnInit {
         gridTemplateColumns: v.gridTemplateColumns,
         gridTemplateRows: v.gridTemplateRows,
         tag: v.tag || undefined,
-        content
+        content,
       };
     });
     return { content: blocks };
   }
 
-  /* ----------------- Actions ----------------- */
   clearAll() {
     this.blocks.clear();
     this.currentPageId = null;
   }
 
-    save() {
-      if (!this.ownerSlug) {
-        this.snack.open('No slug selected', 'Dismiss', { duration: 2000 });
+  save() {
+    if (!this.ownerSlug) {
+      this.snack.open('No slug selected', 'Dismiss', { duration: 2000 });
+      return;
+    }
+
+    let projectCardId: number | undefined;
+    let category: 'page_one' | 'page_two' | `project_${number}`;
+
+    if (this.targetType === 'nav') {
+      category = this.navCategory;
+    } else {
+      if (!this.selectedProjectCardId) {
+        this.snack.open('Choose a project card', 'OK', { duration: 1500 });
         return;
       }
+      projectCardId = this.selectedProjectCardId;
+      category = `project_${projectCardId}`;
+    }
 
-      let projectCardId: number | undefined;
-      let category: 'page_one' | 'page_two' | `project_${number}`;
+    const content = this.buildBlocksPayload();
 
-      if (this.targetType === 'nav') {
-        category = this.navCategory;
-      } else {
-        if (!this.selectedProjectCardId) {
-          this.snack.open('Choose a project card', 'OK', { duration: 1500 });
-          return;
+    const body: any = {
+      owner: this.ownerSlug,
+      category,
+      content,
+      ...(projectCardId ? { project_card_id: projectCardId } : {}),
+    };
+
+    this.saving = true;
+
+    if (this.currentPageId) {
+      this.pagesApi.updatePage(this.currentPageId, body).subscribe({
+        next: () => {
+          this.saving = false;
+          this.snack.open('Page updated', 'OK', { duration: 1500 });
+          this.invalidatePageCache('updated');
+        },
+        error: (err) => {
+          this.saving = false;
+          this.showSaveError(err);
+        },
+      });
+    } else {
+      this.pagesApi.uploadPage(this.ownerSlug, category, content, projectCardId).subscribe({
+        next: (rec) => {
+          this.saving = false;
+          this.currentPageId = rec.id;
+          this.snack.open('Page created', 'OK', { duration: 1500 });
+          this.invalidatePageCache('updated');
+        },
+        error: (err) => {
+          this.saving = false;
+          this.showSaveError(err);
+        },
+      });
+    }
+  }
+
+  confirmDelete() {
+    if (!this.currentPageId) return;
+    const ok = confirm('Delete this page? This cannot be undone.');
+    if (!ok) return;
+    this.pagesApi.deletePage(this.currentPageId).subscribe({
+      next: () => {
+        this.snack.open('Page deleted', 'OK', { duration: 1500 });
+        this.currentPageId = null;
+        this.clearAll();
+        this.invalidatePageCache('updated');
+      },
+      error: (err) => {
+        const details = this.formatHttpError(err);
+        const ref = this.snack.open('Delete failed — see details', 'Details', { duration: 6000 });
+        ref.onAction().subscribe(() => {
+          this.dialog.open(ErrorDialogComponent, {
+            data: { title: 'Page delete failed', details },
+          });
+        });
+      },
+    });
+  }
+
+  private normalizeMediaPath(input?: string | null): string | undefined {
+    if (!input) return undefined;
+    const MEDIA = '/media';
+    try {
+      const u = new URL(input, location.origin);
+      const p = u.pathname;
+      const i = p.indexOf(MEDIA);
+      if (i !== -1) return p.slice(i);
+      if (p.startsWith('media')) return '/' + p;
+      if (input.startsWith('media')) return '/' + input;
+      return input;
+    } catch {
+      const i = input.indexOf(MEDIA);
+      if (i !== -1) return input.slice(i);
+      if (input.startsWith('media')) return '/' + input;
+      return input;
+    }
+  }
+
+  private buildBlocksPayload() {
+    return this.blocks.controls.map((bf) => {
+      const bv = bf.getRawValue();
+      const items = bf.controls.content.controls.map((cf) => {
+        const cv: any = cf.getRawValue();
+
+        if (cv.type === 'image' && cv.url) {
+          cv.url = this.normalizeMediaPath(cv.url);
         }
-        projectCardId = this.selectedProjectCardId;
-        category = `project_${projectCardId}`;
-      }
+        if (cv.type === 'link' && cv.iconUrl) {
+          const normalized = this.normalizeMediaPath(cv.iconUrl);
+          if (normalized && normalized.startsWith('/media')) cv.iconUrl = normalized;
+        }
+        return cv;
+      });
 
-      const content = this.buildBlocksPayload(); // ✅ array of blocks with '/media/...'
-
-      // Serializer expects `project_card_id` (write_only)
-      const body: any = {
-        owner: this.ownerSlug,
-        category,
-        content,
-        ...(projectCardId ? { project_card_id: projectCardId } : {})
+      return {
+        id: bv.id,
+        backgroundColor: bv.backgroundColor || 'transparent',
+        borderColor: bv.borderColor || 'transparent',
+        gridTemplateColumns: bv.gridTemplateColumns || '1fr',
+        gridTemplateRows: bv.gridTemplateRows || 'auto',
+        ...(bv.tag ? { tag: bv.tag } : {}),
+        content: items,
       };
+    });
+  }
+  get previewBlocks(): Block[] {
+    return this.blocks.controls.map((bf) => {
+      const v = bf.getRawValue();
+      const content = bf.controls.content.controls.map((cf) => cf.getRawValue());
+      return {
+        id: v.id!,
+        backgroundColor: v.backgroundColor || 'transparent',
+        borderColor: v.borderColor || 'transparent',
+        gridTemplateColumns: v.gridTemplateColumns || '1fr',
+        gridTemplateRows: v.gridTemplateRows || 'auto',
+        tag: v.tag ?? undefined,
+        content,
+      } as Block;
+    });
+  }
 
-      this.saving = true;
+  private formatHttpError(err: HttpErrorResponse): string {
+    if (!err) return 'Unknown error';
+    if (err.status === 0) return 'Network error: cannot reach the server.';
+    const parts: string[] = [`Status: ${err.status} ${err.statusText || ''}`.trim()];
+    if (err.url) parts.push(`URL: ${err.url}`);
+    if (err.error) {
+      parts.push(this.flattenErrors(err.error) || String(err.error));
+    }
+    return parts.join('\n\n');
+  }
 
-      if (this.currentPageId) {
-        this.pagesApi.updatePage(this.currentPageId, body).subscribe({
-          next: () => { this.saving = false; this.snack.open('Page updated', 'OK', { duration: 1500 }); this.invalidatePageCache('updated'); },
-          error: err => { this.saving = false; this.showSaveError(err); }
-        });
-      } else {
-        this.pagesApi.uploadPage(this.ownerSlug, category, content, projectCardId).subscribe({
-          next: rec => { this.saving = false; this.currentPageId = rec.id; this.snack.open('Page created', 'OK', { duration: 1500 }); this.invalidatePageCache('updated'); },
-          error: err => { this.saving = false; this.showSaveError(err); }
-        });
+  private flattenErrors(e: any, prefix = ''): string {
+    if (e == null) return '';
+    if (typeof e === 'string') return e;
+    if (Array.isArray(e)) {
+      return e
+        .map((v, i) => this.flattenErrors(v, `${prefix}[${i}]`))
+        .filter(Boolean)
+        .join('\n');
+    }
+    if (typeof e === 'object') {
+      const lines: string[] = [];
+      for (const [k, v] of Object.entries(e)) {
+        const p = prefix ? `${prefix}.${k}` : k;
+        if (typeof v === 'string') lines.push(`${p}: ${v}`);
+        else lines.push(this.flattenErrors(v, p));
       }
+      return lines.filter(Boolean).join('\n');
     }
+    return `${prefix}: ${String(e)}`;
+  }
 
-    confirmDelete() {
-      if (!this.currentPageId) return;
-      const ok = confirm('Delete this page? This cannot be undone.');
-      if (!ok) return;
-      this.pagesApi.deletePage(this.currentPageId).subscribe({
-          next: () => {
-            this.snack.open('Page deleted', 'OK', { duration: 1500 });
-            this.currentPageId = null;
-            this.clearAll();
-            this.invalidatePageCache('updated');
-          },
-          error: (err) => {
-            const details = this.formatHttpError(err);
-            const ref = this.snack.open('Delete failed — see details', 'Details', { duration: 6000 });
-            ref.onAction().subscribe(() => {
-              this.dialog.open(ErrorDialogComponent, { data: { title: 'Page delete failed', details } });
-            });
-          }
-        });
-    }
-
-    private normalizeMediaPath(input?: string | null): string | undefined {
-      if (!input) return undefined;
-      const MEDIA = '/media';
-      try {
-        // Try to parse even relative; base on current origin
-        const u = new URL(input, location.origin);
-        const p = u.pathname;
-        const i = p.indexOf(MEDIA);
-        if (i !== -1) return p.slice(i);                 // '/media/...'
-        if (p.startsWith('media')) return '/' + p;       // 'media/...' -> '/media/...'
-        if (input.startsWith('media')) return '/' + input;
-        return input; // leave as-is if no /media segment
-      } catch {
-        // Non-URL string
-        const i = input.indexOf(MEDIA);
-        if (i !== -1) return input.slice(i);
-        if (input.startsWith('media')) return '/' + input;
-        return input;
-      }
-    }
-
-    
-    private buildBlocksPayload() {
-      return this.blocks.controls.map(bf => {
-        const bv = bf.getRawValue();
-        const items = bf.controls.content.controls.map(cf => {
-          const cv: any = cf.getRawValue();
-
-          if (cv.type === 'image' && cv.url) {
-            cv.url = this.normalizeMediaPath(cv.url);
-          }
-          if (cv.type === 'link' && cv.iconUrl) {
-            const normalized = this.normalizeMediaPath(cv.iconUrl);
-            // Only replace if it actually refers to /media; keep external URLs
-            if (normalized && normalized.startsWith('/media')) cv.iconUrl = normalized;
-          }
-          return cv;
-        });
-
-        return {
-          id: bv.id,
-          backgroundColor: bv.backgroundColor || 'transparent',
-          borderColor: bv.borderColor || 'transparent',
-          gridTemplateColumns: bv.gridTemplateColumns || '1fr',
-          gridTemplateRows: bv.gridTemplateRows || 'auto',
-          ...(bv.tag ? { tag: bv.tag } : {}),
-          content: items
-        };
-      });
-    }
-    get previewBlocks(): Block[] {
-        return this.blocks.controls.map(bf => {
-          const v = bf.getRawValue();
-          const content = (bf.controls.content.controls).map(cf => cf.getRawValue());
-          return {
-            id: v.id!, // generated by gid()
-            backgroundColor: v.backgroundColor || 'transparent',
-            borderColor: v.borderColor || 'transparent',
-            gridTemplateColumns: v.gridTemplateColumns || '1fr',
-            gridTemplateRows: v.gridTemplateRows || 'auto',
-            tag: v.tag ?? undefined,
-            content
-          } as Block;
-        });
-    }
-
-    private formatHttpError(err: HttpErrorResponse): string {
-      if (!err) return 'Unknown error';
-      if (err.status === 0) return 'Network error: cannot reach the server.';
-      const parts: string[] = [
-        `Status: ${err.status} ${err.statusText || ''}`.trim()
-      ];
-      if (err.url) parts.push(`URL: ${err.url}`);
-      if (err.error) {
-        parts.push(this.flattenErrors(err.error) || String(err.error));
-      }
-      return parts.join('\n\n');
-    }
-
-    private flattenErrors(e: any, prefix = ''): string {
-      if (e == null) return '';
-      if (typeof e === 'string') return e;
-      if (Array.isArray(e)) {
-        return e.map((v, i) => this.flattenErrors(v, `${prefix}[${i}]`)).filter(Boolean).join('\n');
-      }
-      if (typeof e === 'object') {
-        const lines: string[] = [];
-        for (const [k, v] of Object.entries(e)) {
-          const p = prefix ? `${prefix}.${k}` : k;
-          if (typeof v === 'string') lines.push(`${p}: ${v}`);
-          else lines.push(this.flattenErrors(v, p));
-        }
-        return lines.filter(Boolean).join('\n');
-      }
-      return `${prefix}: ${String(e)}`;
-    }
-
-    private showSaveError(err: HttpErrorResponse) {
-      const details = this.formatHttpError(err);
-      const ref = this.snack.open('Save failed — see details', 'Details', { duration: 6000 });
-      ref.onAction().subscribe(() => {
-        this.dialog.open(ErrorDialogComponent, { data: { title: 'Page save failed', details } });
-      });
-      // also log the payload in console for quick dev inspection
-      console.error('[PageEditor] Save failed', err);
-    }
+  private showSaveError(err: HttpErrorResponse) {
+    const details = this.formatHttpError(err);
+    const ref = this.snack.open('Save failed — see details', 'Details', { duration: 6000 });
+    ref.onAction().subscribe(() => {
+      this.dialog.open(ErrorDialogComponent, { data: { title: 'Page save failed', details } });
+    });
+    console.error('[PageEditor] Save failed', err);
+  }
 }

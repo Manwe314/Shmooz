@@ -1,7 +1,8 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { inject,Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, map, shareReplay } from 'rxjs/operators';
+
 import { ApiService } from '../../services/api.service';
 
 @Injectable({ providedIn: 'root' })
@@ -12,24 +13,26 @@ export class CsrfService {
 
   private hasCookie(name = 'csrftoken'): boolean {
     if (typeof document === 'undefined') return false;
-    return document.cookie.split(';').some(c => c.trim().startsWith(`${name}=`));
-    // If you want stronger guarantees, you can always hit the endpoint.
+    return document.cookie.split(';').some((c) => c.trim().startsWith(`${name}=`));
   }
 
-  /** Ensure CSRFTOKEN cookie exists by calling /api/auth/csrf/ once. */
   ensureCsrfCookie(): Observable<boolean> {
     if (this.hasCookie()) return of(true);
 
     if (!this.inflight$) {
-      this.inflight$ = this.http.get(
-        this.api.buildUrl('auth/csrf/'),
-        { withCredentials: true }               // accept Set-Cookie
-      ).pipe(
-        map(() => true),
-        catchError(() => of(false)),
-        finalize(() => { this.inflight$ = undefined; }),
-        shareReplay(1)
-      );
+      this.inflight$ = this.http
+        .get(
+          this.api.buildUrl('auth/csrf/'),
+          { withCredentials: true },
+        )
+        .pipe(
+          map(() => true),
+          catchError(() => of(false)),
+          finalize(() => {
+            this.inflight$ = undefined;
+          }),
+          shareReplay(1),
+        );
     }
     return this.inflight$;
   }

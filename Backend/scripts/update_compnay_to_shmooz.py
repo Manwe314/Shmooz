@@ -1,11 +1,12 @@
 import os
+
 import django
 
 # --- Setup Django environment ---
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shmooz.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "shmooz.settings")
 django.setup()
 
-from portfolio.models import BackgroundData, Deck, ProjectCard, PagesModel
+from portfolio.models import BackgroundData, Deck, PagesModel, ProjectCard
 
 # --- Update BackgroundData ---
 bg_updated = BackgroundData.objects.filter(owner="COMPANY").update(owner="shmooz")

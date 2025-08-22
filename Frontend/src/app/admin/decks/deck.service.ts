@@ -1,8 +1,9 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ApiService } from '../../services/api.service';
+import { inject,Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+
+import { ApiService } from '../../services/api.service';
 
 export interface DeckDto {
   id: number;
@@ -49,35 +50,49 @@ export class DeckService {
   private api = inject(ApiService);
 
   listByOwner(ownerSlug: string, limit = 100): Observable<DeckDto[]> {
-    const url = this.api.buildUrl(`deck/${encodeURIComponent(ownerSlug)}?ordering=-edited_at&limit=${limit}`);
+    const url = this.api.buildUrl(
+      `deck/${encodeURIComponent(ownerSlug)}?ordering=-edited_at&limit=${limit}`,
+    );
     return this.http.get<Page<DeckDto>>(url).pipe(
-      map(p => p.results || []),
-      catchError(err => {
+      map((p) => p.results || []),
+      catchError((err) => {
         console.error('Failed to fetch decks', err);
         return of([]);
-      })
+      }),
     );
   }
 
   createDeck(
     ownerSlug: string,
-    body: Partial<DeckDto> & { title: string; displayed_name: string; image_id?: number; hover_img_id?: number; owner: string }
+    body: Partial<DeckDto> & {
+      title: string;
+      displayed_name: string;
+      image_id?: number;
+      hover_img_id?: number;
+      owner: string;
+    },
   ): Observable<DeckDto | null> {
     const url = this.api.buildUrl(`auth/create_deck/${encodeURIComponent(ownerSlug)}`);
     return this.http.post<DeckDto>(url, body).pipe(
-      catchError(err => { console.error('Create deck failed', err); return of(null); })
+      catchError((err) => {
+        console.error('Create deck failed', err);
+        return of(null);
+      }),
     );
   }
 
   updateDeck(
     id: number,
     ownerSlug: string,
-    patch: Omit<Partial<DeckDto>, 'owner'>
+    patch: Omit<Partial<DeckDto>, 'owner'>,
   ): Observable<DeckDto | null> {
     const url = this.api.buildUrl(`auth/alter_deck/${id}`);
     const body = { ...patch, owner: ownerSlug };
     return this.http.put<DeckDto>(url, body).pipe(
-      catchError(err => { console.error('Update deck failed', err); return of(null); })
+      catchError((err) => {
+        console.error('Update deck failed', err);
+        return of(null);
+      }),
     );
   }
 
@@ -85,7 +100,10 @@ export class DeckService {
     const url = this.api.buildUrl(`auth/alter_deck/${id}`);
     return this.http.delete(url).pipe(
       map(() => true),
-      catchError(err => { console.error('Delete deck failed', err); return of(false); })
+      catchError((err) => {
+        console.error('Delete deck failed', err);
+        return of(false);
+      }),
     );
   }
 }

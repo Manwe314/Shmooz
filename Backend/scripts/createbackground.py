@@ -2,7 +2,6 @@
 
 from portfolio.models import BackgroundData
 
-
 # First entry
 bg1 = BackgroundData.objects.create(
     owner="kuxi",
@@ -13,7 +12,7 @@ bg1 = BackgroundData.objects.create(
     position2="38%",
     position3="80%",
     page1="About-me",
-    page2="CV"
+    page2="CV",
 )
 print(f"✅ Created BackgroundData entry 1 with ID: {bg1.id}")
 
@@ -27,7 +26,6 @@ bg2 = BackgroundData.objects.create(
     position2="46%",
     position3="71%",
     page1="About-us",
-    page2="Contact-us"
+    page2="Contact-us",
 )
 print(f"✅ Created BackgroundData entry 2 with ID: {bg2.id}")
-

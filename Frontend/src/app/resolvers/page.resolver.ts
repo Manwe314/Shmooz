@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot,Resolve } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { catchError, tap, map } from 'rxjs/operators';
+import { catchError, map,tap } from 'rxjs/operators';
+
 import { PageService } from '../services/page.service';
-import { SlugService } from '../services/slug.service';
 import { SeoService } from '../services/seo.service';
+import { SlugService } from '../services/slug.service';
 
 @Injectable({ providedIn: 'root' })
 export class PageResolver implements Resolve<boolean> {
@@ -21,13 +22,13 @@ export class PageResolver implements Resolve<boolean> {
 
     this.seoService.setCanonical(path);
     return this.pageService.getPageData(path, slug, id).pipe(
-      tap(data => this.pageService.setContent(data)),
-      map(() => true), 
-      catchError(err => {
+      tap((data) => this.pageService.setContent(data)),
+      map(() => true),
+      catchError((err) => {
         console.error('[PageResolver] failed to load page data', err);
         this.pageService.setContent({ content: [] });
-        return of(true); 
-      })
+        return of(true);
+      }),
     );
   }
 }

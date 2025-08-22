@@ -1,6 +1,6 @@
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { DOCUMENT } from '@angular/common';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 
 export interface WindowLike {
   innerWidth: number;
@@ -10,8 +10,16 @@ export interface WindowLike {
   requestAnimationFrame(cb: FrameRequestCallback): number;
   cancelAnimationFrame(id: number): void;
   matchMedia(query: string): { matches: boolean };
-  addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+  addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions,
+  ): void;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -45,23 +53,24 @@ export class PlatformService {
     };
   }
 
-  // ---------- Private ----------
+  /*~~~~~~~~ Private~~~~~~~~ */
 
-  /** No-op SSR window stub so app code can read viewport & attach listeners safely */
   private readonly ssrWindowStub: WindowLike = {
     innerWidth: 1280,
     innerHeight: 800,
     scrollX: 0,
     scrollY: 0,
     requestAnimationFrame: (cb: FrameRequestCallback): number =>
-      // simulate ~60fps tick; cast to number for API compatibility
-      (setTimeout(() => cb(Date.now()), 16) as unknown as number),
+      setTimeout(() => cb(Date.now()), 16) as unknown as number,
     cancelAnimationFrame: (id: number): void => {
       clearTimeout(id as unknown as NodeJS.Timeout);
     },
     matchMedia: (_q: string) => ({ matches: false }),
-    addEventListener: () => { /* no-op on SSR */ },
-    removeEventListener: () => { /* no-op on SSR */ },
+    addEventListener: () => {
+      /* no-op on SSR */
+    },
+    removeEventListener: () => {
+      /* no-op on SSR */
+    },
   };
 }
-

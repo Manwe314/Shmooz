@@ -8,9 +8,8 @@ describe('LandingBackgroundComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LandingBackgroundComponent]
-    })
-    .compileComponents();
+      imports: [LandingBackgroundComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LandingBackgroundComponent);
     component = fixture.componentInstance;

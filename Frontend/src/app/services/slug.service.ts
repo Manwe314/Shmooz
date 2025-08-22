@@ -1,8 +1,9 @@
+import { HttpClient } from '@angular/common/http';
+import { inject,Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { map, shareReplay } from 'rxjs/operators';
+
 import { ApiService } from './api.service';
 
 interface SlugDto {
@@ -13,7 +14,7 @@ interface SlugDto {
 }
 
 @Injectable({
-  providedIn: 'root' 
+  providedIn: 'root',
 })
 export class SlugService {
   private slugSubject = new BehaviorSubject<string | null>(null);
@@ -21,17 +22,13 @@ export class SlugService {
   private api = inject(ApiService);
   private cache$?: Observable<string[]>;
 
-  slug$: Observable<string | null> = this.slugSubject.asObservable().pipe(
-    distinctUntilChanged() 
-  );
+  slug$: Observable<string | null> = this.slugSubject.asObservable().pipe(distinctUntilChanged());
 
-  setSlug(slug: string) 
-  {
+  setSlug(slug: string) {
     this.slugSubject.next(slug);
   }
 
-  getCurrentSlug(): string | null 
-  {
+  getCurrentSlug(): string | null {
     return this.slugSubject.getValue();
   }
 
@@ -39,8 +36,8 @@ export class SlugService {
     if (!this.cache$) {
       const url = this.api.buildUrl('slugs/');
       this.cache$ = this.http.get<SlugDto[]>(url).pipe(
-        map((list: SlugDto[]) => list?.map(s => s.slug) ?? []),
-        shareReplay(1)
+        map((list: SlugDto[]) => list?.map((s) => s.slug) ?? []),
+        shareReplay(1),
       );
     }
     return this.cache$;

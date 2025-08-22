@@ -1,9 +1,11 @@
-from django.db import models
-from administration.models import ImageUpload
-from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
+from django.db import models
+from django.utils import timezone
+
+from administration.models import ImageUpload
 
 # Create your models here.
+
 
 class Deck(models.Model):
     title = models.CharField(max_length=50)
@@ -11,18 +13,18 @@ class Deck(models.Model):
     owner = models.CharField(max_length=50)
 
     image = models.ForeignKey(
-        'administration.ImageUpload',
+        "administration.ImageUpload",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='decks'
+        related_name="decks",
     )
     hover_img = models.ForeignKey(
-        'administration.ImageUpload',
+        "administration.ImageUpload",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='hover_decks'
+        related_name="hover_decks",
     )
 
     card_amount = models.IntegerField(null=True, blank=True)
@@ -41,17 +43,17 @@ class Deck(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     edited_at = models.DateTimeField(null=True, blank=True, db_index=True)
 
-
     class Meta:
-        ordering = ['id']
+        ordering = ["id"]
         indexes = [
-            models.Index(fields=['-edited_at']),
-            models.Index(fields=['-created_at']),
+            models.Index(fields=["-edited_at"]),
+            models.Index(fields=["-created_at"]),
         ]
 
     def __str__(self):
         return self.title
-    
+
+
 class SlugEntry(models.Model):
     slug = models.CharField(max_length=50, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -59,10 +61,11 @@ class SlugEntry(models.Model):
 
     def __str__(self):
         return self.slug
-    
+
+
 class BackgroundData(models.Model):
     owner = models.CharField(max_length=50)
-    
+
     color1 = models.CharField(max_length=50)
     color2 = models.CharField(max_length=50)
     color3 = models.CharField(max_length=50)
@@ -86,15 +89,14 @@ class BackgroundData(models.Model):
         return self.owner
 
 
-    
 class ProjectCard(models.Model):
     title = models.CharField(max_length=50)
     image = models.ForeignKey(
-        'administration.ImageUpload',
+        "administration.ImageUpload",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='project_cards'
+        related_name="project_cards",
     )
     text = models.CharField(max_length=50)
     text_color = models.CharField(max_length=50)
@@ -105,46 +107,47 @@ class ProjectCard(models.Model):
     deck = models.ForeignKey(
         Deck,
         on_delete=models.CASCADE,
-        related_name='project_cards',
+        related_name="project_cards",
         null=True,
-        blank=True
+        blank=True,
     )
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     edited_at = models.DateTimeField(null=True, blank=True, db_index=True)
 
     class Meta:
-        ordering = ['id']  # ✅ default to id
+        ordering = ["id"]
         indexes = [
-            models.Index(fields=['-edited_at']),
-            models.Index(fields=['-created_at']),
+            models.Index(fields=["-edited_at"]),
+            models.Index(fields=["-created_at"]),
         ]
 
     def __str__(self):
         return self.title
 
+
 class PagesModel(models.Model):
     CATEGORY_CHOICES = [
-        ('page_one', 'Page 1'),
-        ('page_two', 'Page 2'),
+        ("page_one", "Page 1"),
+        ("page_two", "Page 2"),
     ]
 
     owner = models.SlugField(max_length=50)
     category = models.CharField(max_length=50)
-    
-    content = models.JSONField()  
+
+    content = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(null=True, blank=True)
 
     project_card = models.OneToOneField(
-        'portfolio.ProjectCard',
+        "portfolio.ProjectCard",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name='page'
+        related_name="page",
     )
 
     class Meta:
-        unique_together = ['owner', 'category']
+        unique_together = ["owner", "category"]
 
     def __str__(self):
         if self.project_card:

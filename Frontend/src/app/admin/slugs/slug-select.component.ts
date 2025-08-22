@@ -1,15 +1,16 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SlugService, SlugEntry } from './slug.service';
-import { Router } from '@angular/router';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+
+import { SlugEntry,SlugService } from './slug.service';
 
 @Component({
   selector: 'app-slug-select',
@@ -37,11 +38,14 @@ export class SlugSelectComponent implements OnInit {
   creating = signal(false);
 
   form = this.fb.group({
-    slug: ['', [
-      Validators.required,
-      Validators.maxLength(50),
-      Validators.pattern(/^[A-Za-z0-9_-]{1,50}$/) // no spaces, only [a-zA-Z0-9_-]
-    ]]
+    slug: [
+      '',
+      [
+        Validators.required,
+        Validators.maxLength(50),
+        Validators.pattern(/^[A-Za-z0-9_-]{1,50}$/),
+      ],
+    ],
   });
 
   ngOnInit() {
@@ -50,14 +54,14 @@ export class SlugSelectComponent implements OnInit {
 
   pick(s: SlugEntry) {
     this.slugsService.selectSlug(s);
-    this.router.navigate(['/admin']); // go to workspace
+    this.router.navigate(['/admin']);
   }
 
   create() {
     if (this.form.invalid || this.creating()) return;
     this.creating.set(true);
     const slug = this.form.value.slug!;
-    this.slugsService.createSlug(slug).subscribe(created => {
+    this.slugsService.createSlug(slug).subscribe((created) => {
       this.creating.set(false);
       if (created) {
         this.snack.open(`Created "${created.slug}"`, 'OK', { duration: 2000 });

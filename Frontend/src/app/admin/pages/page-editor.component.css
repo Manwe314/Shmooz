@@ -1,9 +1,26 @@
-.page-card { max-width: 1735px; margin: 6px auto; padding: 16px; }
-.header { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.spacer { flex: 1 1 auto; }
-.w180 { min-width: 180px; }
-.w220 { min-width: 220px; }
-.w260 { min-width: 260px; }
+.page-card {
+  max-width: 1735px;
+  margin: 6px auto;
+  padding: 16px;
+}
+.header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.spacer {
+  flex: 1 1 auto;
+}
+.w180 {
+  min-width: 180px;
+}
+.w220 {
+  min-width: 220px;
+}
+.w260 {
+  min-width: 260px;
+}
 
 .layout {
   display: grid;
@@ -11,8 +28,17 @@
   gap: 16px;
 }
 
-.editor { max-height: calc(100vh - 220px); max-width: 900px; overflow: auto; padding-right: 8px; }
-.editor-actions { display: flex; gap: 8px; margin-bottom: 8px; }
+.editor {
+  max-height: calc(100vh - 220px);
+  max-width: 900px;
+  overflow: auto;
+  padding-right: 8px;
+}
+.editor-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
 
 .block-grid {
   display: grid;
@@ -21,19 +47,45 @@
   margin-bottom: 8px;
 }
 
-.content-actions { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
-.content-list { display: grid; gap: 12px; }
-.content-item { border: 1px solid #333; border-radius: 8px; padding: 12px; background: #121212; }
-.content-header { display: flex; align-items: center; gap: 8px; }
-.row { display: grid; grid-template-columns: repeat(4, minmax(120px,1fr)); gap: 8px; }
-.row .grow { grid-column: span 3; }
+.content-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0;
+}
+.content-list {
+  display: grid;
+  gap: 12px;
+}
+.content-item {
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  background: #121212;
+}
+.content-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 8px;
+}
+.row .grow {
+  grid-column: span 3;
+}
 
-.preview { max-height: calc(100vh - 220px); overflow: auto; }
+.preview {
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+}
 
 .checkbox-wrap {
   display: flex;
   align-items: center;
-  padding: .25rem 0;
+  padding: 0.25rem 0;
 }
 
 .previewHeader {
@@ -42,4 +94,6 @@
   gap: 12px;
   margin-bottom: 8px;
 }
-.previewHeader .spacer { flex: 1; }
+.previewHeader .spacer {
+  flex: 1;
+}

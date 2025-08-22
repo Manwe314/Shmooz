@@ -1,9 +1,11 @@
-import { APP_BASE_HREF } from '@angular/common';
-import { CommonEngine, isMainModule } from '@angular/ssr/node';
-import express from 'express';
-import compression from 'compression'; // types installed via @types/compression
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { APP_BASE_HREF } from '@angular/common';
+import { CommonEngine, isMainModule } from '@angular/ssr/node';
+import compression from 'compression';
+import express from 'express';
+
 import bootstrap from './main.server';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
@@ -13,11 +15,12 @@ const indexHtml = join(serverDistFolder, 'index.server.html');
 const app = express();
 const commonEngine = new CommonEngine();
 
-
-// ── Config via env ─────────────────────────────────────────────────────────────
 const ADMIN_CACHE_KEY = process.env['ADMIN_CACHE_KEY'] || '';
 const SSR_CACHE_MAX_ENTRIES = parseInt(process.env['SSR_CACHE_MAX_ENTRIES'] || '500', 10);
-const SSR_CACHE_MAX_BYTES = parseInt(process.env['SSR_CACHE_MAX_BYTES'] || String(50 * 1024 * 1024), 10); // 50MB
+const SSR_CACHE_MAX_BYTES = parseInt(
+  process.env['SSR_CACHE_MAX_BYTES'] || String(50 * 1024 * 1024),
+  10,
+);
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -34,7 +37,7 @@ function logCacheStats(tag: string) {
   const s = ssrCache.stats();
   console.log(
     `[SSR cache] ${tag} :: entries=${s.entries}, total=${s.totalBytes}B (${formatBytes(s.totalBytes)}),` +
-    ` limits: entries<=${s.maxEntries}, bytes<=${formatBytes(s.maxBytes)}`
+      ` limits: entries<=${s.maxEntries}, bytes<=${formatBytes(s.maxBytes)}`,
   );
 }
 
@@ -51,18 +54,20 @@ function includesSlugQuery(key: string, slug: string): boolean {
   return key.includes(`?slug=${enc}`) || key.includes(`&slug=${enc}`);
 }
 
-// ── Simple LRU cache for HTML ─────────────────────────────────────────────────
 class LRUCache {
   private map = new Map<string, { html: string; size: number }>();
   private totalBytes = 0;
 
-  constructor(private maxEntries: number, private maxBytes: number) {}
+  constructor(
+    private maxEntries: number,
+    private maxBytes: number,
+  ) {}
 
   get(key: string) {
     const v = this.map.get(key);
     if (!v) return undefined;
     this.map.delete(key);
-    this.map.set(key, v); // refresh recency
+    this.map.set(key, v);
     return v;
   }
 
@@ -91,7 +96,9 @@ class LRUCache {
     this.totalBytes = 0;
   }
 
-  keys() { return Array.from(this.map.keys()); }
+  keys() {
+    return Array.from(this.map.keys());
+  }
 
   stats() {
     return {
@@ -121,14 +128,11 @@ function getOrigin(req: import('express').Request): string {
   return `${proto}://${host}`;
 }
 
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 function normPath(p: string) {
   if (!p) return '/';
   return p.startsWith('/') ? p : `/${p}`;
 }
 
-// Typed as RequestHandler → must return void (no value)
 const requireAdminKey: express.RequestHandler = (req, res, next) => {
   const key = req.header('x-admin-key');
   const serverHasKey = Boolean(ADMIN_CACHE_KEY);
@@ -160,15 +164,12 @@ const requireAdminKey: express.RequestHandler = (req, res, next) => {
   next();
 };
 
-// ── Middlewares ───────────────────────────────────────────────────────────────
 app.use(compression());
 app.use(express.json());
 
-// ── Admin endpoints (optional but useful) ─────────────────────────────────────
 app.post('/__admin/ssr-cache/invalidate', requireAdminKey, (req, res): void => {
   const { kind, slug, category, id } = req.body || {};
 
-  // Make badReq return void so "return badReq(...)" is type-safe
   const badReq = (msg: string): void => {
     res.status(400).json({ error: msg });
   };
@@ -202,11 +203,7 @@ app.post('/__admin/ssr-cache/invalidate', requireAdminKey, (req, res): void => {
   }
 
   if (k === 'page') {
-    // /page_one/:slug OR /page_two/:slug + possible ?slug=
-    toDelete = [
-      `/${category}/${slug}`,
-      `/${category}?slug=${encodeURIComponent(slug)}`
-    ];
+    toDelete = [`/${category}/${slug}`, `/${category}?slug=${encodeURIComponent(slug)}`];
   }
 
   if (k === 'project_page') {
@@ -220,22 +217,21 @@ app.post('/__admin/ssr-cache/invalidate', requireAdminKey, (req, res): void => {
 
   if (k === 'background') {
     const keys = ssrCache.keys();
-    toDelete = keys.filter(key =>
-      key === `/${slug}` ||
-      key.startsWith(`/page_one/${slug}`) ||
-      key.startsWith(`/page_two/${slug}`) ||
-      includesSlugQuery(key, slug!)
+    toDelete = keys.filter(
+      (key) =>
+        key === `/${slug}` ||
+        key.startsWith(`/page_one/${slug}`) ||
+        key.startsWith(`/page_two/${slug}`) ||
+        includesSlugQuery(key, slug!),
     );
 
-    // Also include common forms in case cached that way
     toDelete.push(
       `/page_one/${slug}`,
       `/page_two/${slug}`,
       `/page_one?slug=${encodeURIComponent(slug!)}`,
-      `/page_two?slug=${encodeURIComponent(slug!)}`
+      `/page_two?slug=${encodeURIComponent(slug!)}`,
     );
 
-    // Dedupe
     toDelete = Array.from(new Set(toDelete));
   }
 
@@ -250,10 +246,10 @@ app.post('/__admin/ssr-cache/invalidate', requireAdminKey, (req, res): void => {
     category: category ?? null,
     id: id ?? null,
     deleted,
-    stats
+    stats,
   });
 });
-// Warm (render + cache) specific paths
+
 app.post('/__admin/ssr-cache/warm', requireAdminKey, async (req, res, next): Promise<void> => {
   try {
     const paths: string[] = Array.isArray(req.body?.paths) ? req.body.paths : [];
@@ -275,13 +271,12 @@ app.post('/__admin/ssr-cache/warm', requireAdminKey, async (req, res, next): Pro
         url,
         publicPath: browserDistFolder,
         providers: [
-          { provide: APP_BASE_HREF, useValue: '/' },           // base href your app is served at
-          { provide: 'ORIGIN_URL', useValue: origin },         // used by SeoService
+          { provide: APP_BASE_HREF, useValue: '/' },
+          { provide: 'ORIGIN_URL', useValue: origin },
         ],
       });
 
-      // if ssrCache.get(key) -> cached.html, then store {html}
-      ssrCache.set(pathOnly, html );
+      ssrCache.set(pathOnly, html);
       results.push({ path: pathOnly, bytes: Buffer.byteLength(html, 'utf8') });
     }
 
@@ -291,7 +286,6 @@ app.post('/__admin/ssr-cache/warm', requireAdminKey, async (req, res, next): Pro
   }
 });
 
-// Purge one path or all
 app.delete('/__admin/ssr-cache', requireAdminKey, (req, res): void => {
   const p = req.query['path'];
   if (typeof p === 'string' && p.length) {
@@ -303,12 +297,10 @@ app.delete('/__admin/ssr-cache', requireAdminKey, (req, res): void => {
   res.json({ cleared: true, stats: ssrCache.stats() });
 });
 
-// Inspect cache
 app.get('/__admin/ssr-cache', requireAdminKey, (_req, res): void => {
   res.json({ ...ssrCache.stats(), keys: ssrCache.keys() });
 });
 
-// ── Static files from /browser ────────────────────────────────────────────────
 app.get(
   '**',
   express.static(browserDistFolder, {
@@ -322,11 +314,10 @@ app.get(
   }),
 );
 
-// ── SSR with cache ────────────────────────────────────────────────────────────
 app.get('**', async (req, res, next): Promise<void> => {
   try {
     const origin = getOrigin(req);
-    const key = normPath(req.originalUrl);     // include query; normalized
+    const key = normPath(req.originalUrl);
 
     const cached = ssrCache.get(key);
     if (cached?.html) {
@@ -342,7 +333,7 @@ app.get('**', async (req, res, next): Promise<void> => {
       url: `${origin}${req.originalUrl}`,
       publicPath: browserDistFolder,
       providers: [
-        { provide: APP_BASE_HREF, useValue: '/' },            // or req.baseUrl if you mount under a subpath
+        { provide: APP_BASE_HREF, useValue: '/' },
         { provide: 'ORIGIN_URL', useValue: origin },
       ],
     });
@@ -356,7 +347,6 @@ app.get('**', async (req, res, next): Promise<void> => {
   }
 });
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
   app.listen(port, () => {

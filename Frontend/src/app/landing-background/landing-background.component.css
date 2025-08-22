@@ -1,10 +1,10 @@
 :host {
-    display: block;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+  display: block;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
-  
+
 .background {
   position: fixed;
   top: 0;
@@ -18,19 +18,22 @@
     var(--c3) var(--p3)
   );
   background-repeat: no-repeat;
-  animation: comeIn 1s ease-in 0.2s forwards, pulseGradient 10s ease-in-out  1.2s infinite, shiftCenter 8s ease-in-out 1.2s infinite;
+  animation:
+    comeIn 1s ease-in 0.2s forwards,
+    pulseGradient 10s ease-in-out 1.2s infinite,
+    shiftCenter 8s ease-in-out 1.2s infinite;
   z-index: -1;
   transition: background-image 10s ease-in-out;
   pointer-events: none;
 }
 
 .background-clone.come-in {
-  animation: toCenter 1s cubic-bezier(.21,-0.03,0,.42) forwards;
+  animation: toCenter 1s cubic-bezier(0.21, -0.03, 0, 0.42) forwards;
   filter: brightness(0.75);
 }
 
 .background-clone.go-out {
-  animation: toTop 1s cubic-bezier(.21,-0.03,0,.42) forwards;
+  animation: toTop 1s cubic-bezier(0.21, -0.03, 0, 0.42) forwards;
   filter: brightness(0.75);
 }
 
@@ -44,7 +47,9 @@
   pointer-events: auto;
 }
 
-.nav-disabled { pointer-events: none; }
+.nav-disabled {
+  pointer-events: none;
+}
 
 .text-button {
   background: transparent;
@@ -53,9 +58,11 @@
   padding: 6px 16px;
   font-size: 1rem;
   word-spacing: 0.5rem;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
-  transition: transform 0.4s ease, filter 0.4s ease;
+  transition:
+    transform 0.4s ease,
+    filter 0.4s ease;
 }
 
 .text-button:hover {
@@ -98,7 +105,7 @@
     --y: 200%;
   }
   100% {
-    --y: 130%
+    --y: 130%;
   }
 }
 
@@ -146,7 +153,8 @@
 }
 
 @keyframes pulseGradient {
-  0%, 100% {
+  0%,
+  100% {
     filter: brightness(1);
   }
   50% {
@@ -154,16 +162,12 @@
   }
 }
 
-
 @keyframes shiftCenter {
-    0%, 100% {
-        --y: 130%
-    }
-    50% {
-        --y: 115%
-    }
+  0%,
+  100% {
+    --y: 130%;
+  }
+  50% {
+    --y: 115%;
+  }
 }
-
-
-
-  
