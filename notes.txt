@@ -11,10 +11,8 @@ to-do:
     ? add "please use desktop - on mobile"
     ? last pass optimisations / seo upgrades / security checks
 
-    clean code
 
 
 
 
 for tomorrow:
-    Start working on project card and page

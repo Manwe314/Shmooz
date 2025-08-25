@@ -6,10 +6,10 @@ from portfolio.models import Deck
 # === Step 1: Upload New Images & Hover Images ===
 
 
-def upload_image(title, filename, slug):
+def upload_image(title, filename, slug=None):
+    """Upload image directly to uploads/ folder (slug parameter kept for compatibility but ignored)"""
     with open(f"/app/media/{filename}", "rb") as f:
         img = ImageUpload(title=title, image=File(f, name=filename))
-        img.upload_slug = slug
         img.save()
         print(f"✅ Uploaded image: {filename} as '{title}' with ID {img.id}")
         return img

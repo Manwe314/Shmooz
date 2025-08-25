@@ -21,8 +21,30 @@
           <mat-label>Title</mat-label>
           <input matInput [(ngModel)]="uploadTitle" />
         </mat-form-field>
-        <input type="file" (change)="onFile($event)" accept="image/*" />
-        <button mat-flat-button color="primary" (click)="doUpload()" [disabled]="!file || !uploadTitle || uploading()">
+
+        <div class="file-input-container">
+          <input
+            type="file"
+            (change)="onFile($event)"
+            accept="image/*"
+            title="Select an image file (max {{ getMaxFileSizeMB() }}MB)" />
+          <div class="file-info">
+            <small class="file-limit-info">Maximum file size: {{ getMaxFileSizeMB() }}MB • Supported formats: JPEG, PNG, GIF, WebP</small>
+          </div>
+        </div>
+
+        @if (fileError()) {
+          <div class="error-message">
+            <mat-icon color="warn">error</mat-icon>
+            <span>{{ fileError() }}</span>
+          </div>
+        }
+
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="doUpload()"
+          [disabled]="!file || !uploadTitle || uploading() || fileError()">
           {{ uploading() ? 'Uploading…' : 'Upload' }}
         </button>
       </div>

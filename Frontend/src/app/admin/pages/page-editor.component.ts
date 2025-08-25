@@ -102,26 +102,6 @@ export class PageEditorComponent implements OnInit {
   
   blocks = this.fb.array<BlockForm>([]);
 
-  private invalidatePageCache(_kind: 'created' | 'updated' | 'deleted' = 'updated') {
-    const slug = this.ownerSlug;
-    if (!slug) return;
-
-    if (this.targetType === 'nav') {
-      this.ssr.invalidatePage(this.navCategory, slug).subscribe({
-        next: () =>
-          this.snack.open(`Cache cleared for ${this.navCategory}`, 'OK', { duration: 1200 }),
-        error: (e) => console.warn('SSR invalidate (nav page) failed', e),
-      });
-    } else {
-      const id = this.selectedProjectCardId;
-      if (!id) return;
-      this.ssr.invalidateProjectPage(id, slug).subscribe({
-        next: () =>
-          this.snack.open(`Cache cleared for project page #${id}`, 'OK', { duration: 1200 }),
-        error: (e) => console.warn('SSR invalidate (project page) failed', e),
-      });
-    }
-  }
 
   ngOnInit() {
     this.ownerSlug = this.slugs.selectedSlugSnapshot?.slug ?? null;
@@ -421,7 +401,6 @@ export class PageEditorComponent implements OnInit {
         next: () => {
           this.saving = false;
           this.snack.open('Page updated', 'OK', { duration: 1500 });
-          this.invalidatePageCache('updated');
         },
         error: (err) => {
           this.saving = false;
@@ -434,7 +413,6 @@ export class PageEditorComponent implements OnInit {
           this.saving = false;
           this.currentPageId = rec.id;
           this.snack.open('Page created', 'OK', { duration: 1500 });
-          this.invalidatePageCache('updated');
         },
         error: (err) => {
           this.saving = false;
@@ -453,7 +431,6 @@ export class PageEditorComponent implements OnInit {
         this.snack.open('Page deleted', 'OK', { duration: 1500 });
         this.currentPageId = null;
         this.clearAll();
-        this.invalidatePageCache('updated');
       },
       error: (err) => {
         const details = this.formatHttpError(err);

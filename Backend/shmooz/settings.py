@@ -20,15 +20,34 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+required_db_settings = ['DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD']
+for setting in required_db_settings:
+    if not os.getenv(setting):
+        raise ValueError(f"{setting} environment variable must be set in production")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-^5q41@v#hu$#a&f8oe0&wfgfb%dun8v#&=o0i)2!xvn1qrf&hl"
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("DJANGO_SECRET_KEY environment variable must be set in production")
+
+ADMIN_CACHE_KEY = os.getenv('ADMIN_CACHE_KEY', '')  # must match Node's env
+FRONTEND_SSR_INVALIDATE_URL = os.getenv(
+    'FRONTEND_SSR_INVALIDATE_URL',
+    'http://frontend:4000/__admin/ssr-cache/invalidate'
+)
+
+# SSR Cache Invalidation Production Settings
+SSR_INVALIDATE_TIMEOUT = float(os.getenv('SSR_INVALIDATE_TIMEOUT', '5.0'))
+CACHE_INVALIDATION_MAX_RETRIES = int(os.getenv('CACHE_INVALIDATION_MAX_RETRIES', '3'))
+CACHE_INVALIDATION_BASE_DELAY = float(os.getenv('CACHE_INVALIDATION_BASE_DELAY', '1.0'))
+CACHE_INVALIDATION_FAILURE_THRESHOLD = int(os.getenv('CACHE_INVALIDATION_FAILURE_THRESHOLD', '5'))
+CACHE_INVALIDATION_RECOVERY_TIMEOUT = int(os.getenv('CACHE_INVALIDATION_RECOVERY_TIMEOUT', '60'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Shmooz API",
@@ -44,7 +63,9 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
+if not ALLOWED_HOSTS or ALLOWED_HOSTS == ['']:
+    ALLOWED_HOSTS = ['*']
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -58,6 +79,10 @@ REST_FRAMEWORK = {
     ],
 }
 # Application definition
+
+REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] = [
+    'rest_framework.renderers.JSONRenderer',
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -93,6 +118,7 @@ SIMPLE_JWT = {
 
 ROOT_URLCONF = "shmooz.urls"
 
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -116,14 +142,17 @@ WSGI_APPLICATION = "shmooz.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # Change-log : changed the Databese from sqlite to postgresql
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DATABASE_NAME"),
-        "USER": os.getenv("DATABASE_USER"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-        "HOST": os.getenv("DATABASE_HOST"),
-        "PORT": os.getenv("POSTGRES_PORT"),
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST', 'db'),
+        'PORT': os.getenv('DATABASE_PORT', '5432'),
+        'CONN_MAX_AGE': 60,  # Connection pooling
+        'OPTIONS': {
+            'connect_timeout': 10,
+        }
     }
 }
 
@@ -158,15 +187,84 @@ USE_I18N = True
 
 USE_TZ = True
 
+if os.getenv('USE_HTTPS', 'false').lower() == 'true':
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
+STATIC_ROOT = '/app/staticfiles'
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/app/media'
+
+# File upload settings
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB for images specifically
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+DJANGO_SUPERUSER_USERNAME = os.getenv('DJANGO_SUPERUSER_USERNAME', 'admin')
+DJANGO_SUPERUSER_PASSWORD = os.getenv('DJANGO_SUPERUSER_PASSWORD')
+DJANGO_SUPERUSER_EMAIL = os.getenv('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/app/logs/django.log',
+            'maxBytes': 1024*1024*15,  # 15MB
+            'backupCount': 10,
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'portfolio.cache_invalidate': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

@@ -4,16 +4,19 @@ from django.db import models
 
 
 def upload_dynamicly(instance, filename):
-    slug = getattr(instance, "upload_slug", "shmooz")
-    return f"uploads/{slug}/{filename}"
+    """Legacy function for existing migrations - now uploads to uploads/ folder"""
+    return f"uploads/{filename}"
+
+
+def upload_to_uploads(instance, filename):
+    """Upload all images directly to uploads/ folder"""
+    return f"uploads/{filename}"
 
 
 class ImageUpload(models.Model):
     title = models.CharField(max_length=50)
-    image = models.ImageField(upload_to=upload_dynamicly)
+    image = models.ImageField(upload_to=upload_to_uploads)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-
-    upload_slug = None
 
     class Meta:
         ordering = ["id"]

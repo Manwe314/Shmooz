@@ -15,10 +15,13 @@ services:
   backend:
     build:
       context: ./Backend
+      dockerfile: Dockerfile
     env_file:
       - .env
     volumes:
-      - ./Backend:/app
+      - media-files:/app/media  # Shared media volume
+      - backend-logs:/app/logs  # Logs volume
+      - static-files:/app/staticfiles  # Static files volume
     ports:
       - "8000:8000"
     expose:
@@ -27,6 +30,13 @@ services:
       - app-network
     depends_on:
       - db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   db:
     image: postgres:17@sha256:aadf2c0696f5ef357aa7a68da995137f0cf17bad0bf6e1f17de06ae5c769b302
@@ -44,6 +54,8 @@ services:
       context: ./Nginx
     ports:
       - "8080:443"
+    volumes:
+      - media-files:/var/www/media:ro  # Read-only access to shared media volume
     depends_on:
       - frontend
       - backend
@@ -61,4 +73,25 @@ volumes:
       type: "none"
       o: "bind"
       device: "./Volume/postgresql"
+
+  media-files:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "./Volume/media"
+
+  backend-logs:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "./Volume/logs"
+
+  static-files:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "./Volume/staticfiles"
 

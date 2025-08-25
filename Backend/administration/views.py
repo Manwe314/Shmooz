@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -182,11 +183,9 @@ class ImageUploadView(APIView):
     def post(self, request, slug=None):
         serializer = ImageUploadSerializer(data=request.data)
         if serializer.is_valid():
-            image_instance = serializer.save(commit=False)
+            # Save directly without slug handling
+            image_instance = serializer.save()
 
-            image_instance.upload_slug = slug or "shmooz"
-
-            image_instance.save()
             return Response(
                 {
                     "status": "success",

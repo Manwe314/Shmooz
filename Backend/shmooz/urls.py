@@ -114,8 +114,7 @@ urlpatterns = [
     ),
     path("api/auth/create_slug/", SlugCreateView.as_view(), name="slug_create"),
     path("api/auth/upload_page/", PageUploadView.as_view(), name="upload_page"),
-    path("api/upload-image/<str:slug>", ImageUploadView.as_view()),
-    path("api/upload-image/", ImageUploadView.as_view()),
+    path("api/upload-image/", ImageUploadView.as_view(), name="image_upload"),
     path("api/slugs/", SlugListView.as_view(), name="slug_list"),
     path(
         "api/gradient-colors/<str:slug>",
@@ -171,6 +170,3 @@ urlpatterns += [
         name="swagger-ui",
     ),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -34,11 +34,46 @@
 }
 .upload {
   display: flex;
-  gap: 12px;
-  align-items: center;
+  flex-direction: column;
+  gap: 16px;
   margin-top: 12px;
-  flex-wrap: wrap;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #fafafa;
 }
+
 .w {
-  width: 240px;
+  width: 100%;
+}
+
+.file-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-info .file-limit-info {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+  color: #c62828;
+  font-size: 14px;
+}
+
+.error-message mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }

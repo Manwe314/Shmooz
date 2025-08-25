@@ -244,12 +244,7 @@ export class BackgroundEditorComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private invalidateForOwner(slug: string) {
-    this.ssr.invalidateBackground(slug).subscribe({
-      next: () => this.snack.open('SSR cache purged (background)', 'OK', { duration: 1400 }),
-      error: () => this.snack.open('SSR cache purge failed (dev)', 'Dismiss', { duration: 2500 }),
-    });
-  }
+
 
   private loadFromServer() {
     if (!this.owner) return;
@@ -296,7 +291,6 @@ export class BackgroundEditorComponent implements OnInit, OnDestroy {
           this.record = rec;
           this.form.patchValue(rec as any);
           this.snack.open('Background created', 'OK', { duration: 1500 });
-          this.invalidateForOwner(this.owner!);
         } else {
           this.snack.open('Failed to create background', 'Dismiss', { duration: 2500 });
         }
@@ -308,7 +302,6 @@ export class BackgroundEditorComponent implements OnInit, OnDestroy {
           this.record = rec;
           this.form.patchValue(rec as any);
           this.snack.open('Saved', 'OK', { duration: 1200 });
-          this.invalidateForOwner(this.owner!);
         } else {
           this.snack.open('Failed to save changes', 'Dismiss', { duration: 2500 });
         }
@@ -348,8 +341,8 @@ export class BackgroundEditorComponent implements OnInit, OnDestroy {
             ellipseHeight: 0,
           });
           this.snack.open('Background deleted', 'OK', { duration: 1500 });
-          this.invalidateForOwner(this.owner!);
         } else {
+          this.record = null;
           this.snack.open('Failed to delete', 'Dismiss', { duration: 2500 });
         }
       });

@@ -96,14 +96,7 @@ export class DeckEditorComponent implements OnInit {
   saving = signal(false);
   deleting = signal(false);
 
-  private invalidateLandingCache() {
-    const slug = this.owner();
-    if (!slug) return;
-    this.ssr.invalidateDeck(slug).subscribe({
-      next: () => this.snack.open('Landing cache refreshed', 'OK', { duration: 1200 }),
-      error: (e) => console.warn('SSR invalidate (deck) failed', e),
-    });
-  }
+
 
   private defaults: Record<ArrayKey, number[]> = {
     x_offsets: [3, 5, 1, -10],
@@ -403,7 +396,6 @@ export class DeckEditorComponent implements OnInit {
           this.snack.open('Deck created', 'OK', { duration: 1500 });
           this.loadDecks();
           this.loadDeck(rec);
-          this.invalidateLandingCache();
         } else {
           this.snack.open('Failed to create deck', 'Dismiss', { duration: 2500 });
         }
@@ -416,7 +408,6 @@ export class DeckEditorComponent implements OnInit {
           const list = this.decks().map((d) => (d.id === rec.id ? rec : d));
           this.decks.set(list);
           this.loadDeck(rec);
-          this.invalidateLandingCache();
         } else {
           this.snack.open('Failed to save changes', 'Dismiss', { duration: 2500 });
         }
@@ -444,7 +435,6 @@ export class DeckEditorComponent implements OnInit {
           this.snack.open('Deck deleted', 'OK', { duration: 1500 });
           this.decks.set(this.decks().filter((d) => d.id !== id));
           this.newDeck();
-          this.invalidateLandingCache();
         } else {
           this.snack.open('Failed to delete deck', 'Dismiss', { duration: 2500 });
         }

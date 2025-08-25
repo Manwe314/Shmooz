@@ -1,5 +1,6 @@
 import re
 
+from django.conf import settings
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
@@ -103,6 +104,27 @@ class ImageUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageUpload
         fields = ["id", "title", "image", "uploaded_at"]
+
+    def validate_image(self, value):
+        """Validate image file size and type"""
+        max_size = getattr(settings, 'MAX_IMAGE_SIZE', 5 * 1024 * 1024)  # 5MB default
+
+        if value.size > max_size:
+            max_size_mb = max_size / (1024 * 1024)
+            current_size_mb = value.size / (1024 * 1024)
+            raise ValidationError(
+                f"Image file too large. Maximum size is {max_size_mb:.1f}MB, "
+                f"but uploaded file is {current_size_mb:.1f}MB."
+            )
+
+        # Validate file type
+        allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        if hasattr(value, 'content_type') and value.content_type not in allowed_types:
+            raise ValidationError(
+                f"Unsupported image format. Allowed formats: JPEG, PNG, GIF, WebP."
+            )
+
+        return value
 
 
 class PageNamesSerializer(serializers.ModelSerializer):

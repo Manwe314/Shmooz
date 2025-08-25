@@ -49,6 +49,7 @@ export class ImagePickerDialogComponent implements OnInit {
 
   uploadTitle = '';
   file: File | null = null;
+  fileError = signal<string | null>(null);
 
   ngOnInit() {
     this.load();
@@ -110,11 +111,31 @@ export class ImagePickerDialogComponent implements OnInit {
 
   onFile(ev: Event) {
     const t = ev.target as HTMLInputElement;
-    this.file = (t.files && t.files[0]) || null;
+    const selectedFile = (t.files && t.files[0]) || null;
+
+    if (selectedFile) {
+      // Validate the file
+      const validation = this.imagesApi.validateFile(selectedFile);
+      if (!validation.valid) {
+        this.fileError.set(validation.error || 'Invalid file');
+        this.file = null;
+        // Clear the input
+        t.value = '';
+        return;
+      }
+
+      // File is valid
+      this.fileError.set(null);
+      this.file = selectedFile;
+    } else {
+      this.file = null;
+      this.fileError.set(null);
+    }
   }
 
   doUpload() {
-    if (!this.file || !this.uploadTitle) return;
+    if (!this.file || !this.uploadTitle || this.fileError()) return;
+
     this.uploading.set(true);
     this.imagesApi
       .uploadImage(this.data.ownerSlug, this.uploadTitle, this.file)
@@ -123,7 +144,14 @@ export class ImagePickerDialogComponent implements OnInit {
         if (img) {
           this.images = [img, ...this.images];
           this.ref.close({ id: img.id, path: img.image, title: img.title });
+        } else {
+          // Handle upload error (could be server-side validation)
+          this.fileError.set('Upload failed. Please try again or check file size/format.');
         }
       });
+  }
+
+  getMaxFileSizeMB(): string {
+    return (this.imagesApi.MAX_FILE_SIZE / (1024 * 1024)).toFixed(1);
   }
 }
