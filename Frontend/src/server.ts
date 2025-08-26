@@ -15,12 +15,15 @@ const indexHtml = join(serverDistFolder, 'index.server.html');
 const app = express();
 const commonEngine = new CommonEngine();
 
+// Environment configuration
+const NODE_ENV = process.env['NODE_ENV'] || 'development';
 const ADMIN_CACHE_KEY = process.env['ADMIN_CACHE_KEY'] || '';
 const SSR_CACHE_MAX_ENTRIES = parseInt(process.env['SSR_CACHE_MAX_ENTRIES'] || '500', 10);
 const SSR_CACHE_MAX_BYTES = parseInt(
   process.env['SSR_CACHE_MAX_BYTES'] || String(50 * 1024 * 1024),
   10,
 );
+const ENABLE_CACHE_LOGGING = NODE_ENV !== 'production';
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -34,6 +37,8 @@ function formatBytes(bytes: number): string {
 }
 
 function logCacheStats(tag: string) {
+  if (!ENABLE_CACHE_LOGGING) return;
+
   const s = ssrCache.stats();
   console.log(
     `[SSR cache] ${tag} :: entries=${s.entries}, total=${s.totalBytes}B (${formatBytes(s.totalBytes)}),` +
@@ -348,9 +353,28 @@ app.get('**', async (req, res, next): Promise<void> => {
 });
 
 if (isMainModule(import.meta.url)) {
-  const port = process.env['PORT'] || 4000;
-  app.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+  const port = parseInt(process.env['PORT'] || '4000', 10);
+  const host = '0.0.0.0';
+
+  app.listen(port, host, () => {
+    console.log(`🚀 Angular SSR server running in ${NODE_ENV} mode`);
+    console.log(`📡 Server listening on http://${host}:${port}`);
+    console.log(`💾 SSR Cache: ${SSR_CACHE_MAX_ENTRIES} entries, ${formatBytes(SSR_CACHE_MAX_BYTES)} max`);
+
+    if (NODE_ENV === 'production') {
+      console.log('🔒 Production optimizations enabled');
+      console.log('📊 Cache logging disabled for performance');
+    }
+  });
+
+  process.on('SIGTERM', () => {
+    console.log('🛑 SIGTERM received, shutting down gracefully');
+    process.exit(0);
+  });
+
+  process.on('SIGINT', () => {
+    console.log('🛑 SIGINT received, shutting down gracefully');
+    process.exit(0);
   });
 }
 

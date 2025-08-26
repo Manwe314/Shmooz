@@ -1,15 +1,7 @@
-For Production:
-    serve media files with nginx.
-    deck-display-wheel.ts uses any twice, and many other "any" uses.
-    update the Api service 
-    change DockerFiles to copy files
-    put both django and angular in production
-    ctrl + f "URL"
-    upgrade LRU cache invalidation to django
-
 to-do:
     ? add "please use desktop - on mobile"
     ? last pass optimisations / seo upgrades / security checks
+    ? color picker for admin workspace
 
 
 
