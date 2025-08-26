@@ -1,8 +1,8 @@
-// landing-animation.guard.ts
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { isPlatformServer } from '@angular/common';
-import { Observable, of, timeout, catchError } from 'rxjs';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router,RouterStateSnapshot } from '@angular/router';
+import { catchError,Observable, of, timeout } from 'rxjs';
+
 import { TransitionService } from '../services/transition.service';
 
 @Injectable({ providedIn: 'root' })
@@ -10,7 +10,7 @@ export class LandingAnimationGuard implements CanActivate {
   constructor(
     private transition: TransitionService,
     private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {}
 
   canActivate(_route: ActivatedRouteSnapshot, _state: RouterStateSnapshot): Observable<boolean> {
@@ -23,7 +23,7 @@ export class LandingAnimationGuard implements CanActivate {
 
     return this.transition.waitForUnblock().pipe(
       timeout({ each: 10000 }),
-      catchError(() => of(true))
+      catchError(() => of(true)),
     );
   }
 }

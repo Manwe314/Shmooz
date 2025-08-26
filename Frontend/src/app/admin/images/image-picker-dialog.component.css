@@ -1,44 +1,79 @@
-.gallery { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); 
-    gap: 10px; 
-    margin-top: 8px;
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
 }
-.thumb { 
-    border: 1px solid #ddd; 
-    border-radius: 6px; 
-    overflow: hidden; 
-    cursor: pointer; 
-    background: #111; 
-    color:#eee;
+.thumb {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #111;
+  color: #eee;
 }
-.thumb img { 
-    width: 100%; 
-    height: 110px; 
-    object-fit: cover; 
-    display: block;
+.thumb img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  display: block;
 }
-.caption { 
-    padding: 6px; 
-    font-size: 12px; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis;
+.caption {
+  padding: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.pager { 
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
-    justify-content: flex-end; 
-    margin-top: 8px;
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
-.upload { 
-    display: flex; 
-    gap: 12px; 
-    align-items: center; 
-    margin-top: 12px; 
-    flex-wrap: wrap;
+.upload {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #fafafa;
 }
-.w { 
-    width: 240px;
+
+.w {
+  width: 100%;
+}
+
+.file-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-info .file-limit-info {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+  color: #c62828;
+  font-size: 14px;
+}
+
+.error-message mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }

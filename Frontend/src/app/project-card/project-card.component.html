@@ -1,9 +1,8 @@
 <div class="card" (mousemove)="onMouseMove($event)" (mouseleave)="onMouseLeave()" (click)="onCardClick()">
   <div class="card-bg" [ngStyle]="backgroundImage"></div>
   <div class="inset-border" [ngStyle]="insetBorder"></div>
-  <div class="label-circle"[ngStyle]="label">
+  <div class="label-circle" [ngStyle]="label">
     {{ card.label_letter }}
   </div>
-  <div class="card-text" [ngStyle]="text" [innerHTML]="card.text">
-  </div>
+  <div class="card-text" [ngStyle]="text" [innerHTML]="card.text"></div>
 </div>

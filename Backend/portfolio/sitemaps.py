@@ -1,11 +1,12 @@
 # portfolio/sitemaps.py
 from urllib.parse import urlencode
+
 from django.contrib.sitemaps import Sitemap
-from django.urls import reverse
 from django.db.models.functions import Coalesce
+from django.urls import reverse
 from django.utils import timezone
 
-from portfolio.models import SlugEntry, PagesModel
+from portfolio.models import PagesModel, SlugEntry
 
 
 class SlugRootSitemap(Sitemap):
@@ -13,7 +14,7 @@ class SlugRootSitemap(Sitemap):
     priority = 0.5
 
     def items(self):
-        return SlugEntry.objects.all().order_by('id')
+        return SlugEntry.objects.all().order_by("id")
 
     def location(self, obj: SlugEntry) -> str:
         return f"/{obj.slug}"
@@ -27,9 +28,11 @@ class PageOneSitemap(Sitemap):
     priority = 0.6
 
     def items(self):
-        return PagesModel.objects.filter(category='page_one').annotate(
-            sort_ts=Coalesce('edited_at', 'created_at')
-        ).order_by('id')
+        return (
+            PagesModel.objects.filter(category="page_one")
+            .annotate(sort_ts=Coalesce("edited_at", "created_at"))
+            .order_by("id")
+        )
 
     def location(self, obj: PagesModel) -> str:
         return f"/page_one/{obj.owner}"
@@ -43,9 +46,11 @@ class PageTwoSitemap(Sitemap):
     priority = 0.6
 
     def items(self):
-        return PagesModel.objects.filter(category='page_two').annotate(
-            sort_ts=Coalesce('edited_at', 'created_at')
-        ).order_by('id')
+        return (
+            PagesModel.objects.filter(category="page_two")
+            .annotate(sort_ts=Coalesce("edited_at", "created_at"))
+            .order_by("id")
+        )
 
     def location(self, obj: PagesModel) -> str:
         return f"/page_two/{obj.owner}"
@@ -59,11 +64,12 @@ class ProjectPageSitemap(Sitemap):
     priority = 0.7
 
     def items(self):
-        return PagesModel.objects.select_related('project_card').filter(
-            project_card__isnull=False
-        ).annotate(
-            sort_ts=Coalesce('edited_at', 'created_at')
-        ).order_by('id')
+        return (
+            PagesModel.objects.select_related("project_card")
+            .filter(project_card__isnull=False)
+            .annotate(sort_ts=Coalesce("edited_at", "created_at"))
+            .order_by("id")
+        )
 
     def location(self, obj: PagesModel) -> str:
         qs = urlencode({"slug": obj.owner})

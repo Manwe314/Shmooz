@@ -1,7 +1,9 @@
 <mat-card class="pcard-card" *ngIf="owner(); else noSlug">
   <div class="header">
     <h2>Project Cards</h2>
-    <span class="owner">Owner: <strong>{{ owner() }}</strong></span>
+    <span class="owner"
+      >Owner: <strong>{{ owner() }}</strong></span
+    >
     <span class="spacer"></span>
 
     <!-- Deck picker -->
@@ -25,7 +27,7 @@
       <mat-nav-list>
         <a mat-list-item *ngFor="let c of cards()" (click)="loadCard(c)">
           <span matListItemTitle>{{ c.title }}</span>
-          <span matListItemLine>Edited: {{ c.edited_at || c.created_at | date:'short' }}</span>
+          <span matListItemLine>Edited: {{ c.edited_at || c.created_at | date: 'short' }}</span>
         </a>
       </mat-nav-list>
     </div>
@@ -79,11 +81,26 @@
         </div>
 
         <div class="actions">
-          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || !selectedDeckId() || saving()">
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid || !selectedDeckId() || saving()"
+          >
             {{ form.controls['id'].value ? 'Save changes' : 'Create card' }}
           </button>
-          <button mat-button type="button" (click)="newCard()" [disabled]="!selectedDeckId() || loading()">Reset</button>
-          <button mat-button color="warn" type="button" (click)="confirmDelete()" [disabled]="!form.controls['id'].value || deleting()">Delete</button>
+          <button mat-button type="button" (click)="newCard()" [disabled]="!selectedDeckId() || loading()">
+            Reset
+          </button>
+          <button
+            mat-button
+            color="warn"
+            type="button"
+            (click)="confirmDelete()"
+            [disabled]="!form.controls['id'].value || deleting()"
+          >
+            Delete
+          </button>
         </div>
       </form>
 

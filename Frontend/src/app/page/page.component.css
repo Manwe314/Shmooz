@@ -9,7 +9,7 @@
   gap: 1rem;
 }
 
-.page-content{
+.page-content {
   padding: 1rem;
   box-sizing: border-box;
   width: 100%;
@@ -17,7 +17,7 @@
   transition: opacity 0.8s ease-in-out;
 }
 
-.page-content.visible{
+.page-content.visible {
   opacity: 1;
 }
 
@@ -32,8 +32,8 @@
 }
 
 .scroll-container {
-  scrollbar-width: none;        /* Firefox */
-  -ms-overflow-style: none;     /* Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .scroll-container::-webkit-scrollbar {

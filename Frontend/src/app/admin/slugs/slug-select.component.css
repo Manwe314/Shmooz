@@ -1,5 +1,23 @@
-.slug-card { max-width: 900px; margin: 40px auto; padding: 24px; }
-.chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-mat-chip { margin: 4px; }
-.create-form { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.full { flex: 1 1 300px; }
+.slug-card {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+}
+.chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+mat-chip {
+  margin: 4px;
+}
+.create-form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.full {
+  flex: 1 1 300px;
+}

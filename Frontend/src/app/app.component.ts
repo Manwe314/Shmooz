@@ -1,35 +1,32 @@
-import { filter } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
-import { SlugService } from './services/slug.service';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { LoginComponent } from "./admin/login/login.component";
+import { filter } from 'rxjs/operators';
+
+import { SlugService } from './services/slug.service';
 import { TransitionService } from './services/transition.service';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
   title = 'Shmoozers';
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private slugService: SlugService,
-    private transitionService: TransitionService
+    private transitionService: TransitionService,
   ) {}
 
   ngOnInit() {
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        //this.transitionService.cleanup();
-        let currentRoute = this.route;
-        while (currentRoute.firstChild) {
-          currentRoute = currentRoute.firstChild;
-        }
-      });
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
+      let currentRoute = this.route;
+      while (currentRoute.firstChild) {
+        currentRoute = currentRoute.firstChild;
+      }
+    });
   }
 }

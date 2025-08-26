@@ -1,24 +1,24 @@
 <mat-card class="deck-card" *ngIf="owner(); else noSlug">
   <div class="header">
     <h2>Decks</h2>
-    <span class="owner">Owner: <strong>{{ owner() }}</strong></span>
+    <span class="owner"
+      >Owner: <strong>{{ owner() }}</strong></span
+    >
     <span class="spacer"></span>
     <button mat-flat-button color="primary" (click)="newDeck()">New deck</button>
   </div>
 
   <div class="layout">
-    <!-- Left: list -->
     <div class="list">
       <h3>Existing decks</h3>
       <mat-nav-list>
         <a mat-list-item *ngFor="let d of decks()" (click)="loadDeck(d)">
           <span matListItemTitle>{{ d.displayed_name || d.title }}</span>
-          <span matListItemLine>Edited: {{ d.edited_at || d.created_at | date:'short' }}</span>
+          <span matListItemLine>Edited: {{ d.edited_at || d.created_at | date: 'short' }}</span>
         </a>
       </mat-nav-list>
     </div>
 
-    <!-- Right: editor + preview -->
     <div class="formWrap">
       <form [formGroup]="form" (ngSubmit)="save()">
         <div class="grid">
@@ -47,7 +47,6 @@
             <input type="number" matInput formControlName="card_amount" />
           </mat-form-field>
 
-          <!-- Images -->
           <div class="imageRow">
             <div class="imgPick">
               <div class="label">Cover image</div>
@@ -72,24 +71,23 @@
             </div>
           </div>
 
-          <!-- ===== Collapsible transforms ===== -->
           <mat-accordion multi="true" class="arraySection">
-            <!-- Card transforms -->
             <mat-expansion-panel [expanded]="true">
               <mat-expansion-panel-header>
                 <mat-panel-title>Card transforms</mat-panel-title>
-                <mat-panel-description>
-                  Count: {{ form.controls['card_amount'].value }}
-                </mat-panel-description>
+                <mat-panel-description> Count: {{ form.controls['card_amount'].value }} </mat-panel-description>
               </mat-expansion-panel-header>
 
               <div class="arrayRow">
                 <div class="rowLabel">x_offsets</div>
                 <div class="rowInputs">
                   <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
-                    <input matInput type="number"
-                           [value]="getCsvItem('x_offsets', i)"
-                           (input)="setCsvItem('x_offsets', i, $any($event.target).value)" />
+                    <input
+                      matInput
+                      type="number"
+                      [value]="getCsvItem('x_offsets', i)"
+                      (input)="setCsvItem('x_offsets', i, $any($event.target).value)"
+                    />
                   </mat-form-field>
                 </div>
                 <button mat-stroked-button type="button" (click)="resetDefaults('x_offsets')">Defaults</button>
@@ -99,9 +97,12 @@
                 <div class="rowLabel">y_offsets</div>
                 <div class="rowInputs">
                   <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
-                    <input matInput type="number"
-                           [value]="getCsvItem('y_offsets', i)"
-                           (input)="setCsvItem('y_offsets', i, $any($event.target).value)" />
+                    <input
+                      matInput
+                      type="number"
+                      [value]="getCsvItem('y_offsets', i)"
+                      (input)="setCsvItem('y_offsets', i, $any($event.target).value)"
+                    />
                   </mat-form-field>
                 </div>
                 <button mat-stroked-button type="button" (click)="resetDefaults('y_offsets')">Defaults</button>
@@ -111,9 +112,12 @@
                 <div class="rowLabel">rotations</div>
                 <div class="rowInputs">
                   <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
-                    <input matInput type="number"
-                           [value]="getCsvItem('rotations', i)"
-                           (input)="setCsvItem('rotations', i, $any($event.target).value)" />
+                    <input
+                      matInput
+                      type="number"
+                      [value]="getCsvItem('rotations', i)"
+                      (input)="setCsvItem('rotations', i, $any($event.target).value)"
+                    />
                   </mat-form-field>
                 </div>
                 <button mat-stroked-button type="button" (click)="resetDefaults('rotations')">Defaults</button>
@@ -123,9 +127,13 @@
                 <div class="rowLabel">alphas</div>
                 <div class="rowInputs">
                   <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
-                    <input matInput type="number" step="0.01"
-                           [value]="getCsvItem('alphas', i)"
-                           (input)="setCsvItem('alphas', i, $any($event.target).value)" />
+                    <input
+                      matInput
+                      type="number"
+                      step="0.01"
+                      [value]="getCsvItem('alphas', i)"
+                      (input)="setCsvItem('alphas', i, $any($event.target).value)"
+                    />
                   </mat-form-field>
                 </div>
                 <button mat-stroked-button type="button" (click)="resetDefaults('alphas')">Defaults</button>
@@ -135,31 +143,35 @@
                 <div class="rowLabel">brightness</div>
                 <div class="rowInputs">
                   <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
-                    <input matInput type="number" step="0.01"
-                           [value]="getCsvItem('brightness', i)"
-                           (input)="setCsvItem('brightness', i, $any($event.target).value)" />
+                    <input
+                      matInput
+                      type="number"
+                      step="0.01"
+                      [value]="getCsvItem('brightness', i)"
+                      (input)="setCsvItem('brightness', i, $any($event.target).value)"
+                    />
                   </mat-form-field>
                 </div>
                 <button mat-stroked-button type="button" (click)="resetDefaults('brightness')">Defaults</button>
               </div>
             </mat-expansion-panel>
 
-            <!-- Hover transforms -->
             <mat-expansion-panel>
               <mat-expansion-panel-header>
                 <mat-panel-title>Hover transforms</mat-panel-title>
-                <mat-panel-description>
-                  Count: {{ form.controls['card_amount'].value }}
-                </mat-panel-description>
+                <mat-panel-description> Count: {{ form.controls['card_amount'].value }} </mat-panel-description>
               </mat-expansion-panel-header>
 
               <div class="arrayRow">
                 <div class="rowLabel">hover_x_offsets</div>
                 <div class="rowInputs">
                   <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
-                    <input matInput type="number"
-                           [value]="getCsvItem('hover_x_offsets', i)"
-                           (input)="setCsvItem('hover_x_offsets', i, $any($event.target).value)" />
+                    <input
+                      matInput
+                      type="number"
+                      [value]="getCsvItem('hover_x_offsets', i)"
+                      (input)="setCsvItem('hover_x_offsets', i, $any($event.target).value)"
+                    />
                   </mat-form-field>
                 </div>
                 <button mat-stroked-button type="button" (click)="resetDefaults('hover_x_offsets')">Defaults</button>
@@ -169,9 +181,12 @@
                 <div class="rowLabel">hover_y_offsets</div>
                 <div class="rowInputs">
                   <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
-                    <input matInput type="number"
-                           [value]="getCsvItem('hover_y_offsets', i)"
-                           (input)="setCsvItem('hover_y_offsets', i, $any($event.target).value)" />
+                    <input
+                      matInput
+                      type="number"
+                      [value]="getCsvItem('hover_y_offsets', i)"
+                      (input)="setCsvItem('hover_y_offsets', i, $any($event.target).value)"
+                    />
                   </mat-form-field>
                 </div>
                 <button mat-stroked-button type="button" (click)="resetDefaults('hover_y_offsets')">Defaults</button>
@@ -181,9 +196,12 @@
                 <div class="rowLabel">hover_rotations</div>
                 <div class="rowInputs">
                   <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
-                    <input matInput type="number"
-                           [value]="getCsvItem('hover_rotations', i)"
-                           (input)="setCsvItem('hover_rotations', i, $any($event.target).value)" />
+                    <input
+                      matInput
+                      type="number"
+                      [value]="getCsvItem('hover_rotations', i)"
+                      (input)="setCsvItem('hover_rotations', i, $any($event.target).value)"
+                    />
                   </mat-form-field>
                 </div>
                 <button mat-stroked-button type="button" (click)="resetDefaults('hover_rotations')">Defaults</button>
@@ -193,16 +211,19 @@
                 <div class="rowLabel">hover_brightness</div>
                 <div class="rowInputs">
                   <mat-form-field class="num" appearance="fill" *ngFor="let i of indexArray">
-                    <input matInput type="number" step="0.01"
-                           [value]="getCsvItem('hover_brightness', i)"
-                           (input)="setCsvItem('hover_brightness', i, $any($event.target).value)" />
+                    <input
+                      matInput
+                      type="number"
+                      step="0.01"
+                      [value]="getCsvItem('hover_brightness', i)"
+                      (input)="setCsvItem('hover_brightness', i, $any($event.target).value)"
+                    />
                   </mat-form-field>
                 </div>
                 <button mat-stroked-button type="button" (click)="resetDefaults('hover_brightness')">Defaults</button>
               </div>
             </mat-expansion-panel>
           </mat-accordion>
-          <!-- ===== /Collapsible transforms ===== -->
         </div>
 
         <div class="actions">
@@ -210,15 +231,22 @@
             {{ form.controls['id'].value ? 'Save changes' : 'Create deck' }}
           </button>
           <button mat-button type="button" (click)="resetForm()" [disabled]="loading()">Reset</button>
-          <button mat-button color="warn" type="button" (click)="confirmDelete()" [disabled]="!form.controls['id'].value || deleting()">Delete</button>
+          <button
+            mat-button
+            color="warn"
+            type="button"
+            (click)="confirmDelete()"
+            [disabled]="!form.controls['id'].value || deleting()"
+          >
+            Delete
+          </button>
         </div>
       </form>
 
-      <!-- Live preview -->
       <div class="preview">
         <h3>Preview</h3>
         <div class="previewBox">
-          <app-deck [deck]="previewDeck" ></app-deck>
+          <app-deck [deck]="previewDeck"></app-deck>
         </div>
       </div>
     </div>

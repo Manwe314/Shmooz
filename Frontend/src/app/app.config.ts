@@ -1,19 +1,31 @@
-import { ApplicationConfig, provideZoneChangeDetection, APP_INITIALIZER, inject } from '@angular/core';
-import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
-import { routes } from './app.routes';
+import {
+  provideHttpClient,
+  withFetch,
+  withInterceptors,
+  withInterceptorsFromDi,
+  withXsrfConfiguration,
+} from '@angular/common/http';
+import {
+  APP_INITIALIZER,
+  ApplicationConfig,
+  inject,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideHttpClient, withFetch, withInterceptorsFromDi, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
-import { authInterceptor } from './admin/auth/auth.interceptor';
-import { CsrfService } from './admin/auth/csrf.service';
+import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
 import { firstValueFrom, of } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
+
+import { authInterceptor } from './admin/auth/auth.interceptor';
+import { CsrfService } from './admin/auth/csrf.service';
+import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(
       routes,
-      withEnabledBlockingInitialNavigation() // ✅ avoids any pre-paint before first route resolves
+      withEnabledBlockingInitialNavigation(),
     ),
     provideClientHydration(withEventReplay()),
     provideHttpClient(
@@ -22,8 +34,6 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([authInterceptor]),
       withXsrfConfiguration({ cookieName: 'csrftoken', headerName: 'X-CSRFToken' }),
     ),
-
-    // ✅ Set CSRF cookie before anything else
     {
       provide: APP_INITIALIZER,
       multi: true,
@@ -32,11 +42,11 @@ export const appConfig: ApplicationConfig = {
         return () =>
           firstValueFrom(
             csrf.ensureCsrfCookie().pipe(
-              timeout(2000),          // don't block forever if server is slow
-              catchError(() => of(true)) // don't fail boot if it times out
-            )
+              timeout(2000),
+              catchError(() => of(true)),
+            ),
           );
-      }
-    }
+      },
+    },
   ],
 };

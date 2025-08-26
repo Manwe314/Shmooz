@@ -1,8 +1,9 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { inject,Injectable } from '@angular/core';
+import { makeStateKey,TransferState } from '@angular/core';
 import { Observable } from 'rxjs';
+
 import { ApiService } from './api.service';
-import { TransferState, makeStateKey } from '@angular/core';
 
 export interface GradientColors {
   color1: string;
@@ -31,7 +32,7 @@ export interface PageDetails {
 export class BackgroundService {
   private http = inject(HttpClient);
   private api = inject(ApiService);
-  private ts   = inject(TransferState);
+  private ts = inject(TransferState);
   private gradient: GradientColors | null = null;
   private pageNames: PageInfo | null = null;
   private pageDetails: PageDetails | null = null;
@@ -40,24 +41,24 @@ export class BackgroundService {
     const KEY = makeStateKey<any>(`bg:${slug}`);
     const payload = this.ts.get(KEY, null as any);
     if (payload) {
-      this.gradient    = payload.gradient ?? this.gradient;
-      this.pageNames   = payload.pageNames ?? this.pageNames;
+      this.gradient = payload.gradient ?? this.gradient;
+      this.pageNames = payload.pageNames ?? this.pageNames;
       this.pageDetails = payload.pageDetails ?? this.pageDetails;
     }
   }
-  
+
   setResolvedGradient(data: GradientColors) {
     this.gradient = data;
   }
-  
+
   getGradient(): GradientColors | null {
     return this.gradient;
   }
-  
+
   setResolvedPageNames(data: PageInfo) {
     this.pageNames = data;
   }
-  
+
   getPageNames(): PageInfo | null {
     return this.pageNames;
   }
@@ -71,17 +72,23 @@ export class BackgroundService {
   }
 
   getGradientColors(path: string = ''): Observable<GradientColors> {
-    const endpoint = path ? this.api.buildUrl(`gradient-colors/${path}`) : this.api.buildUrl('gradient-colors/shmooz');
+    const endpoint = path
+      ? this.api.buildUrl(`gradient-colors/${path}`)
+      : this.api.buildUrl('gradient-colors/shmooz');
     return this.http.get<GradientColors>(endpoint);
   }
 
   getPageInfo(path: string = ''): Observable<PageInfo> {
-    const endpoint = path ? this.api.buildUrl(`page-names/${path}`) : this.api.buildUrl('page-names/shmooz');
+    const endpoint = path
+      ? this.api.buildUrl(`page-names/${path}`)
+      : this.api.buildUrl('page-names/shmooz');
     return this.http.get<PageInfo>(endpoint);
   }
 
   getPageDetails(path: string = ''): Observable<PageDetails> {
-    const endpoint = path ? this.api.buildUrl(`page-details/${path}`) : this.api.buildUrl('page-details/shmooz')
+    const endpoint = path
+      ? this.api.buildUrl(`page-details/${path}`)
+      : this.api.buildUrl('page-details/shmooz');
     return this.http.get<PageDetails>(endpoint);
   }
 }

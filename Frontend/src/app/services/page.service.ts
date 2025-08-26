@@ -1,14 +1,15 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { inject,Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+
 import { ApiService } from './api.service';
 
 export interface Block {
   id: string;
-  backgroundColor: string; // rgba(0,0,0,0.1)
+  backgroundColor: string;
   borderColor: string;
-  gridTemplateColumns: string; // e.g. '1fr 2fr 1fr'
-  gridTemplateRows: string;    // e.g. 'auto auto'
+  gridTemplateColumns: string;
+  gridTemplateRows: string;
   tag?: string;
   content: BlockContent[];
 }
@@ -66,18 +67,17 @@ export interface LinkContent extends BaseContent {
   iconPosition?: 'left' | 'right';
 }
 
-
 export interface PageData {
   content: Block[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PageService {
   private http = inject(HttpClient);
   private api = inject(ApiService);
-  private content: PageData = {content: []};
+  private content: PageData = { content: [] };
 
   setContent(data: PageData) {
     this.content = data;
@@ -90,18 +90,11 @@ export class PageService {
   getPageData(path: string, slug: string, id?: string): Observable<PageData> {
     let endpoint: string;
 
-    //to-do mc givi pagination
-
-    if (path === 'page_one') 
-      endpoint = this.api.buildUrl(`page1/${slug}`);
-    else if (path === 'page_two')
-      endpoint = this.api.buildUrl(`page2/${slug}`);
-    else if (path === 'project_page' && id)
-      endpoint = this.api.buildUrl(`project_page/${id}`);
-    else
-      endpoint = this.api.buildUrl(`page1/${slug}`);
+    if (path === 'page_one') endpoint = this.api.buildUrl(`page1/${slug}`);
+    else if (path === 'page_two') endpoint = this.api.buildUrl(`page2/${slug}`);
+    else if (path === 'project_page' && id) endpoint = this.api.buildUrl(`project_page/${id}`);
+    else endpoint = this.api.buildUrl(`page1/${slug}`);
 
     return this.http.get<PageData>(endpoint);
   }
-  
 }

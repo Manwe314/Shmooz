@@ -1,30 +1,32 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component,inject, OnInit, signal } from '@angular/core';
 import {
-  ReactiveFormsModule, FormBuilder, Validators,
-  FormGroup, FormControl
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map, startWith } from 'rxjs/operators';
 
-import { SlugService } from '../slugs/slug.service';
-import { DeckService, DeckDto } from '../decks/deck.service';
-import { ProjectCardsService, ProjectCardDto } from './project-cards.service';
-import { ImagePickerDialogComponent, ImagePickResult } from '../images/image-picker-dialog.component';
-import { ConfirmDialogComponent } from '../widgets/confirm-dialog.component';
-
-// Optional preview
 import { ProjectCardComponent } from '../../../app/project-card/project-card.component';
 import type { ProjectCard } from '../../../app/services/project-cards.service';
+import { DeckDto,DeckService } from '../decks/deck.service';
+import {
+  ImagePickerDialogComponent,
+  ImagePickResult,
+} from '../images/image-picker-dialog.component';
+import { SlugService } from '../slugs/slug.service';
+import { ConfirmDialogComponent } from '../widgets/confirm-dialog.component';
+import { ProjectCardDto,ProjectCardsService } from './project-cards.service';
 
 type CardForm = FormGroup<{
   id: FormControl<number | null>;
@@ -39,9 +41,9 @@ type CardForm = FormGroup<{
 }>;
 
 function ensureHash(v: string | null | undefined): string {
-      if (!v) return '#000000';
-      return v.startsWith('#') ? v : `#${v}`;
-    }
+  if (!v) return '#000000';
+  return v.startsWith('#') ? v : `#${v}`;
+}
 
 @Component({
   selector: 'app-project-card-editor',
@@ -58,10 +60,10 @@ function ensureHash(v: string | null | undefined): string {
     MatSelectModule,
     MatDialogModule,
     MatSnackBarModule,
-    ProjectCardComponent, // remove this if you want to drop the preview
+    ProjectCardComponent,
   ],
   templateUrl: './project-card-editor.component.html',
-  styleUrl: './project-card-editor.component.css'
+  styleUrl: './project-card-editor.component.css',
 })
 export class ProjectCardEditorComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -80,25 +82,29 @@ export class ProjectCardEditorComponent implements OnInit {
   saving = signal(false);
   deleting = signal(false);
 
-    form: CardForm = this.fb.nonNullable.group({
-      id: this.fb.control<number | null>(null),
-      title: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
-      text: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
-      text_color: this.fb.nonNullable.control('#ffffff', [Validators.pattern(/^#(?:[0-9a-fA-F]{3}){1,2}$/)]),
-      label_letter: this.fb.nonNullable.control('A', [Validators.required, Validators.maxLength(2)]),
-      label_color: this.fb.nonNullable.control('#000000', [Validators.pattern(/^#(?:[0-9a-fA-F]{3}){1,2}$/)]),
-      inline_color: this.fb.nonNullable.control('#cccccc', [Validators.pattern(/^#(?:[0-9a-fA-F]{3}){1,2}$/)]),
-      image_id: this.fb.control<number | null>(null),
-      image_url: this.fb.control<string | null>(null),
-    });
+  form: CardForm = this.fb.nonNullable.group({
+    id: this.fb.control<number | null>(null),
+    title: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
+    text: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
+    text_color: this.fb.nonNullable.control('#ffffff', [
+      Validators.pattern(/^#(?:[0-9a-fA-F]{3}){1,2}$/),
+    ]),
+    label_letter: this.fb.nonNullable.control('A', [Validators.required, Validators.maxLength(2)]),
+    label_color: this.fb.nonNullable.control('#000000', [
+      Validators.pattern(/^#(?:[0-9a-fA-F]{3}){1,2}$/),
+    ]),
+    inline_color: this.fb.nonNullable.control('#cccccc', [
+      Validators.pattern(/^#(?:[0-9a-fA-F]{3}){1,2}$/),
+    ]),
+    image_id: this.fb.control<number | null>(null),
+    image_url: this.fb.control<string | null>(null),
+  });
 
-  // Preview card object (cast as any to satisfy ProjectCardComponent input)
-  
 
-    get previewCard(): ProjectCard {
+  get previewCard(): ProjectCard {
     const f = this.form.getRawValue();
     return {
-      id: String(f.id ?? ''),            // public ProjectCard expects string
+      id: String(f.id ?? ''),
       title: f.title ?? '',
       text: f.text ?? '',
       text_color: ensureHash(f.text_color),
@@ -107,7 +113,6 @@ export class ProjectCardEditorComponent implements OnInit {
       inline_color: ensureHash(f.inline_color),
       image_url: f.image_url ?? '',
       owner: this.owner() ?? '',
-      // the component tolerates these optional props
       animationState: 'inHand',
       offsetX: 0,
       offsetY: 0,
@@ -156,7 +161,7 @@ export class ProjectCardEditorComponent implements OnInit {
       return this.getImageUrl(input);
     } catch {
       const i = input.indexOf(MEDIA);
-      if (i !== -1) return  this.getImageUrl(input.slice(i));
+      if (i !== -1) return this.getImageUrl(input.slice(i));
       if (input.startsWith('media')) return this.getImageUrl('/' + input);
       return this.getImageUrl(input);
     }
@@ -169,7 +174,7 @@ export class ProjectCardEditorComponent implements OnInit {
 
   ngOnInit() {
     this.owner.set(this.slugService.selectedSlugSnapshot?.slug ?? null);
-    this.slugService.selectedSlug$.subscribe(s => {
+    this.slugService.selectedSlug$.subscribe((s) => {
       const next = s?.slug ?? null;
       if (next !== this.owner()) {
         this.owner.set(next);
@@ -184,10 +189,14 @@ export class ProjectCardEditorComponent implements OnInit {
   }
 
   loadDecks() {
-    const o = this.owner(); if (!o) return;
-    this.decksApi.listByOwner(o, 100).subscribe(list => {
-      // ensure sorted by -edited_at (backend already does via ordering, but keep)
-      this.decks.set(list.sort((a, b) => (b.edited_at || b.created_at).localeCompare(a.edited_at || a.created_at)));
+    const o = this.owner();
+    if (!o) return;
+    this.decksApi.listByOwner(o, 100).subscribe((list) => {
+      this.decks.set(
+        list.sort((a, b) =>
+          (b.edited_at || b.created_at).localeCompare(a.edited_at || a.created_at),
+        ),
+      );
     });
   }
 
@@ -202,30 +211,34 @@ export class ProjectCardEditorComponent implements OnInit {
   }
 
   loadCards() {
-    const o = this.owner(); const d = this.selectedDeckId();
+    const o = this.owner();
+    const d = this.selectedDeckId();
     if (!o || !d) return;
     this.loading.set(true);
-    this.cardsApi.listByOwnerAndDeck(o, d, 200).subscribe(list => {
+    this.cardsApi.listByOwnerAndDeck(o, d, 200).subscribe((list) => {
       this.cards.set(list);
       this.loading.set(false);
     });
   }
 
-  clearCard() { this.newCard(); }
+  clearCard() {
+    this.newCard();
+  }
 
   pickImage() {
-    const o = this.owner(); if (!o) return;
+    const o = this.owner();
+    if (!o) return;
     const ref = this.dialog.open(ImagePickerDialogComponent, {
       data: { ownerSlug: o },
-      width: '900px',          
-      maxWidth: '90vw',        
-      minWidth: '400px',       
-      panelClass: 'image-picker-dialog' 
+      width: '900px',
+      maxWidth: '90vw',
+      minWidth: '400px',
+      panelClass: 'image-picker-dialog',
     });
     ref.afterClosed().subscribe((res: ImagePickResult | null) => {
       if (!res) return;
       this.form.controls['image_id'].setValue(res.id);
-      this.form.controls['image_url'].setValue(res.path); // normalized /media/.. path
+      this.form.controls['image_url'].setValue(res.path);
     });
   }
 
@@ -235,7 +248,8 @@ export class ProjectCardEditorComponent implements OnInit {
   }
 
   save() {
-    const o = this.owner(); const d = this.selectedDeckId();
+    const o = this.owner();
+    const d = this.selectedDeckId();
     if (!o || !d || this.form.invalid) return;
     this.saving.set(true);
     const f = this.form.getRawValue();
@@ -253,7 +267,7 @@ export class ProjectCardEditorComponent implements OnInit {
     };
 
     if (!f.id) {
-      this.cardsApi.create(o, payload).subscribe(rec => {
+      this.cardsApi.create(o, payload).subscribe((rec) => {
         this.saving.set(false);
         if (rec) {
           this.snack.open('Project card created', 'OK', { duration: 1500 });
@@ -264,11 +278,11 @@ export class ProjectCardEditorComponent implements OnInit {
         }
       });
     } else {
-      this.cardsApi.update(f.id!, o, d, payload).subscribe(rec => {
+      this.cardsApi.update(f.id!, o, d, payload).subscribe((rec) => {
         this.saving.set(false);
         if (rec) {
           this.snack.open('Saved', 'OK', { duration: 1200 });
-          const list = this.cards().map(x => x.id === rec.id ? rec : x);
+          const list = this.cards().map((x) => (x.id === rec.id ? rec : x));
           this.cards.set(list);
           this.loadCard(rec);
         } else {
@@ -287,16 +301,16 @@ export class ProjectCardEditorComponent implements OnInit {
         message: `Delete this card? This cannot be undone.`,
         confirmText: 'Delete',
         cancelText: 'Cancel',
-      }
+      },
     });
-    ref.afterClosed().subscribe(ok => {
+    ref.afterClosed().subscribe((ok) => {
       if (!ok) return;
       this.deleting.set(true);
-      this.cardsApi.delete(id).subscribe(success => {
+      this.cardsApi.delete(id).subscribe((success) => {
         this.deleting.set(false);
         if (success) {
           this.snack.open('Card deleted', 'OK', { duration: 1500 });
-          this.cards.set(this.cards().filter(c => c.id !== id));
+          this.cards.set(this.cards().filter((c) => c.id !== id));
           this.newCard();
         } else {
           this.snack.open('Failed to delete', 'Dismiss', { duration: 2500 });

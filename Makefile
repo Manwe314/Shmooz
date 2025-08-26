@@ -3,11 +3,17 @@ all:	up
 up:
 	@mkdir -p ./Volume
 	@mkdir -p ./Volume/postgresql
+	@mkdir -p ./Volume/media/uploads
+	@mkdir -p ./Volume/logs
+	@mkdir -p ./Volume/staticfiles
 	docker compose -f docker-compose.yml up
 
 detach:
 	@mkdir -p ./Volume
 	@mkdir -p ./Volume/postgresql
+	@mkdir -p ./Volume/media/uploads
+	@mkdir -p ./Volume/logs
+	@mkdir -p ./Volume/staticfiles
 	docker compose -f -d docker-compose.yml up
 
 down:
@@ -20,15 +26,21 @@ fclean: down
 	rm -Rf ./Volume
 	rm -Rf ./Backend/administration/__pycache__
 	rm -Rf ./Backend/portfolio/__pycache__
-re: 
+re:
 	@mkdir -p ./Volume
 	@mkdir -p ./Volume/postgresql
+	@mkdir -p ./Volume/media/uploads
+	@mkdir -p ./Volume/logs
+	@mkdir -p ./Volume/staticfiles
 	@docker compose -f docker-compose.yml build
 	@docker compose -f docker-compose.yml up
 
-dre: 
+dre:
 	@mkdir -p ./Volume
 	@mkdir -p ./Volume/postgresql
+	@mkdir -p ./Volume/media/uploads
+	@mkdir -p ./Volume/logs
+	@mkdir -p ./Volume/staticfiles
 	@docker compose -f docker-compose.yml build
 	@docker compose -f -d docker-compose.yml up
 

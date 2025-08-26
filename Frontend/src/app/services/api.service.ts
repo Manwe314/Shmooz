@@ -1,4 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { inject,Injectable } from '@angular/core';
+
 import { PlatformService } from './platform.service';
 
 @Injectable({ providedIn: 'root' })
@@ -7,12 +8,11 @@ export class ApiService {
 
   getBaseUrl(): string {
     return this.platform.isServer()
-      ? 'http://backend:8000' // container-to-container
-      : 'https://127.0.0.1:8080';  // browser to local backend
+      ? 'http://backend:8000'
+      : 'https://127.0.0.1:8080';
   }
 
   buildUrl(endpoint: string): string {
     return `${this.getBaseUrl()}/api/${endpoint}`;
   }
 }
-

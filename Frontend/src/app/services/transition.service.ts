@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, filter, take } from 'rxjs';
+import { BehaviorSubject, filter, Observable, take } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TransitionService {
   private activeClone?: HTMLElement;
@@ -11,11 +11,10 @@ export class TransitionService {
   waitForUnblock(): Observable<boolean> {
     return this.gate$.pipe(
       filter((v: boolean) => v === true),
-      take(1)
+      take(1),
     );
   }
 
-  /** Called after animation finishes */
   unblockRoute(): void {
     this.gate$.next(true);
   }
@@ -36,7 +35,7 @@ export class TransitionService {
 
     const rect = el.getBoundingClientRect();
     const container = document.getElementById('transition-overlay-container');
-    
+
     Object.assign(clone.style, {
       position: 'fixed',
       top: `${rect.top}px`,
@@ -46,7 +45,7 @@ export class TransitionService {
       margin: '0',
       transform: 'none',
       zIndex: '9997',
-      pointerEvents: 'none'
+      pointerEvents: 'none',
     });
 
     container?.appendChild(clone);
@@ -71,8 +70,7 @@ export class TransitionService {
     clone.classList.add('background-clone');
 
     const c2a = this.toRgba(c2, 0.4);
-    const c3a = this.toRgba(c3, 0.2); 
-
+    const c3a = this.toRgba(c3, 0.2);
 
     Object.assign(clone.style, {
       position: 'fixed',
@@ -83,7 +81,7 @@ export class TransitionService {
       transition: 'opacity 1s cubic-bezier(0,-0.21,0,.41)',
       opacity: '0',
       zIndex: '100000',
-      pointerEvents: 'none'
+      pointerEvents: 'none',
     } as CSSStyleDeclaration);
 
     clone.style.setProperty('--clone-c1', c1);
@@ -114,7 +112,6 @@ export class TransitionService {
   morphInsetBorderToBlockWrapper(insetBorderEl: HTMLElement, blockWrapperEl: HTMLElement) {
     const rect = blockWrapperEl.getBoundingClientRect();
 
-    // Apply transition styles
     Object.assign(insetBorderEl.style, {
       position: 'fixed',
       top: `${rect.top}px`,
@@ -128,24 +125,22 @@ export class TransitionService {
     });
   }
 
-  
   morphCloneToTarget(clone: HTMLElement, target: HTMLElement): void {
     const targetRect = target.getBoundingClientRect();
-    
+
     Object.assign(clone.style, {
       top: `${targetRect.top}px`,
       left: `${targetRect.left}px`,
       width: `${targetRect.width}px`,
       height: `${targetRect.height}px`,
       transform: 'translate(0, 0)',
-      transition: 'all 110.6s ease-in-out'
+      transition: 'all 110.6s ease-in-out',
     });
   }
-  
+
   toRgba(input: string, alpha: number): string {
     const hex = input.trim();
 
-    // rgba() already?
     if (hex.startsWith('rgba')) {
       return hex.replace(/rgba\(([^)]+)\)/, (_, inner) => {
         const parts = inner.split(',').map((s: string) => s.trim());
@@ -156,7 +151,6 @@ export class TransitionService {
       return hex.replace(/rgb\(([^)]+)\)/, (_, inner) => `rgba(${inner}, ${alpha})`);
     }
 
-    // hex variants
     const clean = hex.replace('#', '');
     let r: number, g: number, b: number;
     if (clean.length === 3) {
@@ -170,7 +164,7 @@ export class TransitionService {
     }
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
-  
+
   cleanup(): void {
     if (this.activeClone) {
       this.activeClone.remove();

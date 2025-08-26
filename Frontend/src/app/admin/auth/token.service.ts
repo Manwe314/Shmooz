@@ -6,7 +6,6 @@ interface JwtPayload {
 }
 
 function base64UrlDecode(input: string): string {
-  // Replace URL-safe chars and pad
   input = input.replace(/-/g, '+').replace(/_/g, '/');
   const pad = input.length % 4;
   if (pad) input += '===='.slice(pad);
@@ -52,20 +51,20 @@ export class TokenService {
 
   getExpiration(): number | null {
     const payload = this.getPayload();
-    return payload?.exp ?? null; // seconds since epoch
+    return payload?.exp ?? null;
   }
 
   isExpired(skewSeconds = 10): boolean {
     const exp = this.getExpiration();
     if (!exp) return true;
     const now = Math.floor(Date.now() / 1000);
-    return exp <= (now + skewSeconds);
+    return exp <= now + skewSeconds;
   }
 
   isExpiringSoon(seconds = 20): boolean {
     const exp = this.getExpiration();
     if (!exp) return true;
     const now = Math.floor(Date.now() / 1000);
-    return exp <= (now + seconds);
+    return exp <= now + seconds;
   }
 }

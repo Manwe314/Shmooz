@@ -1,12 +1,12 @@
-import { Injectable, inject } from '@angular/core';
+import { inject,Injectable } from '@angular/core';
+import { makeStateKey,TransferState } from '@angular/core';
 import { Resolve } from '@angular/router';
 import { forkJoin, of, tap } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { BackgroundService } from '../services/background.service';
-import { SlugService } from '../services/slug.service';
-import { PageDetails, PageInfo, GradientColors } from '../services/background.service';
-import { TransferState, makeStateKey } from '@angular/core';
 
+import { BackgroundService } from '../services/background.service';
+import { GradientColors,PageDetails, PageInfo } from '../services/background.service';
+import { SlugService } from '../services/slug.service';
 
 type BgPayload = {
   gradient: GradientColors;
@@ -19,13 +19,13 @@ export class LandingBackgroundResolver implements Resolve<boolean> {
   private ts = inject(TransferState);
   constructor(
     private backgroundService: BackgroundService,
-    private slugService: SlugService
+    private slugService: SlugService,
   ) {}
 
   resolve() {
     const slug = this.slugService.getCurrentSlug() ?? 'shmooz';
     const KEY = makeStateKey<any>(`bg:${slug}`);
-    
+
     const cached = this.ts.get(KEY, null as any);
     if (cached) {
       this.backgroundService.setResolvedGradient(cached.gradient);
@@ -33,11 +33,11 @@ export class LandingBackgroundResolver implements Resolve<boolean> {
       this.backgroundService.setResolvedPageDetails(cached.pageDetails);
       return of(true);
     }
-    
+
     return forkJoin({
       gradient: this.backgroundService.getGradientColors(slug),
       pageNames: this.backgroundService.getPageInfo(slug),
-      pageDetails: this.backgroundService.getPageDetails(slug)
+      pageDetails: this.backgroundService.getPageDetails(slug),
     }).pipe(
       tap((payload: BgPayload) => {
         this.backgroundService.setResolvedGradient(payload.gradient);
@@ -46,10 +46,10 @@ export class LandingBackgroundResolver implements Resolve<boolean> {
         this.ts.set(KEY, payload);
       }),
       map(() => true),
-      catchError(err => {
+      catchError((err) => {
         console.error('[LandingBackgroundResolver] error:', err);
         return of(true);
-      })
+      }),
     );
   }
 }

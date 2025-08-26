@@ -2,7 +2,9 @@
   <span>Admin</span>
   <span class="spacer"></span>
   <ng-container *ngIf="current as s">
-    <span class="slug-pill">Slug: <strong>{{ s.slug }}</strong></span>
+    <span class="slug-pill"
+      >Slug: <strong>{{ s.slug }}</strong></span
+    >
     <button mat-icon-button aria-label="Edit slug" (click)="editSlug(s)">
       <mat-icon>edit</mat-icon>
     </button>

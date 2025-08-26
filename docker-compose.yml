@@ -2,23 +2,33 @@ services:
   frontend:
     build:
       context: ./Frontend
-    volumes:
-      - ./Frontend:/app
-      - /app/node_modules
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
     env_file:
       - .env
     expose:
       - "4000"
     networks:
       - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4000/', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
   
   backend:
     build:
       context: ./Backend
+      dockerfile: Dockerfile
     env_file:
       - .env
     volumes:
-      - ./Backend:/app
+      - media-files:/app/media  # Shared media volume
+      - backend-logs:/app/logs  # Logs volume
+      - static-files:/app/staticfiles  # Static files volume
     ports:
       - "8000:8000"
     expose:
@@ -27,6 +37,13 @@ services:
       - app-network
     depends_on:
       - db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   db:
     image: postgres:17@sha256:aadf2c0696f5ef357aa7a68da995137f0cf17bad0bf6e1f17de06ae5c769b302
@@ -38,17 +55,46 @@ services:
       - "5432:5432"
     networks:
       - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${DATABASE_USER} -d $${DATABASE_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_stat_statements
+      -c pg_stat_statements.track=all
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
 
   nginx:
     build:
       context: ./Nginx
     ports:
       - "8080:443"
+    volumes:
+      - media-files:/var/www/media:ro  # Read-only access to shared media volume
     depends_on:
-      - frontend
-      - backend
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
     networks:
       - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://localhost:443/", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 networks:
   app-network:
@@ -61,4 +107,25 @@ volumes:
       type: "none"
       o: "bind"
       device: "./Volume/postgresql"
+
+  media-files:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "./Volume/media"
+
+  backend-logs:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "./Volume/logs"
+
+  static-files:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "./Volume/staticfiles"
 

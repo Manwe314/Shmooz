@@ -1,7 +1,8 @@
-import { Component, ElementRef, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Deck } from '../services/deck.service';
+import { Component, ElementRef, EventEmitter,Input, Output, ViewChild } from '@angular/core';
 import { inject } from '@angular/core';
+
+import { Deck } from '../services/deck.service';
 import { PlatformService } from '../services/platform.service';
 
 @Component({
@@ -38,33 +39,29 @@ export class DeckComponent {
   private platform = inject(PlatformService);
 
   @Input()
-  set deck(value: Deck)
-  {
+  set deck(value: Deck) {
     this.id = value.id;
     this.displayName = value.displayed_name;
     this.imageUrl = this.getImageUrl(value.image_url || '');
-    this.hoverImg = value.hover_img_url ?  this.getImageUrl(value.hover_img_url) : '';
+    this.hoverImg = value.hover_img_url ? this.getImageUrl(value.hover_img_url) : '';
     this.card_amount = value.card_amount ?? 4;
     this.x_offsets = this.ensure(value.x_offsets, [3, 5, 1, -10]);
     this.y_offsets = this.ensure(value.y_offsets, [1, 0, 4, 1]);
     this.rotations = this.ensure(value.rotations, [-3, -9, 2, 7]);
-    this.alphas = this.ensure(value.alphas, [0.15, 0.20, 0.25, 0.25]);
-    this.brightness = this.ensure(value.brightness, [0.9, 0.85, 0.80, 0.75]);
+    this.alphas = this.ensure(value.alphas, [0.15, 0.2, 0.25, 0.25]);
+    this.brightness = this.ensure(value.brightness, [0.9, 0.85, 0.8, 0.75]);
     this.hover_x_offsets = this.ensure(value.hover_x_offsets, [-15, -15, -3, 5]);
     this.hover_y_offsets = this.ensure(value.hover_y_offsets, [28, 43, -20, 55]);
     this.hover_rotations = this.ensure(value.hover_rotations, [-8, 20, 5, 7]);
     this.hover_brightness = this.ensure(value.hover_brightness, [0.95, 0.9, 0.85, 0.8]);
-    this.text_color = value.text_color ?? "#fff";
+    this.text_color = value.text_color ?? '#fff';
     this.hover_color = value.hover_color ? value.hover_color : this.toRgba('#e0f804', 1);
 
     this.cards = Array.from({ length: this.card_amount }, (_, i) => i);
-    console.log(value.image_url);
   }
 
   ensure(val: number[] | undefined, fallback: number[]): number[] {
-    return Array.isArray(val) && val.length > 0 && this.card_amount != 0
-      ? val
-      : fallback;
+    return Array.isArray(val) && val.length > 0 && this.card_amount != 0 ? val : fallback;
   }
 
   toRgba(input: string, alpha: number): string {
@@ -94,7 +91,6 @@ export class DeckComponent {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
-
   hovered = false;
 
   getDeckCardsStyle(card: number): Record<string, string> {
@@ -109,36 +105,34 @@ export class DeckComponent {
     const blur = isHovered ? 0 : 0.4;
     const alpha = this.alphas[idx] ?? 0;
 
-    const index = 40 - (10 * idx);
+    const index = 40 - 10 * idx;
 
     return {
       'z-index': `${index}`,
       'background-image': `linear-gradient(rgba(0,0,0,${alpha}), rgba(0,0,0,${alpha})), url('${this.imageUrl}')`,
-      'transform': `translateX(${x_offset}px) translateY(${y_offset}px) rotate(${rotation}deg)`,
-      'filter': `brightness(${brightness}) blur(${blur}px)`,
+      transform: `translateX(${x_offset}px) translateY(${y_offset}px) rotate(${rotation}deg)`,
+      filter: `brightness(${brightness}) blur(${blur}px)`,
     };
   }
 
   handleClick() {
     if (!this.platform.isBrowser()) return;
-    
+
     const host = this.deckEl?.nativeElement;
     if (!host) return;
 
     const rect = this.deckEl.nativeElement.getBoundingClientRect();
     const origin = {
       x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2
+      y: rect.top + rect.height / 2,
     };
-  
+
     this.deckSelected.emit({ id: this.id!, origin });
-  
-    console.log('Deck clicked:', this.id, 'at', origin);
   }
 
   getImageUrl(path: string): string {
     if (!path) return '';
     //URL
-    return `https://127.0.0.1:8080${path}`
+    return `https://127.0.0.1:8080${path}`;
   }
 }

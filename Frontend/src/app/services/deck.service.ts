@@ -1,9 +1,10 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { inject,Injectable } from '@angular/core';
+import { makeStateKey,TransferState } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiService } from './api.service';
 import { map } from 'rxjs/operators';
-import { TransferState, makeStateKey } from '@angular/core';
+
+import { ApiService } from './api.service';
 
 interface PaginatedResponse<T> {
   results: T[];
@@ -32,12 +33,12 @@ export interface Deck {
 }
 
 @Injectable({
-  providedIn: 'root' 
+  providedIn: 'root',
 })
 export class DeckService {
   private http = inject(HttpClient);
   private api = inject(ApiService);
-  private ts  = inject(TransferState);
+  private ts = inject(TransferState);
   private decks: Deck[] | null = null;
 
   hydrateFromTransferState(slug: string): void {
@@ -49,15 +50,15 @@ export class DeckService {
   setResolvedDecks(data: Deck[]) {
     this.decks = data;
   }
-  
+
   getResolvedDeck(): Deck[] {
     return this.decks ?? [];
   }
 
   getDecks(path: string): Observable<Deck[]> {
     const endpoint = path ? this.api.buildUrl(`deck/${path}`) : this.api.buildUrl(`deck/shmooz`);
-    return this.http.get<PaginatedResponse<Deck>>(endpoint).pipe(
-      map((res: PaginatedResponse<Deck>) => res?.results ?? [])
-    );
+    return this.http
+      .get<PaginatedResponse<Deck>>(endpoint)
+      .pipe(map((res: PaginatedResponse<Deck>) => res?.results ?? []));
   }
 }
