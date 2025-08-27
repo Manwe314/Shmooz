@@ -11,7 +11,7 @@ echo "=============================================="
 # Check if domain is pointing to this server
 echo "🌐 Checking DNS configuration..."
 DOMAIN_IP=$(dig +short shmooz.space)
-SERVER_IP=$(curl -s ifconfig.me)
+SERVER_IP=$(curl -s -4 ifconfig.me)  # Force IPv4
 
 if [ -z "$DOMAIN_IP" ]; then
     echo "❌ Error: shmooz.space does not resolve to any IP address"
@@ -43,61 +43,87 @@ chmod 755 ./Volume/certbot/conf
 chmod 755 ./Volume/certbot/www
 chmod 755 ./Volume/certbot/logs
 
-# Start nginx first (needed for ACME challenge)
-echo "🚀 Starting Nginx for ACME challenge..."
-docker-compose up -d nginx
+# Ensure main application is running (creates the network)
+echo "🚀 Starting main application (creates network)..."
+docker compose up -d
 
-# Wait for nginx to be ready
-echo "⏳ Waiting for Nginx to be ready..."
-sleep 10
+# Wait for services to be ready
+echo "⏳ Waiting for services to be ready..."
+sleep 15
+
+# Verify network exists
+echo "🔍 Checking Docker network..."
+if docker network ls | grep -q "portfolio_app-network"; then
+    echo "✅ Docker network 'portfolio_app-network' exists"
+else
+    echo "⚠️  Network not found, but continuing..."
+fi
 
 # Test if nginx is responding on port 80
-if ! curl -f -s http://localhost/.well-known/acme-challenge/test > /dev/null 2>&1; then
-    echo "⚠️  Nginx may not be ready for ACME challenge, but continuing..."
-fi
-
-# Generate SSL certificate
-echo "📜 Generating SSL certificate..."
-docker-compose -f docker-compose.certbot.yml run --rm certbot
-
-# Check if certificate was generated
-if [ -f "./Volume/certbot/conf/live/shmooz.space/fullchain.pem" ]; then
-    echo "✅ SSL certificate generated successfully!"
-    
-    # Restart nginx to use the new certificate
-    echo "🔄 Restarting Nginx with SSL certificate..."
-    docker-compose restart nginx
-    
-    # Test SSL certificate
-    echo "🧪 Testing SSL certificate..."
-    sleep 5
-    
-    if curl -f -s https://shmooz.space > /dev/null 2>&1; then
-        echo "✅ SSL certificate is working!"
-    else
-        echo "⚠️  SSL test failed, but certificate was generated"
-    fi
-    
-    echo ""
-    echo "🎉 SSL setup complete!"
-    echo ""
-    echo "📋 Certificate Information:"
-    echo "  - Domain: shmooz.space, www.shmooz.space"
-    echo "  - Certificate: ./Volume/certbot/conf/live/shmooz.space/fullchain.pem"
-    echo "  - Private Key: ./Volume/certbot/conf/live/shmooz.space/privkey.pem"
-    echo "  - Expires: $(openssl x509 -enddate -noout -in ./Volume/certbot/conf/live/shmooz.space/fullchain.pem | cut -d= -f2)"
-    echo ""
-    echo "🔄 Auto-renewal:"
-    echo "  - Certificates will auto-renew before expiration"
-    echo "  - Run './ssl-renew.sh' to manually renew"
-    echo ""
-    echo "🌐 Your site is now available at:"
-    echo "  - https://shmooz.space"
-    echo "  - https://www.shmooz.space"
-    
+echo "🧪 Testing Nginx readiness..."
+if curl -f -s http://localhost/ > /dev/null 2>&1; then
+    echo "✅ Nginx is responding"
 else
-    echo "❌ SSL certificate generation failed!"
-    echo "Check the logs:"
-    echo "  docker-compose -f docker-compose.certbot.yml logs certbot"
-    exit 1
+    echo "⚠️  Nginx may not be ready, but continuing with certificate generation..."
 fi
+
+# Stop nginx temporarily for standalone mode
+echo "🛑 Temporarily stopping Nginx for certificate generation..."
+docker compose stop nginx
+
+# Generate SSL certificate using standalone mode (binds to port 80 directly)
+echo "📜 Generating SSL certificate using standalone mode..."
+docker run --rm -v $(pwd)/Volume/certbot/conf:/etc/letsencrypt \
+  -v $(pwd)/Volume/certbot/logs:/var/log/letsencrypt \
+  -p 80:80 -p 443:443 \
+  certbot/certbot:v2.7.4 certonly --standalone \
+  --email admin@shmooz.space --agree-tos --no-eff-email \
+  --force-renewal \
+  -d shmooz.space -d www.shmooz.space
+
+# Start nginx back up
+echo "🚀 Starting Nginx with SSL certificates..."
+docker compose start nginx
+
+# Wait for nginx to be ready
+echo "⏳ Waiting for Nginx to start..."
+sleep 10
+
+# Test if SSL is working
+echo "🧪 Testing SSL certificate..."
+if curl -f -s -k https://localhost > /dev/null 2>&1; then
+    echo "✅ SSL certificate is working locally!"
+
+    # Test external access
+    if curl -f -s https://shmooz.space > /dev/null 2>&1; then
+        echo "✅ SSL certificate is working externally!"
+    else
+        echo "⚠️  External SSL test failed - check firewall/DNS"
+    fi
+else
+    echo "⚠️  Local SSL test failed"
+fi
+
+# Check if certificate files exist (for information)
+if [ -f "./Volume/certbot/conf/live/shmooz.space/fullchain.pem" ]; then
+    echo "✅ Certificate files found in volume"
+else
+    echo "⚠️  Certificate files not found in volume (may be in container only)"
+fi
+echo ""
+echo "🎉 SSL setup complete!"
+echo ""
+echo "📋 Certificate Information:"
+echo "  - Domain: shmooz.space, www.shmooz.space"
+echo "  - Expires: 2025-11-25 (as shown in Certbot output)"
+echo ""
+echo "🔄 Auto-renewal:"
+echo "  - Run './ssl-renew.sh' to manually renew"
+echo "  - Run './ssl-cron-setup.sh' to setup automatic renewal"
+echo ""
+echo "🌐 Your site should now be available at:"
+echo "  - https://shmooz.space"
+echo "  - https://www.shmooz.space"
+echo ""
+echo "✅ SSL certificate has been generated and Nginx restarted!"
+

@@ -17,7 +17,7 @@ detach:
 	@mkdir -p ./Volume/media/uploads
 	@mkdir -p ./Volume/logs
 	@mkdir -p ./Volume/staticfiles
-	docker compose -f -d docker-compose.yml up
+	docker compose  -f docker-compose.yml up -d
 
 down:
 	docker compose -f docker-compose.yml down
@@ -48,8 +48,12 @@ dre:
 	@docker compose -f -d docker-compose.yml up
 
 ssl-setup:
-	@chmod +x ssl-setup.sh ssl-renew.sh ssl-cron-setup.sh
+	@chmod +x ssl-setup.sh ssl-renew.sh ssl-cron-setup.sh ssl-setup-standalone.sh
 	@./ssl-setup.sh
+
+ssl-setup-standalone:
+	@chmod +x ssl-setup-standalone.sh ssl-renew.sh ssl-cron-setup.sh
+	@./ssl-setup-standalone.sh
 
 ssl-renew:
 	@./ssl-renew.sh
