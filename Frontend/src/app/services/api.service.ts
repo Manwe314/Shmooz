@@ -9,7 +9,7 @@ export class ApiService {
   getBaseUrl(): string {
     return this.platform.isServer()
       ? 'http://backend:8000'
-      : 'https://127.0.0.1:8080';
+      : 'https://shmooz.space';
   }
 
   buildUrl(endpoint: string): string {

@@ -6,6 +6,9 @@ up:
 	@mkdir -p ./Volume/media/uploads
 	@mkdir -p ./Volume/logs
 	@mkdir -p ./Volume/staticfiles
+	@mkdir -p ./Volume/certbot/conf
+	@mkdir -p ./Volume/certbot/www
+	@mkdir -p ./Volume/certbot/logs
 	docker compose -f docker-compose.yml up
 
 detach:
@@ -44,4 +47,17 @@ dre:
 	@docker compose -f docker-compose.yml build
 	@docker compose -f -d docker-compose.yml up
 
-.PHONY: all up down fclean re detach dre
+ssl-setup:
+	@chmod +x ssl-setup.sh ssl-renew.sh ssl-cron-setup.sh
+	@./ssl-setup.sh
+
+ssl-renew:
+	@./ssl-renew.sh
+
+ssl-cron:
+	@./ssl-cron-setup.sh
+
+logs:
+	docker compose -f docker-compose.yml logs -f
+
+.PHONY: all up down fclean re detach dre ssl-setup ssl-renew ssl-cron logs

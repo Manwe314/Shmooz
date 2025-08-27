@@ -133,6 +133,6 @@ export class DeckComponent {
   getImageUrl(path: string): string {
     if (!path) return '';
     //URL
-    return `https://127.0.0.1:8080${path}`;
+    return `https://shmooz.space0${path}`;
   }
 }

@@ -169,7 +169,7 @@ export class ProjectCardEditorComponent implements OnInit {
 
   getImageUrl(path: string): string {
     if (!path) return '';
-    return `https://127.0.0.1:8080${path}`;
+    return `https://shmooz.space${path}`;
   }
 
   ngOnInit() {
