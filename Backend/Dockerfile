@@ -32,7 +32,7 @@ RUN addgroup -g 1001 -S appgroup && \
 COPY --from=builder /root/.local /home/appuser/.local
 RUN chown -R appuser:appgroup /home/appuser/.local
 
-ENV PATH=/home/appuser/.local/bin:$PATH
+RUN export PATH=/home/appuser/.local/bin:$PATH
 
 RUN mkdir -p /app/logs /app/staticfiles /app/media /app/media/uploads && \
     chown -R appuser:appgroup /app
