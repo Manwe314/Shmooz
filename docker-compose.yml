@@ -100,7 +100,9 @@ services:
       start_period: 30s
 
   certbot:
-    image: certbot/certbot:v2.7.4
+    build:
+      context: ./Certbot
+    image: local/certbot-webroot:latest
     container_name: certbot
     networks:
       - app-network
@@ -108,21 +110,6 @@ services:
       - ./Volume/certbot/conf:/etc/letsencrypt
       - ./Volume/certbot/www:/var/www/certbot
       - ./Volume/certbot/logs:/var/log/letsencrypt
-    entrypoint: ["/bin/sh", "-c"]
-    command: |
-      set -e
-      mkdir -p /var/www/certbot
-      if [ ! -d "/etc/letsencrypt/live/shmooz.space" ]; then
-        echo "[certbot] Initial certificate request..."
-        certbot certonly --non-interactive --agree-tos --email levan.kukhaleishvili@gmail.com \
-          --webroot -w /var/www/certbot \
-          -d shmooz.space -d www.shmooz.space
-      fi
-      echo "[certbot] Starting renewal loop..."
-      while :; do
-        certbot renew --webroot -w /var/www/certbot --quiet
-        sleep 12h
-      done
     depends_on:
       - nginx
     restart: unless-stopped
