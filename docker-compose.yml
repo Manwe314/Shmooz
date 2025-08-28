@@ -81,9 +81,9 @@ services:
       - "443:443"
       - "80:80"
     volumes:
-      - media-files:/var/www/media:ro  # Read-only access to shared media volume
-      - ./Volume/certbot/conf:/etc/letsencrypt:ro  # SSL certificates
-      - ./Volume/certbot/www:/var/www/certbot:ro   # ACME challenge
+      - media-files:/var/www/media:ro
+      - ./Volume/certbot/conf:/etc/letsencrypt
+      - ./Volume/certbot/www:/var/www/certbot:ro
     depends_on:
       frontend:
         condition: service_healthy
@@ -98,6 +98,35 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+
+  certbot:
+    image: certbot/certbot:v2.7.4
+    container_name: certbot
+    networks:
+      - app-network
+    volumes:
+      - ./Volume/certbot/conf:/etc/letsencrypt
+      - ./Volume/certbot/www:/var/www/certbot
+      - ./Volume/certbot/logs:/var/log/letsencrypt
+    command: >
+      sh -c '
+        set -e;
+        mkdir -p /var/www/certbot;
+        if [ ! -d "/etc/letsencrypt/live/shmooz.space" ]; then
+          echo "[certbot] Initial certificate request...";
+          certbot certonly --non-interactive --agree-tos --email admin@shmooz.space
+            --webroot -w /var/www/certbot
+            -d shmooz.space -d www.shmooz.space;
+        fi;
+        echo "[certbot] Starting renewal loop...";
+        while :; do
+          certbot renew --webroot -w /var/www/certbot --quiet;
+          sleep 12h;
+        done
+      '
+    depends_on:
+      - nginx
+    restart: unless-stopped
 
 networks:
   app-network:
