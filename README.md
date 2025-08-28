@@ -145,7 +145,6 @@ Since Shmooz is a **portfolio platform**, SEO is crucial for discoverability. SS
 
 ### 🏆 Google Lighthouse Results
 
-> **Note**: Add your Lighthouse results here after running tests
 
 ```
 Performance: ⭐⭐⭐⭐⭐ (Score: 98/100)
@@ -154,11 +153,6 @@ Best Practices: ⭐⭐⭐⭐⭐ (Score: 96/100)
 SEO: ⭐⭐⭐⭐⭐ (Score: 92/100)
 ```
 
-**Key Metrics:**
-- First Contentful Paint: XXms
-- Largest Contentful Paint: XXms
-- Time to Interactive: XXms
-- Cumulative Layout Shift: X.XX
 
 ---
 
@@ -170,7 +164,7 @@ Get your development environment running in under 5 minutes!
 
 - **Docker** & **Docker Compose** installed
 - **Git** for cloning the repository
-- **8GB+ RAM** recommended for smooth development
+- **4GB+ RAM** recommended for smooth development
 
 ### ⚡ One-Command Setup
 
@@ -416,7 +410,7 @@ DELETE /api/auth/alter_page/{id}       # Delete page       # Clear SSR cache
 5. **presisting Volume**: If the data is presisting after `make fclean`, delete the `Volume` folder manually
 
 **Getting Help:**
-- Check the [Issues](link-to-issues) page for known problems
+- Check the [Issues](https://github.com/Manwe314/Shmooz/issues) page for known problems
 - Review container logs: `docker-compose logs <service-name>`
 - Join our community discussions
 
@@ -432,6 +426,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ and modularity in mind**
 
-[⭐ Star this repo](link-to-repo) | [🐛 Report Bug](link-to-issues) | [💡 Request Feature](link-to-issues)
+[⭐ Star this repo](https://github.com/Manwe314/Shmooz) | [🐛 Report Bug](https://github.com/Manwe314/Shmooz/issues) | [💡 Request Feature](https://github.com/Manwe314/Shmooz/issues)
 
 </div>

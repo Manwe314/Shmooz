@@ -8,7 +8,7 @@ up:
 detach:
 	@mkdir -p ./Volume
 	@mkdir -p ./Volume/postgresql
-	docker compose -f -d docker-compose.yml up
+	docker compose -f  docker-compose.yml up -d
 
 down:
 	docker compose -f docker-compose.yml down
@@ -30,6 +30,6 @@ dre:
 	@mkdir -p ./Volume
 	@mkdir -p ./Volume/postgresql
 	@docker compose -f docker-compose.yml build
-	@docker compose -f -d docker-compose.yml up
+	@docker compose -f  docker-compose.yml up -d
 
 .PHONY: all up down fclean re detach dre
